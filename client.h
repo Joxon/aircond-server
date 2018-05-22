@@ -60,10 +60,13 @@ public slots:
 
    void setEnergy(double _energy);
    void setCost(double _cost);
+   void setST();
 
    double getCurrentTemp() const;
    Speed getSpeed() const;
    double getCost() const;
+   void Cost_Cal(double new_n);                          // 计算价格
+   bool CheckServing();                                  // 判断服务
 
 private:
    Ui::Client *ui;
@@ -84,8 +87,7 @@ private:
 
    QDateTime start_t;                                      // 开启时间
 
-   void Init_Room();                                       // 初始化房间
-   double Cost_Cal(double new_n);                          // 计算价格
+//   void Init_Room();                                       // 初始化房间
    void write_detail_list(QString roomid);                 // 写入数据库
    void read_detail_list(QString roomid, QString stat);    // 打印详单
 };

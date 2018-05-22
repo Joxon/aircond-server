@@ -171,6 +171,10 @@ void Client::setCost(double _cost)
    cost = _cost;
 }
 
+void Client::setST()
+{
+    start_t = QDateTime::currentDateTime();
+}
 
 double Client::getCurrentTemp() const
 {
@@ -190,35 +194,34 @@ double Client::getCost() const
 }
 
 
-void Client::Init_Room()
-{
+//void Client::Init_Room()
+//{
 //    Link = Work = Service = false;              // 未连接，未工作，未服务
 //    Now = Goal = cost = energy = 0;             // 初始化为0000
 //    Wind = 0;                                    // 风速是 0 1 2 对应三个挡位
-   start_t.fromString("9999-12-31 00:00:00", "yyyy-MM-dd hh:mm:ss");
-}
+//   start_t.fromString("9999-12-31 00:00:00", "yyyy-MM-dd hh:mm:ss");
+//}
 
 
-double Client::Cost_Cal(double new_n)                   // 为了计算需要1个周期计算一次，不然需要不断获取上一次的温度风速等信息
+void Client::Cost_Cal(double new_n)                   // 为了计算需要1个周期计算一次，不然需要不断获取上一次的温度风速等信息
 {
    // 计算公式emmm S是单价 固定了时间所以只需要考虑风速和单价
    //cost += wind * S;             S == 1;
-   if (this->serving == ServingNo)
-   {
-      return -1;
-   }
    double temp = qAbs(new_n - currentTemp) * ((double)speed / 2) * 1;
 
    // 还需要编一个公式计算能量 暂定为 cost * 1.25
    cost  += temp;
    energy = cost * 1.25;
-   // cost 和 energy存储在内存里，当end出现的时候才开始
-   return cost;         // 返回本次增加的价格 或者直接返回cost 即到现在为止产生的费用
+
 }
 
+bool Client::CheckServing()
+{
+    return this->serving == ServingYes;
+}
 
 void Client::write_detail_list(QString roomid)
-{       // 当出现：①达到目标 ②用户停止工作 ③连接断开
+{  // 当出现：①达到目标 ②用户停止工作 ③连接断开
    // 传入当前的房间号roomid
    QDateTime endt  = QDateTime::currentDateTime();
    QString   tmp_t = endt.toString("yyyy-MM-dd hh:mm:ss");
@@ -253,7 +256,7 @@ void Client::write_detail_list(QString roomid)
    else
    {    // 插入成功，将energy, price(cost) start_t置零
       cost = energy = 0;
-      start_t.fromString("9999-12-31 00:00:00", "yyyy-MM-dd hh:mm:ss");
+//      start_t.fromString("9999-12-31 00:00:00", "yyyy-MM-dd hh:mm:ss");
    }
 }
 

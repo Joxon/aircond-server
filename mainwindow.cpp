@@ -241,7 +241,7 @@ void MainWindow::readFromSockets()
          client = new Client;
          client->setFixedHeight(150);
          client->setId(roomID);
-
+         client->setST();
          clients.append(client);
       }
       //旧的ID，更新client
@@ -252,6 +252,8 @@ void MainWindow::readFromSockets()
 
       if (msgType == 1)
       {
+         if(client->CheckServing())
+            client->Cost_Cal(dTemp);
          client->setCurrentTemp(dTemp);
          sendCommonMessage(socket, msgType, 1,
                            client->getCurrentTemp(),
@@ -266,8 +268,9 @@ void MainWindow::readFromSockets()
       {
          switch (usSwitch)
          {
-         case 0:
+         case 0:    // 关机 此时存储一次账单
             client->setWorking(Client::WorkingNo);
+            client->write_detail_list(roomID);
             break;
 
          case 1:
@@ -316,6 +319,7 @@ void MainWindow::sendRequestMessage(QTcpSocket *tsock, int msgType, int isServed
 
    json.insert("type", msgType);
    json.insert("isServed", isServed);
+   json.insert("cost",  cost);
 
    QJsonDocument document;
    document.setObject(json);
