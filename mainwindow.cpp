@@ -15,10 +15,12 @@ MainWindow::MainWindow(QWidget *parent) :
    initAnimation();
    initClientPanel();
 
-//   QTimer *timer = new QTimer(this);
-//   connect(timer, SIGNAL(timeout()), this, SLOT(Cycle_Check()));
-//   timer->start(999);
-//   k = 0;
+   LowSpeedList.clear();
+   HighSpeedList.clear();   // 队列清零
+   turn[0] = 1; turn[1] = turn[2] = 0;
+   QTimer *timer = new QTimer(this);
+   connect(timer, SIGNAL(timeout()), this, SLOT(RRinc()));
+   timer->start(4999);
 }
 
 
@@ -266,6 +268,7 @@ void MainWindow::readFromSockets()
       //请求报文
       else if (msgType == 0)
       {
+          int hi, li;
          switch (usSwitch)
          {
          case 0:    // 关机 此时存储一次账单
@@ -279,14 +282,29 @@ void MainWindow::readFromSockets()
             if (wind == 0)
             {
                client->setSpeed(Client::SpeedNone);
+               // 从队列中清除
+               hi = HighSpeedList.indexOf(roomID);
+               if(hi != -1) HighSpeedList.removeAt(hi);
+               li = LowSpeedList.indexOf(roomID);
+               if(li == -1) LowSpeedList.removeAt(li);
             }
             else if (wind == 1)
             {
                client->setSpeed(Client::SpeedLow);
+               // 判断是否更新低风队列
+               hi = HighSpeedList.indexOf(roomID);
+               if(hi != -1) HighSpeedList.removeAt(hi);
+               li = LowSpeedList.indexOf(roomID);
+               if(li == -1) LowSpeedList.append(roomID);
             }
             else if (wind == 2)
             {
                client->setSpeed(Client::SpeedHigh);
+               // 判断是否更新高风队列
+               hi = HighSpeedList.indexOf(roomID);
+               if(hi == -1) HighSpeedList.append(roomID);
+               li = LowSpeedList.indexOf(roomID);
+               if(li != -1) LowSpeedList.removeAt(li);
             }
 
             client->setWorking(Client::WorkingYes);
@@ -296,8 +314,18 @@ void MainWindow::readFromSockets()
             break;
          }
 
-         sendRequestMessage(socket, msgType, 1);
-         client->setServing(Client::ServingYes);
+//         sendRequestMessage(socket, msgType, 1);
+//         client->setServing(Client::ServingYes);
+        ResourceAllocation();
+        if(client->CheckServing())  // 分配成功
+        {
+            // 有bug
+            // 分配资源
+        }
+        else
+        {
+            // 不分配
+        }
          qDebug() << DATETIME
                   << " readFromSockets: "
                   << msgType << " "
@@ -312,6 +340,73 @@ void MainWindow::readFromSockets()
    ui->clientPanel->setWidget(clients, 4);
 }
 
+void MainWindow::ResourceAllocation()
+{
+    // 先将全部房间服务置零
+    for(int i = 0; i < clients.size(); i++)
+    {
+        Client * client = qobject_cast<Client *>(clients.at(i));
+        client->setServing(Client::ServingNo);
+    }
+
+    int hn = HighSpeedList.size();
+    int ln = LowSpeedList.size();
+    int surplus = 5 - hn;
+    if(hn <= 5)             // 可是把5改成一个define
+    {   // high 不需要轮转
+        for(int i = 0; i < hn; i++)
+        {
+            QString temp = HighSpeedList.at(i);
+            Client * client = qobject_cast<Client *>(clients.at(clientIDs.indexOf(temp)));
+            client->setServing(Client::ServingYes);
+        }
+    }
+    else
+    {   // high 需要轮转
+        RoundRobin(2, 5);
+    }
+
+    if(surplus <= 0) return;        // high占用全部资源
+
+    if(ln <= surplus)
+    {   // low 不需要轮转
+        for(int i = 0; i < ln; i++)
+        {
+            QString temp = HighSpeedList.at(i);
+            Client * client = qobject_cast<Client *>(clients.at(clientIDs.indexOf(temp)));
+            client->setServing(Client::ServingYes);
+        }
+    }
+    else
+    {   // low 需要轮转
+        RoundRobin(1, surplus);
+    }
+}
+
+void MainWindow::RRinc()
+{
+    turn[0] ++;
+    if(turn[0] % 5 == 0)
+    {
+        turn[1] = (turn[1] + 1) % LowSpeedList.size();
+        turn[2] = (turn[2] + 1) % HighSpeedList.size();
+    }
+}
+void MainWindow::RoundRobin(int level, int maxx)            // 轮转
+{
+    int M;
+    if(level == 1) M = LowSpeedList.size();
+    else    M = HighSpeedList.size();
+    // turn[0] 每5s增加一次
+
+    for(int i = turn[level], j = 0; j < maxx; j++, i = (i+1)%M)
+    {
+        QString temp = HighSpeedList.at(i);
+//        qDebug() << "资源分配：" << temp;
+        Client * client = qobject_cast<Client *>(clients.at(clientIDs.indexOf(temp)));
+        client->setServing(Client::ServingYes);
+    }
+}
 
 void MainWindow::sendRequestMessage(QTcpSocket *tsock, int msgType, int isServed)
 {

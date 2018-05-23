@@ -31,6 +31,8 @@ private slots:
    void sendCommonMessage(QTcpSocket *tsock, int msgType, int usSwitch, double dTemp, int usWind, double cost);
    void sendRequestMessage(QTcpSocket *tsock, int msgType, int isServed);
 
+   void RRinc();
+
 private:
    QWidget *parent;
    Ui::MainWindow *ui;
@@ -44,16 +46,18 @@ private:
    QVector<QTcpSocket *> sockets;
    QList<QWidget *> clients;
    QStringList clientIDs;
-\
+   QList<QString> LowSpeedList;
+   QList<QString> HighSpeedList;
+
+   int turn[3];
+
    void initDatabase();
    void initNetwork();
    void initFont();
    void initAnimation();
    void initClientPanel();
-
-//   void Cycle_Check();
-//   void Service_Allocation();
-//   int k;
+   void ResourceAllocation();
+   void RoundRobin(int level, int maxx);
 };
 
 #endif // MAINWINDOW_H
