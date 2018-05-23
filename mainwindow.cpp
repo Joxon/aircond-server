@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
    turn[0] = 1; turn[1] = turn[2] = 0;
    QTimer *timer = new QTimer(this);
    connect(timer, SIGNAL(timeout()), this, SLOT(RRinc()));
-   timer->start(4999);
+   timer->start(999);
 }
 
 
@@ -316,7 +316,7 @@ void MainWindow::readFromSockets()
 
 //         sendRequestMessage(socket, msgType, 1);
 //         client->setServing(Client::ServingYes);
-        ResourceAllocation();
+//         ResourceAllocation();
         if(client->CheckServing())  // 分配成功
         {
             // 有bug
@@ -391,7 +391,9 @@ void MainWindow::RRinc()
         turn[1] = (turn[1] + 1) % LowSpeedList.size();
         turn[2] = (turn[2] + 1) % HighSpeedList.size();
     }
+    ResourceAllocation();
 }
+
 void MainWindow::RoundRobin(int level, int maxx)            // 轮转
 {
     int M;
