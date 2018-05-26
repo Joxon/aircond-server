@@ -293,7 +293,7 @@ void MainWindow::readFromSockets()
             break;
          }
 
-         sendRequestMessage(socket, msgType, 1);
+         sendCommonMessage(socket, msgType, 0, 0, 0, 0);
          client->setServing(Client::ServingYes);
          qDebug() << DATETIME
                   << " readFromSockets: "
@@ -307,38 +307,6 @@ void MainWindow::readFromSockets()
    }
 
    ui->clientPanel->setWidget(clients, 4);
-}
-
-
-void MainWindow::sendRequestMessage(QTcpSocket *tsock, int msgType, int isServed)
-{
-   QJsonObject json;
-
-   json.insert("type", msgType);
-   json.insert("isServed", isServed);
-
-   QJsonDocument document;
-   document.setObject(json);
-   QByteArray byte_array = document.toJson(QJsonDocument::Compact);
-
-   tsock->write(byte_array);
-
-   qDebug() << DATETIME << " sendRequestMessage: ";
-
-//   QByteArray  block;
-//   QDataStream out(&block, QIODevice::WriteOnly);
-
-//   out.setVersion(QDataStream::Qt_5_5);
-
-//   out << (quint16)0;
-//   out << type;
-//   out << isServed;
-//   out.device()->seek(0);
-//   out << (quint16)(block.size() - sizeof(quint16));
-
-//   tsock->write(block);
-
-//   qDebug() << DATETIME << " sendRequestMessage: ";
 }
 
 
