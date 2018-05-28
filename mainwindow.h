@@ -29,7 +29,7 @@ private slots:
    void readFromSockets();
 
    void sendCommonMessage(QTcpSocket *tsock, int msgType, int usSwitch, double dTemp, int usWind, double cost);
-   void sendRequestMessage(QTcpSocket *tsock, int msgType, int isServed);
+   //void sendRequestMessage(QTcpSocket *tsock, int msgType, int isServed);
 
    void RRinc();
 

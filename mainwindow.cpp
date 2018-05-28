@@ -35,7 +35,7 @@ void MainWindow::initDatabase()
    QSqlDatabase database = QSqlDatabase::addDatabase("QSQLITE");
 
    database.setDatabaseName("air_conditioning.db");
-   if (!database.open())
+   if (database.open())
    {
       qDebug() << "Open success!";
    }
@@ -244,6 +244,7 @@ void MainWindow::readFromSockets()
          client->setFixedHeight(150);
          client->setId(roomID);
          client->setST();
+         client->setCost(0);
          clients.append(client);
       }
       //旧的ID，更新client
@@ -268,7 +269,7 @@ void MainWindow::readFromSockets()
       //请求报文
       else if (msgType == 0)
       {
-          int hi, li;
+          int hi = -1, li = -1;
          switch (usSwitch)
          {
          case 0:    // 关机 此时存储一次账单
@@ -278,32 +279,39 @@ void MainWindow::readFromSockets()
 
          case 1:
             client->setTargetTemp(dTemp);
-
             if (wind == 0)
             {
                client->setSpeed(Client::SpeedNone);
                // 从队列中清除
-               hi = HighSpeedList.indexOf(roomID);
+               if(HighSpeedList.size())
+                   hi = HighSpeedList.indexOf(roomID);
                if(hi != -1) HighSpeedList.removeAt(hi);
-               li = LowSpeedList.indexOf(roomID);
+
+               if(LowSpeedList.size())
+                   li = LowSpeedList.indexOf(roomID);
                if(li == -1) LowSpeedList.removeAt(li);
             }
             else if (wind == 1)
             {
                client->setSpeed(Client::SpeedLow);
                // 判断是否更新低风队列
-               hi = HighSpeedList.indexOf(roomID);
+               if(HighSpeedList.size())
+                   hi = HighSpeedList.indexOf(roomID);
                if(hi != -1) HighSpeedList.removeAt(hi);
-               li = LowSpeedList.indexOf(roomID);
+
+               if(LowSpeedList.size())
+                   li = LowSpeedList.indexOf(roomID);
                if(li == -1) LowSpeedList.append(roomID);
             }
             else if (wind == 2)
             {
                client->setSpeed(Client::SpeedHigh);
                // 判断是否更新高风队列
-               hi = HighSpeedList.indexOf(roomID);
+               if(HighSpeedList.size())
+                   hi = HighSpeedList.indexOf(roomID);
                if(hi == -1) HighSpeedList.append(roomID);
-               li = LowSpeedList.indexOf(roomID);
+               if(LowSpeedList.size())
+                   li = LowSpeedList.indexOf(roomID);
                if(li != -1) LowSpeedList.removeAt(li);
             }
 
@@ -317,22 +325,21 @@ void MainWindow::readFromSockets()
 //         sendRequestMessage(socket, msgType, 1);
 //         client->setServing(Client::ServingYes);
 //         ResourceAllocation();
-        if(client->CheckServing())  // 分配成功
-        {
-            // 有bug
-            // 分配资源
-        }
-        else
-        {
-            // 不分配
-        }
-         qDebug() << DATETIME
-                  << " readFromSockets: "
-                  << msgType << " "
-                  << roomID << " "
-                  << dTemp << " "
-                  << usSwitch << " "
-                  << wind;
+//        if(client->CheckServing())  // 分配成功
+//        {
+            sendCommonMessage(socket, msgType, 1, dTemp, wind, 0);
+//        }
+//        else
+//        {
+//            // 不分配
+//        }
+//         qDebug() << DATETIME
+//                  << " readFromSockets: "
+//                  << msgType << " "
+//                  << roomID << " "
+//                  << dTemp << " "
+//                  << usSwitch << " "
+//                  << wind;
       }
       break;
    }
@@ -367,12 +374,12 @@ void MainWindow::ResourceAllocation()
     }
 
     if(surplus <= 0) return;        // high占用全部资源
-
+    qDebug() << ln;
     if(ln <= surplus)
     {   // low 不需要轮转
         for(int i = 0; i < ln; i++)
         {
-            QString temp = HighSpeedList.at(i);
+            QString temp = LowSpeedList.at(i);
             Client * client = qobject_cast<Client *>(clients.at(clientIDs.indexOf(temp)));
             client->setServing(Client::ServingYes);
         }
@@ -386,10 +393,13 @@ void MainWindow::ResourceAllocation()
 void MainWindow::RRinc()
 {
     turn[0] ++;
+    //qDebug() << turn[0];
     if(turn[0] % 5 == 0)
     {
-        turn[1] = (turn[1] + 1) % LowSpeedList.size();
-        turn[2] = (turn[2] + 1) % HighSpeedList.size();
+        if(LowSpeedList.size() != 0)
+            turn[1] = (turn[1] + 1) % LowSpeedList.size();
+        if(HighSpeedList.size() != 0)
+            turn[2] = (turn[2] + 1) % HighSpeedList.size();
     }
     ResourceAllocation();
 }
@@ -410,37 +420,37 @@ void MainWindow::RoundRobin(int level, int maxx)            // 轮转
     }
 }
 
-void MainWindow::sendRequestMessage(QTcpSocket *tsock, int msgType, int isServed)
-{
-   QJsonObject json;
+// void MainWindow::sendRequestMessage(QTcpSocket *tsock, int msgType, int isServed)
+// {
+//    QJsonObject json;
 
-   json.insert("type", msgType);
-   json.insert("isServed", isServed);
-   json.insert("cost",  cost);
+//    json.insert("type", msgType);
+//    json.insert("isServed", isServed);
+// //   json.insert("cost",  cost);
 
-   QJsonDocument document;
-   document.setObject(json);
-   QByteArray byte_array = document.toJson(QJsonDocument::Compact);
+//    QJsonDocument document;
+//    document.setObject(json);
+//    QByteArray byte_array = document.toJson(QJsonDocument::Compact);
 
-   tsock->write(byte_array);
+//    tsock->write(byte_array);
 
-   qDebug() << DATETIME << " sendRequestMessage: ";
+//    qDebug() << DATETIME << " sendRequestMessage: ";
 
-//   QByteArray  block;
-//   QDataStream out(&block, QIODevice::WriteOnly);
+// //   QByteArray  block;
+// //   QDataStream out(&block, QIODevice::WriteOnly);
 
-//   out.setVersion(QDataStream::Qt_5_5);
+// //   out.setVersion(QDataStream::Qt_5_5);
 
-//   out << (quint16)0;
-//   out << type;
-//   out << isServed;
-//   out.device()->seek(0);
-//   out << (quint16)(block.size() - sizeof(quint16));
+// //   out << (quint16)0;
+// //   out << type;
+// //   out << isServed;
+// //   out.device()->seek(0);
+// //   out << (quint16)(block.size() - sizeof(quint16));
 
-//   tsock->write(block);
+// //   tsock->write(block);
 
-//   qDebug() << DATETIME << " sendRequestMessage: ";
-}
+// //   qDebug() << DATETIME << " sendRequestMessage: ";
+// }
 
 
 void MainWindow::sendCommonMessage(QTcpSocket *tsock, int msgType, int usSwitch, double dTemp, int usWind, double cost)
@@ -452,14 +462,13 @@ void MainWindow::sendCommonMessage(QTcpSocket *tsock, int msgType, int usSwitch,
    json.insert("temperature", dTemp);
    json.insert("wind", usWind);
    json.insert("cost", cost);
-
+   qDebug() << DATETIME << " sendCommonMessage:  Type:" << msgType << " Switch:" << usSwitch << " Temp:" << dTemp << " Wind:" << usWind << " cost:" << cost;
    QJsonDocument document;
    document.setObject(json);
 
    QByteArray byte_array = document.toJson(QJsonDocument::Compact);
    tsock->write(byte_array);
 
-   qDebug() << DATETIME << " sendCommonMessage: ";
 
 //   QByteArray  block;
 //   QDataStream out(&block, QIODevice::WriteOnly);
