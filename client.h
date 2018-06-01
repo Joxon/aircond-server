@@ -1,7 +1,11 @@
 ﻿#ifndef CLIENT_H
 #define CLIENT_H
 
+#if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
+#endif
+
+#include "quiwidget.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -65,10 +69,14 @@ public slots:
    double getCurrentTemp() const;
    Speed getSpeed() const;
    double getCost() const;
-   void Cost_Cal(double new_n);                          // 计算价格
-   bool CheckServing();                                  // 判断服务
-   void write_detail_list(QString roomid);                 // 写入数据库
-   void read_detail_list(QString roomid, QString stat);    // 打印详单
+   void Cost_Cal(double new_n);                              // 计算价格
+   bool CheckServing();                                      // 判断服务
+   void write_detail_list(QString roomid);                   // 写入数据库
+   void read_detail_list(QString roomid, QString starttime); // 打印详单
+
+private slots:
+
+   void on_toolButtonDetails_clicked();
 
 private:
    Ui::Client *ui;
@@ -90,7 +98,6 @@ private:
    QDateTime start_t;                                      // 开启时间
 
 //   void Init_Room();                                       // 初始化房间
-
 };
 
 #endif // CLIENT_H

@@ -29,6 +29,9 @@ Client::Client(QWidget *parent) :
 
    ui->labelSpeedIcon->setFont(font);
    ui->labelSpeedIcon->setText((QChar)ICON_FA_SNOWFLAKE);
+
+   ui->toolButtonDetails->setFont(font);
+   ui->toolButtonDetails->setText((QChar)ICON_FA_LIST);
 }
 
 
@@ -171,10 +174,12 @@ void Client::setCost(double _cost)
    cost = _cost;
 }
 
+
 void Client::setST()
 {
-    start_t = QDateTime::currentDateTime();
+   start_t = QDateTime::currentDateTime();
 }
+
 
 double Client::getCurrentTemp() const
 {
@@ -215,10 +220,12 @@ void Client::Cost_Cal(double new_n)                   // 为了计算需要1个�
    qDebug() << cost << " " << temp;
 }
 
+
 bool Client::CheckServing()
 {
-    return this->serving == ServingYes;
+   return this->serving == ServingYes;
 }
+
 
 void Client::write_detail_list(QString roomid)
 {  // 当出现：①达到目标 ②用户停止工作 ③连接断开
@@ -251,7 +258,7 @@ void Client::write_detail_list(QString roomid)
    QString insert_sql = "insert into Info_list values(" + id + ", " + roomid + ", " + stat + ", " + tmp_t + ", " + cp + ", " + ep + ")";
    if (!sql_query.exec(insert_sql))
    {
-      qDebug() << sql_query.lastError();
+      qDebug() << DATETIME << "write_detail_list:" << sql_query.lastError();
    }
    else
    {    // 插入成功，将energy, price(cost) start_t置零
@@ -261,19 +268,26 @@ void Client::write_detail_list(QString roomid)
 }
 
 
-void Client::read_detail_list(QString roomid, QString stat)
+void Client::read_detail_list(QString roomid, QString starttime)
 {
-   QSqlQuery sql_query;
-   QString   select_sql = "select * from Info_list where roomid = \"" + roomid + "\" and start_t > \"" + stat + "\"";
+   QSqlQuery query;
+   QString   select = "select * from Info_list where roomid = \"" + roomid
+                      + "\" and start_t > \"" + starttime + "\"";
 
-   if (!sql_query.exec(select_sql))
+   if (!query.exec(select))
    {
-      qDebug() << sql_query.lastError();
+      qDebug() << DATETIME << "read_detail_list:" << query.lastError();
    }
    else
    {
       // 新建一个ui 来表示详单
-      detailList *Dl = new detailList(sql_query, NULL);
-      Dl->show();
+      detailList *list = new detailList(query, NULL);
+      list->show();
    }
+}
+
+
+void Client::on_toolButtonDetails_clicked()
+{
+   read_detail_list(this->id, "");
 }

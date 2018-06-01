@@ -1,7 +1,9 @@
 ﻿#ifndef QUIWIDGET_H
 #define QUIWIDGET_H
 
+#if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
+#endif
 
 #include <QtCore>
 #include <QtGui>

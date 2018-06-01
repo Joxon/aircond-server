@@ -1,7 +1,9 @@
 ﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
+#endif
 
 #include "client.h"
 
@@ -29,6 +31,7 @@ private slots:
    void readFromSockets();
 
    void sendCommonMessage(QTcpSocket *tsock, int msgType, int usSwitch, double dTemp, int usWind, double cost);
+
    //void sendRequestMessage(QTcpSocket *tsock, int msgType, int isServed);
 
    void RRinc();
@@ -56,7 +59,7 @@ private:
    void initFont();
    void initAnimation();
    void initClientPanel();
-   void ResourceAllocation();
+   void resourceAllocation();
    void RoundRobin(int level, int maxx);
 };
 
