@@ -38,7 +38,7 @@ void MainWindow::initDatabase()
    database.setDatabaseName("air_conditioning.db");
    if (!database.open())
    {
-      qDebug() << "DB is NOT open:" << database.lastError();
+      qDebug() << DATETIME << "DB is NOT open:" << database.lastError();
       exit(EXIT_FAILURE);
    }
 }
@@ -230,6 +230,7 @@ void MainWindow::readFromSockets()
             }
          }
       }
+//      qDebug() << DATETIME << "receive message : Type : " <<  msgType << " Temp : " << dTemp;
 
       //新的ID，新增client
       Client *client;
@@ -245,7 +246,7 @@ void MainWindow::readFromSockets()
          client->setCost(0);
          client->setCurrentTemp(28);
          clients.append(client);
-         qDebug() << "clent.start_t : " << client->getTime().toString("yyyy-MM-dd hh:mm:ss");
+//         qDebug() << DATETIME << "clent.start_t : " << client->getTime().toString("yyyy-MM-dd hh:mm:ss");
       }
       //旧的ID，更新client
       else
@@ -260,7 +261,7 @@ void MainWindow::readFromSockets()
             client->Cost_Cal(dTemp);
          }
          client->setCurrentTemp(dTemp);
-         sendCommonMessage(socket, msgType, 1,
+         sendCommonMessage(socket, 1, 1,
                            client->getCurrentTemp(),
                            (int)client->getSpeed(),
                            client->getCost());
@@ -302,6 +303,7 @@ void MainWindow::readFromSockets()
                {
                   LowSpeedList.removeAt(li);
                }
+               client->write_detail_list(roomID);
             }
             else if (wind == 1)
             {
@@ -350,7 +352,7 @@ void MainWindow::readFromSockets()
             temp_t = QDateTime::currentDateTime();
             if(temp_t < client->getTime())
                 client->setTime(temp_t);
-            qDebug() << "clent.start_t : " << client->getTime().toString("yyyy-MM-dd hh:mm:ss");
+            qDebug() << DATETIME << "clent.start_t : " << client->getTime().toString("yyyy-MM-dd hh:mm:ss");
             client->setWorking(Client::WorkingYes);
             break;
 
@@ -363,7 +365,7 @@ void MainWindow::readFromSockets()
 //         ResourceAllocation();
 //        if(client->CheckServing())  // 分配成功
 //        {
-         sendCommonMessage(socket, msgType, 1, dTemp, wind, 0);
+//         sendCommonMessage(socket, msgType, 1, dTemp, wind, 0);
 //        }
 //        else
 //        {

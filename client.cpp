@@ -225,12 +225,22 @@ void Client::Cost_Cal(double new_n)                   // 为了计算需要1个�
 {
    // 计算公式emmm S是单价 固定了时间所以只需要考虑风速和单价
    //cost += wind * S;             S == 1;
-   double temp = qAbs(new_n - currentTemp) * ((double)speed / 2) * 1;
-
+    double wind = 0;
+    switch(SpeedLow)
+    {
+        case SpeedNone:
+            wind = 0;   break;
+        case SpeedLow:
+            wind = 1;   break;
+        case SpeedHigh:
+            wind = 2;   break;
+    }
+   double temp = qAbs(new_n - currentTemp) * ((double)wind / 2) * 1;
+   qDebug() << DATETIME << "now temp : " << new_n << " ever temp : " << currentTemp << "Wind : " << speed;
    // 还需要编一个公式计算能量 暂定为 cost * 1.25
    cost  += temp;
    energy = cost * 1.25;
-//   qDebug() << cost << " " << temp;
+   qDebug() << DATETIME << "now cost : " << cost << " temp cost : " << temp;
 }
 
 
@@ -285,7 +295,8 @@ void Client::write_detail_list(QString roomid)
    else
    {    // 插入成功，将energy, price(cost) start_t置零
       cost = energy = 0;
-      start_t.fromString("9999-12-31 00:00:00", "yyyy-MM-dd hh:mm:ss");
+      QString str = "2999-01-12 17:35:00";
+      start_t = QDateTime::fromString(str, "yyyy-MM-dd hh:mm:ss");
    }
 }
 
@@ -294,7 +305,8 @@ void Client::read_detail_list(QString roomid)
 {
    QSqlQuery query;
    QString   select = "select * from Info_list where roomid = \"" + roomid
-                      + "\" and start_t > \"" + begin_t.toString("yyyy-MM-dd hh:mm:ss") + "\"";
+                      + "\" and start_t >= \"" + begin_t.toString("yyyy-MM-dd hh:mm:ss") + "\"";
+   qDebug() << "select sql : " << select;
 
    if (!query.exec(select))
    {
