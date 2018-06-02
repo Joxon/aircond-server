@@ -243,7 +243,9 @@ void MainWindow::readFromSockets()
          client->setId(roomID);
          client->setST();
          client->setCost(0);
+         client->setCurrentTemp(28);
          clients.append(client);
+         qDebug() << "clent.start_t : " << client->getTime().toString("yyyy-MM-dd hh:mm:ss");
       }
       //旧的ID，更新client
       else
@@ -269,6 +271,7 @@ void MainWindow::readFromSockets()
       else if (msgType == 0)
       {
          int hi = -1, li = -1;
+         QDateTime temp_t;
          switch (usSwitch)
          {
          case 0:    // 关机 此时存储一次账单
@@ -344,6 +347,10 @@ void MainWindow::readFromSockets()
                }
             }
 
+            temp_t = QDateTime::currentDateTime();
+            if(temp_t < client->getTime())
+                client->setTime(temp_t);
+            qDebug() << "clent.start_t : " << client->getTime().toString("yyyy-MM-dd hh:mm:ss");
             client->setWorking(Client::WorkingYes);
             break;
 
@@ -407,7 +414,7 @@ void MainWindow::resourceAllocation()
    {
       return;                       // high占用全部资源
    }
-   qDebug() << DATETIME << "resourceAllocation:" << ln;
+//   qDebug() << DATETIME << "resourceAllocation:" << ln;
    if (ln <= surplus)
    {    // low 不需要轮转
       for (int i = 0; i < ln; i++)
@@ -438,6 +445,22 @@ void MainWindow::RRinc()
       {
          turn[2] = (turn[2] + 1) % HighSpeedList.size();
       }
+   }
+   // 清空关机的序列
+   for(int i = 0; i < HighSpeedList.size(); i++)
+   {
+       QString temp    = HighSpeedList.at(i);
+       Client  *client = qobject_cast<Client *>(clients.at(clientIDs.indexOf(temp)));
+       if(!client->CheckWorking())
+            HighSpeedList.removeAt(i);
+   }
+
+   for(int i = 0; i < LowSpeedList.size(); i++)
+   {
+       QString temp    = LowSpeedList.at(i);
+       Client  *client = qobject_cast<Client *>(clients.at(clientIDs.indexOf(temp)));
+       if(!client->CheckWorking())
+           LowSpeedList.removeAt(i);
    }
    resourceAllocation();
 }

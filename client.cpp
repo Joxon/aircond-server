@@ -108,12 +108,12 @@ void Client::setServing(Client::Serving serve)
    {
    case ServingNo:
       serving = ServingNo;
-      ui->labelServing->setText(tr("服务状态：是"));
+      ui->labelServing->setText(tr("服务状态：否"));
       break;
 
    case ServingYes:
       serving = ServingYes;
-      ui->labelServing->setText(tr("服务状态：否"));
+      ui->labelServing->setText(tr("服务状态：是"));
       break;
 
    default:
@@ -177,7 +177,11 @@ void Client::setCost(double _cost)
 
 void Client::setST()
 {
-   start_t = QDateTime::currentDateTime();
+   begin_t = QDateTime::currentDateTime();
+   QString str = "2999-01-12 17:35:00";
+   start_t = QDateTime::fromString(str, "yyyy-MM-dd hh:mm:ss");
+   qDebug() << "begin_t : " << begin_t.toString("yyyy-MM-dd hh:mm:ss");
+   qDebug() << "start_t : " << start_t.toString("yyyy-MM-dd hh:mm:ss");
 }
 
 
@@ -198,6 +202,15 @@ double Client::getCost() const
    return cost;
 }
 
+QDateTime Client::getTime()                                     // 获得start_t;
+{
+    return start_t;
+}
+
+void Client::setTime(QDateTime temp_t)                                          // 设置start_t;
+{
+    start_t = temp_t;
+}
 
 //void Client::Init_Room()
 //{
@@ -217,7 +230,7 @@ void Client::Cost_Cal(double new_n)                   // 为了计算需要1个�
    // 还需要编一个公式计算能量 暂定为 cost * 1.25
    cost  += temp;
    energy = cost * 1.25;
-   qDebug() << cost << " " << temp;
+//   qDebug() << cost << " " << temp;
 }
 
 
@@ -226,7 +239,15 @@ bool Client::CheckServing()
    return this->serving == ServingYes;
 }
 
+bool Client::CheckWorking()
+{
+    return this->working == WorkingYes;
+}
 
+bool Client::CheckWind()
+{
+    return this->speed == 0;
+}
 void Client::write_detail_list(QString roomid)
 {  // 当出现：①达到目标 ②用户停止工作 ③连接断开
    // 传入当前的房间号roomid
@@ -255,7 +276,8 @@ void Client::write_detail_list(QString roomid)
    QString stat       = start_t.toString("yyyy-MM-dd hh:mm:ss");
    QString cp         = QString::number(cost, 10, 4);
    QString ep         = QString::number(energy, 10, 4);
-   QString insert_sql = "insert into Info_list values(" + id + ", " + roomid + ", " + stat + ", " + tmp_t + ", " + cp + ", " + ep + ")";
+   QString insert_sql = "insert into Info_list values(" + id + ", \"" + roomid + "\", \"" + stat + "\", \"" + tmp_t + "\", " + cp + ", " + ep + ")";
+   qDebug() << "insert sql : " << insert_sql;
    if (!sql_query.exec(insert_sql))
    {
       qDebug() << DATETIME << "write_detail_list:" << sql_query.lastError();
@@ -263,16 +285,16 @@ void Client::write_detail_list(QString roomid)
    else
    {    // 插入成功，将energy, price(cost) start_t置零
       cost = energy = 0;
-//      start_t.fromString("9999-12-31 00:00:00", "yyyy-MM-dd hh:mm:ss");
+      start_t.fromString("9999-12-31 00:00:00", "yyyy-MM-dd hh:mm:ss");
    }
 }
 
 
-void Client::read_detail_list(QString roomid, QString starttime)
+void Client::read_detail_list(QString roomid)
 {
    QSqlQuery query;
    QString   select = "select * from Info_list where roomid = \"" + roomid
-                      + "\" and start_t > \"" + starttime + "\"";
+                      + "\" and start_t > \"" + begin_t.toString("yyyy-MM-dd hh:mm:ss") + "\"";
 
    if (!query.exec(select))
    {
@@ -289,5 +311,5 @@ void Client::read_detail_list(QString roomid, QString starttime)
 
 void Client::on_toolButtonDetails_clicked()
 {
-   read_detail_list(this->id, "");
+   read_detail_list(this->id);
 }

@@ -69,10 +69,14 @@ public slots:
    double getCurrentTemp() const;
    Speed getSpeed() const;
    double getCost() const;
+   QDateTime getTime();                                     // 获得start_t;
+   void setTime(QDateTime temp_t);                                          // 设置start_t;
    void Cost_Cal(double new_n);                              // 计算价格
    bool CheckServing();                                      // 判断服务
+   bool CheckWorking();                                      // 判断工作
+   bool CheckWind();                                         // 判断风速
    void write_detail_list(QString roomid);                   // 写入数据库
-   void read_detail_list(QString roomid, QString starttime); // 打印详单
+   void read_detail_list(QString roomid);                   // 打印详单
 
 private slots:
 
@@ -95,8 +99,8 @@ private:
    double energy;                                          // 消耗的能量
    double cost;                                            // 费用
 
-   QDateTime start_t;                                      // 开启时间
-
+   QDateTime start_t;                                      // 计费开启时间
+   QDateTime begin_t;                                       // 开启时间
 //   void Init_Room();                                       // 初始化房间
 };
 
