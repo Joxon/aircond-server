@@ -333,4 +333,5 @@ DISTFILES += \
     res/qss/silvery.css \
     res/qss/test.css \
     res/main.rc \
-    res/main.ico
+    res/main.ico \
+    uncrustify.cfg

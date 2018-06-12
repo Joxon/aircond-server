@@ -3,155 +3,155 @@
 
 int QUIWidget::deskWidth()
 {
-   return qApp->desktop()->availableGeometry().width();
+    return qApp->desktop()->availableGeometry().width();
 }
 
 
 int QUIWidget::deskHeight()
 {
-   return qApp->desktop()->availableGeometry().height();
+    return qApp->desktop()->availableGeometry().height();
 }
 
 
 QString QUIWidget::appName()
 {
-   QString     name = qApp->applicationFilePath();
-   QStringList list = name.split("/");
+    QString     name = qApp->applicationFilePath();
+    QStringList list = name.split("/");
 
-   name = list.at(list.count() - 1).split(".").at(0);
-   return name;
+    name = list.at(list.count() - 1).split(".").at(0);
+    return name;
 }
 
 
 QString QUIWidget::appPath()
 {
 #ifdef __arm__
-   return "/sdcard/Android/lys";
+    return "/sdcard/Android/lys";
 
-   //return QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    //return QStandardPaths::writableLocation(QStandardPaths::DataLocation);
 #else
-   return qApp->applicationDirPath();
+    return qApp->applicationDirPath();
 #endif
 }
 
 
 void QUIWidget::newDir(const QString& dirName)
 {
-   QString strDir = dirName;
+    QString strDir = dirName;
 
-   //如果路径中包含斜杠字符则说明是绝对路径
-   //linux系统路径字符带有 /  windows系统 路径字符带有 :/
-   if (!strDir.startsWith("/") && !strDir.contains(":/"))
-   {
-      strDir = QString("%1/%2").arg(QUIWidget::appPath()).arg(strDir);
-   }
+    //如果路径中包含斜杠字符则说明是绝对路径
+    //linux系统路径字符带有 /  windows系统 路径字符带有 :/
+    if (!strDir.startsWith("/") && !strDir.contains(":/"))
+    {
+        strDir = QString("%1/%2").arg(QUIWidget::appPath()).arg(strDir);
+    }
 
-   QDir dir(strDir);
+    QDir dir(strDir);
 
-   if (!dir.exists())
-   {
-      dir.mkpath(strDir);
-   }
+    if (!dir.exists())
+    {
+        dir.mkpath(strDir);
+    }
 }
 
 
 void QUIWidget::writeInfo(const QString& info, const QString& filePath)
 {
-   QString fileName = QString("%1/%2/%3_runinfo_%4.txt").arg(QUIWidget::appPath())
-                         .arg(filePath).arg(QUIWidget::appName()).arg(QDate::currentDate().year());
+    QString fileName = QString("%1/%2/%3_runinfo_%4.txt").arg(QUIWidget::appPath())
+                          .arg(filePath).arg(QUIWidget::appName()).arg(QDate::currentDate().year());
 
-   QFile file(fileName);
+    QFile file(fileName);
 
-   file.open(QIODevice::WriteOnly | QIODevice::Append | QFile::Text);
-   QTextStream stream(&file);
-   stream << DATETIME << info << NEWLINE;
-   file.close();
+    file.open(QIODevice::WriteOnly | QIODevice::Append | QFile::Text);
+    QTextStream stream(&file);
+    stream << DATETIME << info << NEWLINE;
+    file.close();
 }
 
 
 void QUIWidget::setStyle(QUIWidget::Styles style)
 {
-   QString qssFile = ":/qss/blue.css";
+    QString qssFile = ":/qss/blue.css";
 
-   if (style == QUIWidget::StyleSilvery)
-   {
-      qssFile = ":/qss/silvery.css";
-   }
-   else if (style == QUIWidget::StyleBlue)
-   {
-      qssFile = ":/qss/blue.css";
-   }
-   else if (style == QUIWidget::StyleLightBlue)
-   {
-      qssFile = ":/qss/lightblue.css";
-   }
-   else if (style == QUIWidget::StyleDarkBlue)
-   {
-      qssFile = ":/qss/darkblue.css";
-   }
-   else if (style == QUIWidget::StyleGray)
-   {
-      qssFile = ":/qss/gray.css";
-   }
-   else if (style == QUIWidget::StyleLightGray)
-   {
-      qssFile = ":/qss/lightgray.css";
-   }
-   else if (style == QUIWidget::StyleDarkGray)
-   {
-      qssFile = ":/qss/darkgray.css";
-   }
-   else if (style == QUIWidget::StyleBlack)
-   {
-      qssFile = ":/qss/black.css";
-   }
-   else if (style == QUIWidget::StyleLightBlack)
-   {
-      qssFile = ":/qss/lightblack.css";
-   }
-   else if (style == QUIWidget::StyleDarkBlack)
-   {
-      qssFile = ":/qss/darkblack.css";
-   }
-   else if (style == QUIWidget::StylePSBlack)
-   {
-      qssFile = ":/qss/psblack.css";
-   }
-   else if (style == QUIWidget::StyleFlatBlack)
-   {
-      qssFile = ":/qss/flatblack.css";
-   }
-   else if (style == QUIWidget::StyleFlatWhite)
-   {
-      qssFile = ":/qss/flatwhite.css";
-   }
+    if (style == QUIWidget::StyleSilvery)
+    {
+        qssFile = ":/qss/silvery.css";
+    }
+    else if (style == QUIWidget::StyleBlue)
+    {
+        qssFile = ":/qss/blue.css";
+    }
+    else if (style == QUIWidget::StyleLightBlue)
+    {
+        qssFile = ":/qss/lightblue.css";
+    }
+    else if (style == QUIWidget::StyleDarkBlue)
+    {
+        qssFile = ":/qss/darkblue.css";
+    }
+    else if (style == QUIWidget::StyleGray)
+    {
+        qssFile = ":/qss/gray.css";
+    }
+    else if (style == QUIWidget::StyleLightGray)
+    {
+        qssFile = ":/qss/lightgray.css";
+    }
+    else if (style == QUIWidget::StyleDarkGray)
+    {
+        qssFile = ":/qss/darkgray.css";
+    }
+    else if (style == QUIWidget::StyleBlack)
+    {
+        qssFile = ":/qss/black.css";
+    }
+    else if (style == QUIWidget::StyleLightBlack)
+    {
+        qssFile = ":/qss/lightblack.css";
+    }
+    else if (style == QUIWidget::StyleDarkBlack)
+    {
+        qssFile = ":/qss/darkblack.css";
+    }
+    else if (style == QUIWidget::StylePSBlack)
+    {
+        qssFile = ":/qss/psblack.css";
+    }
+    else if (style == QUIWidget::StyleFlatBlack)
+    {
+        qssFile = ":/qss/flatblack.css";
+    }
+    else if (style == QUIWidget::StyleFlatWhite)
+    {
+        qssFile = ":/qss/flatwhite.css";
+    }
 
-   QFile file(qssFile);
+    QFile file(qssFile);
 
-   if (file.open(QFile::ReadOnly))
-   {
-      QString qss          = QLatin1String(file.readAll());
-      QString paletteColor = qss.mid(20, 7);
-      qApp->setPalette(QPalette(QColor(paletteColor)));
-      qApp->setStyleSheet(qss);
-      file.close();
-   }
+    if (file.open(QFile::ReadOnly))
+    {
+        QString qss          = QLatin1String(file.readAll());
+        QString paletteColor = qss.mid(20, 7);
+        qApp->setPalette(QPalette(QColor(paletteColor)));
+        qApp->setStyleSheet(qss);
+        file.close();
+    }
 }
 
 
 void QUIWidget::setStyle(const QString& qssFile, QString& paletteColor, QString& textColor)
 {
-   QFile file(qssFile);
+    QFile file(qssFile);
 
-   if (file.open(QFile::ReadOnly))
-   {
-      QString qss = QLatin1String(file.readAll());
-      paletteColor = qss.mid(20, 7);
-      textColor    = qss.mid(49, 7);
-      qApp->setPalette(QPalette(QColor(paletteColor)));
-      qApp->setStyleSheet(qss);
-      file.close();
-   }
+    if (file.open(QFile::ReadOnly))
+    {
+        QString qss = QLatin1String(file.readAll());
+        paletteColor = qss.mid(20, 7);
+        textColor    = qss.mid(49, 7);
+        qApp->setPalette(QPalette(QColor(paletteColor)));
+        qApp->setStyleSheet(qss);
+        file.close();
+    }
 }
 
 
@@ -159,16 +159,16 @@ void QUIWidget::setStyle(const QString& qssFile, QString& textColor, QString& pa
                          QString& normalColorStart, QString& normalColorEnd,
                          QString& darkColorStart, QString& darkColorEnd, QString& highColor)
 {
-   QFile file(qssFile);
+    QFile file(qssFile);
 
-   if (file.open(QFile::ReadOnly))
-   {
-      QString qss = QLatin1String(file.readAll());
-      getQssColor(qss, textColor, panelColor, borderColor, normalColorStart, normalColorEnd, darkColorStart, darkColorEnd, highColor);
-      qApp->setPalette(QPalette(QColor(panelColor)));
-      qApp->setStyleSheet(qss);
-      file.close();
-   }
+    if (file.open(QFile::ReadOnly))
+    {
+        QString qss = QLatin1String(file.readAll());
+        getQssColor(qss, textColor, panelColor, borderColor, normalColorStart, normalColorEnd, darkColorStart, darkColorEnd, highColor);
+        qApp->setPalette(QPalette(QColor(panelColor)));
+        qApp->setStyleSheet(qss);
+        file.close();
+    }
 }
 
 
@@ -176,93 +176,93 @@ void QUIWidget::getQssColor(const QString& qss, QString& textColor, QString& pan
                             QString& normalColorStart, QString& normalColorEnd,
                             QString& darkColorStart, QString& darkColorEnd, QString& highColor)
 {
-   QString str = qss;
+    QString str = qss;
 
-   QString flagTextColor  = "TextColor:";
-   int     indexTextColor = str.indexOf(flagTextColor);
+    QString flagTextColor  = "TextColor:";
+    int     indexTextColor = str.indexOf(flagTextColor);
 
-   if (indexTextColor >= 0)
-   {
-      textColor = str.mid(indexTextColor + flagTextColor.length(), 7);
-   }
+    if (indexTextColor >= 0)
+    {
+        textColor = str.mid(indexTextColor + flagTextColor.length(), 7);
+    }
 
-   QString flagPanelColor  = "PanelColor:";
-   int     indexPanelColor = str.indexOf(flagPanelColor);
+    QString flagPanelColor  = "PanelColor:";
+    int     indexPanelColor = str.indexOf(flagPanelColor);
 
-   if (indexPanelColor >= 0)
-   {
-      panelColor = str.mid(indexPanelColor + flagPanelColor.length(), 7);
-   }
+    if (indexPanelColor >= 0)
+    {
+        panelColor = str.mid(indexPanelColor + flagPanelColor.length(), 7);
+    }
 
-   QString flagBorderColor  = "BorderColor:";
-   int     indexBorderColor = str.indexOf(flagBorderColor);
+    QString flagBorderColor  = "BorderColor:";
+    int     indexBorderColor = str.indexOf(flagBorderColor);
 
-   if (indexBorderColor >= 0)
-   {
-      borderColor = str.mid(indexBorderColor + flagBorderColor.length(), 7);
-   }
+    if (indexBorderColor >= 0)
+    {
+        borderColor = str.mid(indexBorderColor + flagBorderColor.length(), 7);
+    }
 
-   QString flagNormalColorStart  = "NormalColorStart:";
-   int     indexNormalColorStart = str.indexOf(flagNormalColorStart);
+    QString flagNormalColorStart  = "NormalColorStart:";
+    int     indexNormalColorStart = str.indexOf(flagNormalColorStart);
 
-   if (indexNormalColorStart >= 0)
-   {
-      normalColorStart = str.mid(indexNormalColorStart + flagNormalColorStart.length(), 7);
-   }
+    if (indexNormalColorStart >= 0)
+    {
+        normalColorStart = str.mid(indexNormalColorStart + flagNormalColorStart.length(), 7);
+    }
 
-   QString flagNormalColorEnd  = "NormalColorEnd:";
-   int     indexNormalColorEnd = str.indexOf(flagNormalColorEnd);
+    QString flagNormalColorEnd  = "NormalColorEnd:";
+    int     indexNormalColorEnd = str.indexOf(flagNormalColorEnd);
 
-   if (indexNormalColorEnd >= 0)
-   {
-      normalColorEnd = str.mid(indexNormalColorEnd + flagNormalColorEnd.length(), 7);
-   }
+    if (indexNormalColorEnd >= 0)
+    {
+        normalColorEnd = str.mid(indexNormalColorEnd + flagNormalColorEnd.length(), 7);
+    }
 
-   QString flagDarkColorStart  = "DarkColorStart:";
-   int     indexDarkColorStart = str.indexOf(flagDarkColorStart);
+    QString flagDarkColorStart  = "DarkColorStart:";
+    int     indexDarkColorStart = str.indexOf(flagDarkColorStart);
 
-   if (indexDarkColorStart >= 0)
-   {
-      darkColorStart = str.mid(indexDarkColorStart + flagDarkColorStart.length(), 7);
-   }
+    if (indexDarkColorStart >= 0)
+    {
+        darkColorStart = str.mid(indexDarkColorStart + flagDarkColorStart.length(), 7);
+    }
 
-   QString flagDarkColorEnd  = "DarkColorEnd:";
-   int     indexDarkColorEnd = str.indexOf(flagDarkColorEnd);
+    QString flagDarkColorEnd  = "DarkColorEnd:";
+    int     indexDarkColorEnd = str.indexOf(flagDarkColorEnd);
 
-   if (indexDarkColorEnd >= 0)
-   {
-      darkColorEnd = str.mid(indexDarkColorEnd + flagDarkColorEnd.length(), 7);
-   }
+    if (indexDarkColorEnd >= 0)
+    {
+        darkColorEnd = str.mid(indexDarkColorEnd + flagDarkColorEnd.length(), 7);
+    }
 
-   QString flagHighColor  = "HighColor:";
-   int     indexHighColor = str.indexOf(flagHighColor);
+    QString flagHighColor  = "HighColor:";
+    int     indexHighColor = str.indexOf(flagHighColor);
 
-   if (indexHighColor >= 0)
-   {
-      highColor = str.mid(indexHighColor + flagHighColor.length(), 7);
-   }
+    if (indexHighColor >= 0)
+    {
+        highColor = str.mid(indexHighColor + flagHighColor.length(), 7);
+    }
 }
 
 
 void QUIWidget::setFormInCenter(QWidget *frm)
 {
-   int            frmX = frm->width();
-   int            frmY = frm->height();
-   QDesktopWidget w;
-   int            deskWidth  = w.availableGeometry().width();
-   int            deskHeight = w.availableGeometry().height();
-   QPoint         movePoint(deskWidth / 2 - frmX / 2, deskHeight / 2 - frmY / 2);
+    int            frmX = frm->width();
+    int            frmY = frm->height();
+    QDesktopWidget w;
+    int            deskWidth  = w.availableGeometry().width();
+    int            deskHeight = w.availableGeometry().height();
+    QPoint         movePoint(deskWidth / 2 - frmX / 2, deskHeight / 2 - frmY / 2);
 
-   frm->move(movePoint);
+    frm->move(movePoint);
 }
 
 
 void QUIWidget::setTranslator(const QString& qmFile)
 {
-   QTranslator *translator = new QTranslator(qApp);
+    QTranslator *translator = new QTranslator(qApp);
 
-   translator->load(qmFile);
-   qApp->installTranslator(translator);
+    translator->load(qmFile);
+    qApp->installTranslator(translator);
 }
 
 
@@ -270,51 +270,51 @@ void QUIWidget::setCode()
 {
 #if (QT_VERSION <= QT_VERSION_CHECK(5, 0, 0))
 #if _MSC_VER
-   QTextCodec *codec = QTextCodec::codecForName("gbk");
+    QTextCodec *codec = QTextCodec::codecForName("gbk");
 #else
-   QTextCodec *codec = QTextCodec::codecForName("utf-8");
+    QTextCodec *codec = QTextCodec::codecForName("utf-8");
 #endif
-   QTextCodec::setCodecForLocale(codec);
-   QTextCodec::setCodecForCStrings(codec);
-   QTextCodec::setCodecForTr(codec);
+    QTextCodec::setCodecForLocale(codec);
+    QTextCodec::setCodecForCStrings(codec);
+    QTextCodec::setCodecForTr(codec);
 #else
-   QTextCodec *codec = QTextCodec::codecForName("utf-8");
-   QTextCodec::setCodecForLocale(codec);
+    QTextCodec *codec = QTextCodec::codecForName("utf-8");
+    QTextCodec::setCodecForLocale(codec);
 #endif
 }
 
 
 void QUIWidget::sleep(int sec)
 {
-   QTime dieTime = QTime::currentTime().addMSecs(sec);
+    QTime dieTime = QTime::currentTime().addMSecs(sec);
 
-   while (QTime::currentTime() < dieTime)
-   {
-      QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-   }
+    while (QTime::currentTime() < dieTime)
+    {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+    }
 }
 
 
 void QUIWidget::setSystemDateTime(const QString& year, const QString& month, const QString& day, const QString& hour, const QString& min, const QString& sec)
 {
 #ifdef Q_OS_WIN
-   QProcess p(0);
-   p.start("cmd");
-   p.waitForStarted();
-   p.write(QString("date %1-%2-%3\n").arg(year).arg(month).arg(day).toLatin1());
-   p.closeWriteChannel();
-   p.waitForFinished(1000);
-   p.close();
-   p.start("cmd");
-   p.waitForStarted();
-   p.write(QString("time %1:%2:%3.00\n").arg(hour).arg(min).arg(sec).toLatin1());
-   p.closeWriteChannel();
-   p.waitForFinished(1000);
-   p.close();
+    QProcess p(0);
+    p.start("cmd");
+    p.waitForStarted();
+    p.write(QString("date %1-%2-%3\n").arg(year).arg(month).arg(day).toLatin1());
+    p.closeWriteChannel();
+    p.waitForFinished(1000);
+    p.close();
+    p.start("cmd");
+    p.waitForStarted();
+    p.write(QString("time %1:%2:%3.00\n").arg(hour).arg(min).arg(sec).toLatin1());
+    p.closeWriteChannel();
+    p.waitForFinished(1000);
+    p.close();
 #else
-   QString cmd = QString("date %1%2%3%4%5.%6").arg(month).arg(day).arg(hour).arg(min).arg(year).arg(sec);
-   system(cmd.toLatin1());
-   system("hwclock -w");
+    QString cmd = QString("date %1%2%3%4%5.%6").arg(month).arg(day).arg(hour).arg(min).arg(year).arg(sec);
+    system(cmd.toLatin1());
+    system("hwclock -w");
 #endif
 }
 
@@ -322,2379 +322,2380 @@ void QUIWidget::setSystemDateTime(const QString& year, const QString& month, con
 void QUIWidget::runWithSystem(const QString& strName, const QString& strPath, bool autoRun)
 {
 #ifdef Q_OS_WIN
-   QSettings reg("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+    QSettings reg("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
 
-   if (autoRun)
-   {
-      reg.setValue(strName, strPath);
-   }
-   else
-   {
-      reg.setValue(strName, "");
-   }
+    if (autoRun)
+    {
+        reg.setValue(strName, strPath);
+    }
+    else
+    {
+        reg.setValue(strName, "");
+    }
 #endif
 }
 
 
 bool QUIWidget::isIP(const QString& ip)
 {
-   QRegExp RegExp("((2[0-4]\\d|25[0-5]|[01]?\\d\\d?)\\.){3}(2[0-4]\\d|25[0-5]|[01]?\\d\\d?)");
+    QRegExp RegExp("((2[0-4]\\d|25[0-5]|[01]?\\d\\d?)\\.){3}(2[0-4]\\d|25[0-5]|[01]?\\d\\d?)");
 
-   return RegExp.exactMatch(ip);
+    return RegExp.exactMatch(ip);
 }
 
 
 bool QUIWidget::isMac(const QString& mac)
 {
-   QRegExp RegExp("^[A-F0-9]{2}(-[A-F0-9]{2}){5}$");
+    QRegExp RegExp("^[A-F0-9]{2}(-[A-F0-9]{2}){5}$");
 
-   return RegExp.exactMatch(mac);
+    return RegExp.exactMatch(mac);
 }
 
 
 bool QUIWidget::isTel(const QString& tel)
 {
-   if (tel.length() != 11)
-   {
-      return false;
-   }
+    if (tel.length() != 11)
+    {
+        return false;
+    }
 
-   if (!tel.startsWith("13") && !tel.startsWith("14") && !tel.startsWith("15") && !tel.startsWith("18"))
-   {
-      return false;
-   }
+    if (!tel.startsWith("13") && !tel.startsWith("14") && !tel.startsWith("15") && !tel.startsWith("18"))
+    {
+        return false;
+    }
 
-   return true;
+    return true;
 }
 
 
 bool QUIWidget::isEmail(const QString& email)
 {
-   if (!email.contains("@") || !email.contains(".com"))
-   {
-      return false;
-   }
+    if (!email.contains("@") || !email.contains(".com"))
+    {
+        return false;
+    }
 
-   return true;
+    return true;
 }
 
 
 int QUIWidget::strHexToDecimal(const QString& strHex)
 {
-   bool ok;
+    bool ok;
 
-   return strHex.toInt(&ok, 16);
+    return strHex.toInt(&ok, 16);
 }
 
 
 int QUIWidget::strDecimalToDecimal(const QString& strDecimal)
 {
-   bool ok;
+    bool ok;
 
-   return strDecimal.toInt(&ok, 10);
+    return strDecimal.toInt(&ok, 10);
 }
 
 
 int QUIWidget::strBinToDecimal(const QString& strBin)
 {
-   bool ok;
+    bool ok;
 
-   return strBin.toInt(&ok, 2);
+    return strBin.toInt(&ok, 2);
 }
 
 
 QString QUIWidget::strHexToStrBin(const QString& strHex)
 {
-   uchar   decimal = strHexToDecimal(strHex);
-   QString bin     = QString::number(decimal, 2);
-   uchar   len     = bin.length();
+    uchar   decimal = strHexToDecimal(strHex);
+    QString bin     = QString::number(decimal, 2);
+    uchar   len     = bin.length();
 
-   if (len < 8)
-   {
-      for (int i = 0; i < 8 - len; i++)
-      {
-         bin = "0" + bin;
-      }
-   }
+    if (len < 8)
+    {
+        for (int i = 0; i < 8 - len; i++)
+        {
+            bin = "0" + bin;
+        }
+    }
 
-   return bin;
+    return bin;
 }
 
 
 QString QUIWidget::decimalToStrBin1(int decimal)
 {
-   QString bin = QString::number(decimal, 2);
-   uchar   len = bin.length();
+    QString bin = QString::number(decimal, 2);
+    uchar   len = bin.length();
 
-   if (len <= 8)
-   {
-      for (int i = 0; i < 8 - len; i++)
-      {
-         bin = "0" + bin;
-      }
-   }
+    if (len <= 8)
+    {
+        for (int i = 0; i < 8 - len; i++)
+        {
+            bin = "0" + bin;
+        }
+    }
 
-   return bin;
+    return bin;
 }
 
 
 QString QUIWidget::decimalToStrBin2(int decimal)
 {
-   QString bin = QString::number(decimal, 2);
-   uchar   len = bin.length();
+    QString bin = QString::number(decimal, 2);
+    uchar   len = bin.length();
 
-   if (len <= 16)
-   {
-      for (int i = 0; i < 16 - len; i++)
-      {
-         bin = "0" + bin;
-      }
-   }
+    if (len <= 16)
+    {
+        for (int i = 0; i < 16 - len; i++)
+        {
+            bin = "0" + bin;
+        }
+    }
 
-   return bin;
+    return bin;
 }
 
 
 QString QUIWidget::decimalToStrHex(int decimal)
 {
-   QString temp = QString::number(decimal, 16);
+    QString temp = QString::number(decimal, 16);
 
-   if (temp.length() == 1)
-   {
-      temp = "0" + temp;
-   }
+    if (temp.length() == 1)
+    {
+        temp = "0" + temp;
+    }
 
-   return temp;
+    return temp;
 }
 
 
 QByteArray QUIWidget::intToByte(int i)
 {
-   QByteArray result;
+    QByteArray result;
 
-   result.resize(4);
-   result[3] = (uchar)(0x000000ff & i);
-   result[2] = (uchar)((0x0000ff00 & i) >> 8);
-   result[1] = (uchar)((0x00ff0000 & i) >> 16);
-   result[0] = (uchar)((0xff000000 & i) >> 24);
-   return result;
+    result.resize(4);
+    result[3] = (uchar)(0x000000ff & i);
+    result[2] = (uchar)((0x0000ff00 & i) >> 8);
+    result[1] = (uchar)((0x00ff0000 & i) >> 16);
+    result[0] = (uchar)((0xff000000 & i) >> 24);
+    return result;
 }
 
 
 int QUIWidget::byteToInt(const QByteArray& data)
 {
-   int i = data.at(3) & 0x000000FF;
+    int i = data.at(3) & 0x000000FF;
 
-   i |= ((data.at(2) << 8) & 0x0000FF00);
-   i |= ((data.at(1) << 16) & 0x00FF0000);
-   i |= ((data.at(0) << 24) & 0xFF000000);
-   return i;
+    i |= ((data.at(2) << 8) & 0x0000FF00);
+    i |= ((data.at(1) << 16) & 0x00FF0000);
+    i |= ((data.at(0) << 24) & 0xFF000000);
+    return i;
 }
 
 
 QByteArray QUIWidget::ushortToByte(ushort i)
 {
-   QByteArray result;
+    QByteArray result;
 
-   result.resize(2);
-   result[1] = (uchar)(0x000000ff & i);
-   result[0] = (uchar)((0x0000ff00 & i) >> 8);
-   return result;
+    result.resize(2);
+    result[1] = (uchar)(0x000000ff & i);
+    result[0] = (uchar)((0x0000ff00 & i) >> 8);
+    return result;
 }
 
 
 int QUIWidget::byteToUShort(const QByteArray& data)
 {
-   int i = data.at(1) & 0x000000FF;
+    int i = data.at(1) & 0x000000FF;
 
-   i |= ((data.at(0) << 8) & 0x0000FF00);
-   return i;
+    i |= ((data.at(0) << 8) & 0x0000FF00);
+    return i;
 }
 
 
 QString QUIWidget::getXorEncryptDecrypt(const QString& str, char key)
 {
-   QByteArray data = str.toLatin1();
-   int        size = data.size();
+    QByteArray data = str.toLatin1();
+    int        size = data.size();
 
-   for (int i = 0; i < size; i++)
-   {
-      data[i] = data.at(i) ^ key;
-   }
+    for (int i = 0; i < size; i++)
+    {
+        data[i] = data.at(i) ^ key;
+    }
 
-   return QLatin1String(data);
+    return QLatin1String(data);
 }
 
 
 uchar QUIWidget::getOrCode(const QByteArray& data)
 {
-   int   len    = data.length();
-   uchar result = 0;
+    int   len    = data.length();
+    uchar result = 0;
 
-   for (int i = 0; i < len; i++)
-   {
-      result ^= data.at(i);
-   }
+    for (int i = 0; i < len; i++)
+    {
+        result ^= data.at(i);
+    }
 
-   return result;
+    return result;
 }
 
 
 uchar QUIWidget::getCheckCode(const QByteArray& data)
 {
-   int   len  = data.length();
-   uchar temp = 0;
+    int   len  = data.length();
+    uchar temp = 0;
 
-   for (uchar i = 0; i < len; i++)
-   {
-      temp += data.at(i);
-   }
+    for (uchar i = 0; i < len; i++)
+    {
+        temp += data.at(i);
+    }
 
-   return temp % 256;
+    return temp % 256;
 }
 
 
 QString QUIWidget::byteArrayToAsciiStr(const QByteArray& data)
 {
-   QString temp;
-   int     len = data.size();
+    QString temp;
+    int     len = data.size();
 
-   for (int i = 0; i < len; i++)
-   {
-      //0x20为空格,空格以下都是不可见字符
-      char b = data.at(i);
+    for (int i = 0; i < len; i++)
+    {
+        //0x20为空格,空格以下都是不可见字符
+        char b = data.at(i);
 
-      if (0x00 == b)
-      {
-         temp += QString("\\NUL");
-      }
-      else if (0x01 == b)
-      {
-         temp += QString("\\SOH");
-      }
-      else if (0x02 == b)
-      {
-         temp += QString("\\STX");
-      }
-      else if (0x03 == b)
-      {
-         temp += QString("\\ETX");
-      }
-      else if (0x04 == b)
-      {
-         temp += QString("\\EOT");
-      }
-      else if (0x05 == b)
-      {
-         temp += QString("\\ENQ");
-      }
-      else if (0x06 == b)
-      {
-         temp += QString("\\ACK");
-      }
-      else if (0x07 == b)
-      {
-         temp += QString("\\BEL");
-      }
-      else if (0x08 == b)
-      {
-         temp += QString("\\BS");
-      }
-      else if (0x09 == b)
-      {
-         temp += QString("\\HT");
-      }
-      else if (0x0A == b)
-      {
-         temp += QString("\\LF");
-      }
-      else if (0x0B == b)
-      {
-         temp += QString("\\VT");
-      }
-      else if (0x0C == b)
-      {
-         temp += QString("\\FF");
-      }
-      else if (0x0D == b)
-      {
-         temp += QString("\\CR");
-      }
-      else if (0x0E == b)
-      {
-         temp += QString("\\SO");
-      }
-      else if (0x0F == b)
-      {
-         temp += QString("\\SI");
-      }
-      else if (0x10 == b)
-      {
-         temp += QString("\\DLE");
-      }
-      else if (0x11 == b)
-      {
-         temp += QString("\\DC1");
-      }
-      else if (0x12 == b)
-      {
-         temp += QString("\\DC2");
-      }
-      else if (0x13 == b)
-      {
-         temp += QString("\\DC3");
-      }
-      else if (0x14 == b)
-      {
-         temp += QString("\\DC4");
-      }
-      else if (0x15 == b)
-      {
-         temp += QString("\\NAK");
-      }
-      else if (0x16 == b)
-      {
-         temp += QString("\\SYN");
-      }
-      else if (0x17 == b)
-      {
-         temp += QString("\\ETB");
-      }
-      else if (0x18 == b)
-      {
-         temp += QString("\\CAN");
-      }
-      else if (0x19 == b)
-      {
-         temp += QString("\\EM");
-      }
-      else if (0x1A == b)
-      {
-         temp += QString("\\SUB");
-      }
-      else if (0x1B == b)
-      {
-         temp += QString("\\ESC");
-      }
-      else if (0x1C == b)
-      {
-         temp += QString("\\FS");
-      }
-      else if (0x1D == b)
-      {
-         temp += QString("\\GS");
-      }
-      else if (0x1E == b)
-      {
-         temp += QString("\\RS");
-      }
-      else if (0x1F == b)
-      {
-         temp += QString("\\US");
-      }
-      else if (0x7F == b)
-      {
-         temp += QString("\\x7F");
-      }
-      else if (0x5C == b)
-      {
-         temp += QString("\\x5C");
-      }
-      else if (0x20 >= b)
-      {
-         temp += QString("\\x%1").arg(decimalToStrHex((quint8)b));
-      }
-      else
-      {
-         temp += QString("%1").arg(b);
-      }
-   }
+        if (0x00 == b)
+        {
+            temp += QString("\\NUL");
+        }
+        else if (0x01 == b)
+        {
+            temp += QString("\\SOH");
+        }
+        else if (0x02 == b)
+        {
+            temp += QString("\\STX");
+        }
+        else if (0x03 == b)
+        {
+            temp += QString("\\ETX");
+        }
+        else if (0x04 == b)
+        {
+            temp += QString("\\EOT");
+        }
+        else if (0x05 == b)
+        {
+            temp += QString("\\ENQ");
+        }
+        else if (0x06 == b)
+        {
+            temp += QString("\\ACK");
+        }
+        else if (0x07 == b)
+        {
+            temp += QString("\\BEL");
+        }
+        else if (0x08 == b)
+        {
+            temp += QString("\\BS");
+        }
+        else if (0x09 == b)
+        {
+            temp += QString("\\HT");
+        }
+        else if (0x0A == b)
+        {
+            temp += QString("\\LF");
+        }
+        else if (0x0B == b)
+        {
+            temp += QString("\\VT");
+        }
+        else if (0x0C == b)
+        {
+            temp += QString("\\FF");
+        }
+        else if (0x0D == b)
+        {
+            temp += QString("\\CR");
+        }
+        else if (0x0E == b)
+        {
+            temp += QString("\\SO");
+        }
+        else if (0x0F == b)
+        {
+            temp += QString("\\SI");
+        }
+        else if (0x10 == b)
+        {
+            temp += QString("\\DLE");
+        }
+        else if (0x11 == b)
+        {
+            temp += QString("\\DC1");
+        }
+        else if (0x12 == b)
+        {
+            temp += QString("\\DC2");
+        }
+        else if (0x13 == b)
+        {
+            temp += QString("\\DC3");
+        }
+        else if (0x14 == b)
+        {
+            temp += QString("\\DC4");
+        }
+        else if (0x15 == b)
+        {
+            temp += QString("\\NAK");
+        }
+        else if (0x16 == b)
+        {
+            temp += QString("\\SYN");
+        }
+        else if (0x17 == b)
+        {
+            temp += QString("\\ETB");
+        }
+        else if (0x18 == b)
+        {
+            temp += QString("\\CAN");
+        }
+        else if (0x19 == b)
+        {
+            temp += QString("\\EM");
+        }
+        else if (0x1A == b)
+        {
+            temp += QString("\\SUB");
+        }
+        else if (0x1B == b)
+        {
+            temp += QString("\\ESC");
+        }
+        else if (0x1C == b)
+        {
+            temp += QString("\\FS");
+        }
+        else if (0x1D == b)
+        {
+            temp += QString("\\GS");
+        }
+        else if (0x1E == b)
+        {
+            temp += QString("\\RS");
+        }
+        else if (0x1F == b)
+        {
+            temp += QString("\\US");
+        }
+        else if (0x7F == b)
+        {
+            temp += QString("\\x7F");
+        }
+        else if (0x5C == b)
+        {
+            temp += QString("\\x5C");
+        }
+        else if (0x20 >= b)
+        {
+            temp += QString("\\x%1").arg(decimalToStrHex((quint8)b));
+        }
+        else
+        {
+            temp += QString("%1").arg(b);
+        }
+    }
 
-   return temp.trimmed();
+    return temp.trimmed();
 }
 
 
 QByteArray QUIWidget::hexStrToByteArray(const QString& str)
 {
-   QByteArray senddata;
-   int        hexdata, lowhexdata;
-   int        hexdatalen = 0;
-   int        len        = str.length();
+    QByteArray senddata;
+    int        hexdata, lowhexdata;
+    int        hexdatalen = 0;
+    int        len        = str.length();
 
-   senddata.resize(len / 2);
-   char lstr, hstr;
+    senddata.resize(len / 2);
+    char lstr, hstr;
 
-   for (int i = 0; i < len;)
-   {
-      hstr = str.at(i).toLatin1();
+    for (int i = 0; i < len;)
+    {
+        hstr = str.at(i).toLatin1();
 
-      if (hstr == ' ')
-      {
-         i++;
-         continue;
-      }
+        if (hstr == ' ')
+        {
+            i++;
+            continue;
+        }
 
-      i++;
+        i++;
 
-      if (i >= len)
-      {
-         break;
-      }
+        if (i >= len)
+        {
+            break;
+        }
 
-      lstr       = str.at(i).toLatin1();
-      hexdata    = convertHexChar(hstr);
-      lowhexdata = convertHexChar(lstr);
+        lstr       = str.at(i).toLatin1();
+        hexdata    = convertHexChar(hstr);
+        lowhexdata = convertHexChar(lstr);
 
-      if ((hexdata == 16) || (lowhexdata == 16))
-      {
-         break;
-      }
-      else
-      {
-         hexdata = hexdata * 16 + lowhexdata;
-      }
+        if ((hexdata == 16) || (lowhexdata == 16))
+        {
+            break;
+        }
+        else
+        {
+            hexdata = hexdata * 16 + lowhexdata;
+        }
 
-      i++;
-      senddata[hexdatalen] = (char)hexdata;
-      hexdatalen++;
-   }
+        i++;
+        senddata[hexdatalen] = (char)hexdata;
+        hexdatalen++;
+    }
 
-   senddata.resize(hexdatalen);
-   return senddata;
+    senddata.resize(hexdatalen);
+    return senddata;
 }
 
 
 char QUIWidget::convertHexChar(char ch)
 {
-   if ((ch >= '0') && (ch <= '9'))
-   {
-      return ch - 0x30;
-   }
-   else if ((ch >= 'A') && (ch <= 'F'))
-   {
-      return ch - 'A' + 10;
-   }
-   else if ((ch >= 'a') && (ch <= 'f'))
-   {
-      return ch - 'a' + 10;
-   }
-   else
-   {
-      return(-1);
-   }
+    if ((ch >= '0') && (ch <= '9'))
+    {
+        return ch - 0x30;
+    }
+    else if ((ch >= 'A') && (ch <= 'F'))
+    {
+        return ch - 'A' + 10;
+    }
+    else if ((ch >= 'a') && (ch <= 'f'))
+    {
+        return ch - 'a' + 10;
+    }
+    else
+    {
+        return(-1);
+    }
 }
 
 
 QByteArray QUIWidget::asciiStrToByteArray(const QString& str)
 {
-   QByteArray buffer;
-   int        len = str.length();
-   QString    letter;
-   QString    hex;
+    QByteArray buffer;
+    int        len = str.length();
+    QString    letter;
+    QString    hex;
 
-   for (int i = 0; i < len; i++)
-   {
-      letter = str.at(i);
+    for (int i = 0; i < len; i++)
+    {
+        letter = str.at(i);
 
-      if (letter == "\\")
-      {
-         i++;
-         letter = str.mid(i, 1);
-
-         if (letter == "x")
-         {
+        if (letter == "\\")
+        {
             i++;
-            hex = str.mid(i, 2);
-            buffer.append(strHexToDecimal(hex));
-            i++;
-            continue;
-         }
-         else if (letter == "N")
-         {
-            i++;
-            hex = str.mid(i, 1);
+            letter = str.mid(i, 1);
 
-            if (hex == "U")
+            if (letter == "x")
             {
-               i++;
-               hex = str.mid(i, 1);
-
-               if (hex == "L")                  //NUL=0x00
-               {
-                  buffer.append((char)0x00);
-                  continue;
-               }
+                i++;
+                hex = str.mid(i, 2);
+                buffer.append(strHexToDecimal(hex));
+                i++;
+                continue;
             }
-            else if (hex == "A")
+            else if (letter == "N")
             {
-               i++;
-               hex = str.mid(i, 1);
+                i++;
+                hex = str.mid(i, 1);
 
-               if (hex == "K")                  //NAK=0x15
-               {
-                  buffer.append(0x15);
-                  continue;
-               }
+                if (hex == "U")
+                {
+                    i++;
+                    hex = str.mid(i, 1);
+
+                    if (hex == "L")             //NUL=0x00
+                    {
+                        buffer.append((char)0x00);
+                        continue;
+                    }
+                }
+                else if (hex == "A")
+                {
+                    i++;
+                    hex = str.mid(i, 1);
+
+                    if (hex == "K")             //NAK=0x15
+                    {
+                        buffer.append(0x15);
+                        continue;
+                    }
+                }
             }
-         }
-         else if (letter == "S")
-         {
-            i++;
-            hex = str.mid(i, 1);
-
-            if (hex == "O")
+            else if (letter == "S")
             {
-               i++;
-               hex = str.mid(i, 1);
+                i++;
+                hex = str.mid(i, 1);
 
-               if (hex == "H")                  //SOH=0x01
-               {
-                  buffer.append(0x01);
-                  continue;
-               }
-               else                             //SO=0x0E
-               {
-                  buffer.append(0x0E);
-                  i--;
-                  continue;
-               }
+                if (hex == "O")
+                {
+                    i++;
+                    hex = str.mid(i, 1);
+
+                    if (hex == "H")             //SOH=0x01
+                    {
+                        buffer.append(0x01);
+                        continue;
+                    }
+                    else                        //SO=0x0E
+                    {
+                        buffer.append(0x0E);
+                        i--;
+                        continue;
+                    }
+                }
+                else if (hex == "T")
+                {
+                    i++;
+                    hex = str.mid(i, 1);
+
+                    if (hex == "X")             //STX=0x02
+                    {
+                        buffer.append(0x02);
+                        continue;
+                    }
+                }
+                else if (hex == "I")            //SI=0x0F
+                {
+                    buffer.append(0x0F);
+                    continue;
+                }
+                else if (hex == "Y")
+                {
+                    i++;
+                    hex = str.mid(i, 1);
+
+                    if (hex == "N")             //SYN=0x16
+                    {
+                        buffer.append(0x16);
+                        continue;
+                    }
+                }
+                else if (hex == "U")
+                {
+                    i++;
+                    hex = str.mid(i, 1);
+
+                    if (hex == "B")             //SUB=0x1A
+                    {
+                        buffer.append(0x1A);
+                        continue;
+                    }
+                }
             }
-            else if (hex == "T")
+            else if (letter == "E")
             {
-               i++;
-               hex = str.mid(i, 1);
+                i++;
+                hex = str.mid(i, 1);
 
-               if (hex == "X")                  //STX=0x02
-               {
-                  buffer.append(0x02);
-                  continue;
-               }
+                if (hex == "T")
+                {
+                    i++;
+                    hex = str.mid(i, 1);
+
+                    if (hex == "X")             //ETX=0x03
+                    {
+                        buffer.append(0x03);
+                        continue;
+                    }
+                    else if (hex == "B")        //ETB=0x17
+                    {
+                        buffer.append(0x17);
+                        continue;
+                    }
+                }
+                else if (hex == "O")
+                {
+                    i++;
+                    hex = str.mid(i, 1);
+
+                    if (hex == "T")             //EOT=0x04
+                    {
+                        buffer.append(0x04);
+                        continue;
+                    }
+                }
+                else if (hex == "N")
+                {
+                    i++;
+                    hex = str.mid(i, 1);
+
+                    if (hex == "Q")             //ENQ=0x05
+                    {
+                        buffer.append(0x05);
+                        continue;
+                    }
+                }
+                else if (hex == "M")            //EM=0x19
+                {
+                    buffer.append(0x19);
+                    continue;
+                }
+                else if (hex == "S")
+                {
+                    i++;
+                    hex = str.mid(i, 1);
+
+                    if (hex == "C")             //ESC=0x1B
+                    {
+                        buffer.append(0x1B);
+                        continue;
+                    }
+                }
             }
-            else if (hex == "I")                //SI=0x0F
+            else if (letter == "A")
             {
-               buffer.append(0x0F);
-               continue;
+                i++;
+                hex = str.mid(i, 1);
+
+                if (hex == "C")
+                {
+                    i++;
+                    hex = str.mid(i, 1);
+
+                    if (hex == "K")             //ACK=0x06
+                    {
+                        buffer.append(0x06);
+                        continue;
+                    }
+                }
             }
-            else if (hex == "Y")
+            else if (letter == "B")
             {
-               i++;
-               hex = str.mid(i, 1);
+                i++;
+                hex = str.mid(i, 1);
 
-               if (hex == "N")                  //SYN=0x16
-               {
-                  buffer.append(0x16);
-                  continue;
-               }
+                if (hex == "E")
+                {
+                    i++;
+                    hex = str.mid(i, 1);
+
+                    if (hex == "L")             //BEL=0x07
+                    {
+                        buffer.append(0x07);
+                        continue;
+                    }
+                }
+                else if (hex == "S")            //BS=0x08
+                {
+                    buffer.append(0x08);
+                    continue;
+                }
             }
-            else if (hex == "U")
+            else if (letter == "C")
             {
-               i++;
-               hex = str.mid(i, 1);
+                i++;
+                hex = str.mid(i, 1);
 
-               if (hex == "B")                  //SUB=0x1A
-               {
-                  buffer.append(0x1A);
-                  continue;
-               }
+                if (hex == "R")                 //CR=0x0D
+                {
+                    buffer.append(0x0D);
+                    continue;
+                }
+                else if (hex == "A")
+                {
+                    i++;
+                    hex = str.mid(i, 1);
+
+                    if (hex == "N")             //CAN=0x18
+                    {
+                        buffer.append(0x18);
+                        continue;
+                    }
+                }
             }
-         }
-         else if (letter == "E")
-         {
-            i++;
-            hex = str.mid(i, 1);
-
-            if (hex == "T")
+            else if (letter == "D")
             {
-               i++;
-               hex = str.mid(i, 1);
+                i++;
+                hex = str.mid(i, 1);
 
-               if (hex == "X")                  //ETX=0x03
-               {
-                  buffer.append(0x03);
-                  continue;
-               }
-               else if (hex == "B")             //ETB=0x17
-               {
-                  buffer.append(0x17);
-                  continue;
-               }
+                if (hex == "L")
+                {
+                    i++;
+                    hex = str.mid(i, 1);
+
+                    if (hex == "E")             //DLE=0x10
+                    {
+                        buffer.append(0x10);
+                        continue;
+                    }
+                }
+                else if (hex == "C")
+                {
+                    i++;
+                    hex = str.mid(i, 1);
+
+                    if (hex == "1")             //DC1=0x11
+                    {
+                        buffer.append(0x11);
+                        continue;
+                    }
+                    else if (hex == "2")        //DC2=0x12
+                    {
+                        buffer.append(0x12);
+                        continue;
+                    }
+                    else if (hex == "3")        //DC3=0x13
+                    {
+                        buffer.append(0x13);
+                        continue;
+                    }
+                    else if (hex == "4")        //DC2=0x14
+                    {
+                        buffer.append(0x14);
+                        continue;
+                    }
+                }
             }
-            else if (hex == "O")
+            else if (letter == "F")
             {
-               i++;
-               hex = str.mid(i, 1);
+                i++;
+                hex = str.mid(i, 1);
 
-               if (hex == "T")                  //EOT=0x04
-               {
-                  buffer.append(0x04);
-                  continue;
-               }
+                if (hex == "F")                 //FF=0x0C
+                {
+                    buffer.append(0x0C);
+                    continue;
+                }
+                else if (hex == "S")            //FS=0x1C
+                {
+                    buffer.append(0x1C);
+                    continue;
+                }
             }
-            else if (hex == "N")
+            else if (letter == "H")
             {
-               i++;
-               hex = str.mid(i, 1);
+                i++;
+                hex = str.mid(i, 1);
 
-               if (hex == "Q")                  //ENQ=0x05
-               {
-                  buffer.append(0x05);
-                  continue;
-               }
+                if (hex == "T")                 //HT=0x09
+                {
+                    buffer.append(0x09);
+                    continue;
+                }
             }
-            else if (hex == "M")                //EM=0x19
+            else if (letter == "L")
             {
-               buffer.append(0x19);
-               continue;
+                i++;
+                hex = str.mid(i, 1);
+
+                if (hex == "F")                 //LF=0x0A
+                {
+                    buffer.append(0x0A);
+                    continue;
+                }
             }
-            else if (hex == "S")
+            else if (letter == "G")
             {
-               i++;
-               hex = str.mid(i, 1);
+                i++;
+                hex = str.mid(i, 1);
 
-               if (hex == "C")                  //ESC=0x1B
-               {
-                  buffer.append(0x1B);
-                  continue;
-               }
+                if (hex == "S")                 //GS=0x1D
+                {
+                    buffer.append(0x1D);
+                    continue;
+                }
             }
-         }
-         else if (letter == "A")
-         {
-            i++;
-            hex = str.mid(i, 1);
-
-            if (hex == "C")
+            else if (letter == "R")
             {
-               i++;
-               hex = str.mid(i, 1);
+                i++;
+                hex = str.mid(i, 1);
 
-               if (hex == "K")                  //ACK=0x06
-               {
-                  buffer.append(0x06);
-                  continue;
-               }
+                if (hex == "S")                 //RS=0x1E
+                {
+                    buffer.append(0x1E);
+                    continue;
+                }
             }
-         }
-         else if (letter == "B")
-         {
-            i++;
-            hex = str.mid(i, 1);
-
-            if (hex == "E")
+            else if (letter == "U")
             {
-               i++;
-               hex = str.mid(i, 1);
+                i++;
+                hex = str.mid(i, 1);
 
-               if (hex == "L")                  //BEL=0x07
-               {
-                  buffer.append(0x07);
-                  continue;
-               }
+                if (hex == "S")                 //US=0x1F
+                {
+                    buffer.append(0x1F);
+                    continue;
+                }
             }
-            else if (hex == "S")                //BS=0x08
+            else if (letter == "V")
             {
-               buffer.append(0x08);
-               continue;
-            }
-         }
-         else if (letter == "C")
-         {
-            i++;
-            hex = str.mid(i, 1);
+                i++;
+                hex = str.mid(i, 1);
 
-            if (hex == "R")                     //CR=0x0D
+                if (hex == "T")                 //VT=0x0B
+                {
+                    buffer.append(0x0B);
+                    continue;
+                }
+            }
+            else if (letter == "\\")
             {
-               buffer.append(0x0D);
-               continue;
+                //如果连着的是多个\\则对应添加\对应的16进制0x5C
+                buffer.append(0x5C);
+                continue;
             }
-            else if (hex == "A")
+            else
             {
-               i++;
-               hex = str.mid(i, 1);
-
-               if (hex == "N")                  //CAN=0x18
-               {
-                  buffer.append(0x18);
-                  continue;
-               }
+                //将对应的\[前面的\\也要加入
+                buffer.append(0x5C);
+                buffer.append(letter.toLatin1());
+                continue;
             }
-         }
-         else if (letter == "D")
-         {
-            i++;
-            hex = str.mid(i, 1);
+        }
 
-            if (hex == "L")
-            {
-               i++;
-               hex = str.mid(i, 1);
+        buffer.append(str.mid(i, 1).toLatin1());
+    }
 
-               if (hex == "E")                  //DLE=0x10
-               {
-                  buffer.append(0x10);
-                  continue;
-               }
-            }
-            else if (hex == "C")
-            {
-               i++;
-               hex = str.mid(i, 1);
-
-               if (hex == "1")                  //DC1=0x11
-               {
-                  buffer.append(0x11);
-                  continue;
-               }
-               else if (hex == "2")             //DC2=0x12
-               {
-                  buffer.append(0x12);
-                  continue;
-               }
-               else if (hex == "3")             //DC3=0x13
-               {
-                  buffer.append(0x13);
-                  continue;
-               }
-               else if (hex == "4")             //DC2=0x14
-               {
-                  buffer.append(0x14);
-                  continue;
-               }
-            }
-         }
-         else if (letter == "F")
-         {
-            i++;
-            hex = str.mid(i, 1);
-
-            if (hex == "F")                     //FF=0x0C
-            {
-               buffer.append(0x0C);
-               continue;
-            }
-            else if (hex == "S")                //FS=0x1C
-            {
-               buffer.append(0x1C);
-               continue;
-            }
-         }
-         else if (letter == "H")
-         {
-            i++;
-            hex = str.mid(i, 1);
-
-            if (hex == "T")                     //HT=0x09
-            {
-               buffer.append(0x09);
-               continue;
-            }
-         }
-         else if (letter == "L")
-         {
-            i++;
-            hex = str.mid(i, 1);
-
-            if (hex == "F")                     //LF=0x0A
-            {
-               buffer.append(0x0A);
-               continue;
-            }
-         }
-         else if (letter == "G")
-         {
-            i++;
-            hex = str.mid(i, 1);
-
-            if (hex == "S")                     //GS=0x1D
-            {
-               buffer.append(0x1D);
-               continue;
-            }
-         }
-         else if (letter == "R")
-         {
-            i++;
-            hex = str.mid(i, 1);
-
-            if (hex == "S")                     //RS=0x1E
-            {
-               buffer.append(0x1E);
-               continue;
-            }
-         }
-         else if (letter == "U")
-         {
-            i++;
-            hex = str.mid(i, 1);
-
-            if (hex == "S")                     //US=0x1F
-            {
-               buffer.append(0x1F);
-               continue;
-            }
-         }
-         else if (letter == "V")
-         {
-            i++;
-            hex = str.mid(i, 1);
-
-            if (hex == "T")                     //VT=0x0B
-            {
-               buffer.append(0x0B);
-               continue;
-            }
-         }
-         else if (letter == "\\")
-         {
-            //如果连着的是多个\\则对应添加\对应的16进制0x5C
-            buffer.append(0x5C);
-            continue;
-         }
-         else
-         {
-            //将对应的\[前面的\\也要加入
-            buffer.append(0x5C);
-            buffer.append(letter.toLatin1());
-            continue;
-         }
-      }
-
-      buffer.append(str.mid(i, 1).toLatin1());
-   }
-
-   return buffer;
+    return buffer;
 }
 
 
 QString QUIWidget::byteArrayToHexStr(const QByteArray& data)
 {
-   QString temp = "";
-   QString hex  = data.toHex();
+    QString temp = "";
+    QString hex  = data.toHex();
 
-   for (int i = 0; i < hex.length(); i = i + 2)
-   {
-      temp += hex.mid(i, 2) + " ";
-   }
+    for (int i = 0; i < hex.length(); i = i + 2)
+    {
+        temp += hex.mid(i, 2) + " ";
+    }
 
-   return temp.trimmed().toUpper();
+    return temp.trimmed().toUpper();
 }
 
 
 QString QUIWidget::getFileName(const QString& filter, QString defaultDir)
 {
-   return QFileDialog::getOpenFileName(0, "选择文件", defaultDir, filter);
+    return QFileDialog::getOpenFileName(0, "选择文件", defaultDir, filter);
 }
 
 
 QStringList QUIWidget::getFileNames(const QString& filter, QString defaultDir)
 {
-   return QFileDialog::getOpenFileNames(0, "选择文件", defaultDir, filter);
+    return QFileDialog::getOpenFileNames(0, "选择文件", defaultDir, filter);
 }
 
 
 QString QUIWidget::getFolderName()
 {
-   return QFileDialog::getExistingDirectory();
+    return QFileDialog::getExistingDirectory();
 }
 
 
 QString QUIWidget::getFileNameWithExtension(const QString& strFilePath)
 {
-   QFileInfo fileInfo(strFilePath);
+    QFileInfo fileInfo(strFilePath);
 
-   return fileInfo.fileName();
+    return fileInfo.fileName();
 }
 
 
 QStringList QUIWidget::getFolderFileNames(const QStringList& filter)
 {
-   QStringList fileList;
-   QString     strFolder = QFileDialog::getExistingDirectory();
+    QStringList fileList;
+    QString     strFolder = QFileDialog::getExistingDirectory();
 
-   if (!strFolder.length() == 0)
-   {
-      QDir myFolder(strFolder);
+    if (!strFolder.length() == 0)
+    {
+        QDir myFolder(strFolder);
 
-      if (myFolder.exists())
-      {
-         fileList = myFolder.entryList(filter);
-      }
-   }
+        if (myFolder.exists())
+        {
+            fileList = myFolder.entryList(filter);
+        }
+    }
 
-   return fileList;
+    return fileList;
 }
 
 
 bool QUIWidget::folderIsExist(const QString& strFolder)
 {
-   QDir tempFolder(strFolder);
+    QDir tempFolder(strFolder);
 
-   return tempFolder.exists();
+    return tempFolder.exists();
 }
 
 
 bool QUIWidget::fileIsExist(const QString& strFile)
 {
-   QFile tempFile(strFile);
+    QFile tempFile(strFile);
 
-   return tempFile.exists();
+    return tempFile.exists();
 }
 
 
 bool QUIWidget::copyFile(const QString& sourceFile, const QString& targetFile)
 {
-   bool ok;
+    bool ok;
 
-   ok = QFile::copy(sourceFile, targetFile);
-   //将复制过去的文件只读属性取消
-   ok = QFile::setPermissions(targetFile, QFile::WriteOwner);
-   return ok;
+    ok = QFile::copy(sourceFile, targetFile);
+    //将复制过去的文件只读属性取消
+    ok = QFile::setPermissions(targetFile, QFile::WriteOwner);
+    return ok;
 }
 
 
 void QUIWidget::deleteDirectory(const QString& path)
 {
-   QDir dir(path);
+    QDir dir(path);
 
-   if (!dir.exists())
-   {
-      return;
-   }
+    if (!dir.exists())
+    {
+        return;
+    }
 
-   dir.setFilter(QDir::AllEntries | QDir::NoDotAndDotDot);
-   QFileInfoList fileList = dir.entryInfoList();
+    dir.setFilter(QDir::AllEntries | QDir::NoDotAndDotDot);
+    QFileInfoList fileList = dir.entryInfoList();
 
-   foreach(QFileInfo fi, fileList)
-   {
-      if (fi.isFile())
-      {
-         fi.dir().remove(fi.fileName());
-      }
-      else
-      {
-         deleteDirectory(fi.absoluteFilePath());
-         dir.rmdir(fi.absoluteFilePath());
-      }
-   }
+    foreach(QFileInfo fi, fileList)
+    {
+        if (fi.isFile())
+        {
+            fi.dir().remove(fi.fileName());
+        }
+        else
+        {
+            deleteDirectory(fi.absoluteFilePath());
+            dir.rmdir(fi.absoluteFilePath());
+        }
+    }
 }
 
 
 bool QUIWidget::ipLive(const QString& ip, int port, int timeout)
 {
-   QTcpSocket tcpClient;
+    QTcpSocket tcpClient;
 
-   tcpClient.abort();
-   tcpClient.connectToHost(ip, port);
-   //超时没有连接上则判断不在线
-   return tcpClient.waitForConnected(timeout);
+    tcpClient.abort();
+    tcpClient.connectToHost(ip, port);
+    //超时没有连接上则判断不在线
+    return tcpClient.waitForConnected(timeout);
 }
 
 
 QString QUIWidget::getHtml(const QString& url)
 {
-   QNetworkAccessManager *manager = new QNetworkAccessManager();
-   QNetworkReply         *reply   = manager->get(QNetworkRequest(QUrl(url)));
-   QByteArray            responseData;
-   QEventLoop            eventLoop;
+    QNetworkAccessManager *manager = new QNetworkAccessManager();
+    QNetworkReply         *reply   = manager->get(QNetworkRequest(QUrl(url)));
+    QByteArray            responseData;
+    QEventLoop            eventLoop;
 
-   QObject::connect(manager, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
-   eventLoop.exec();
-   responseData = reply->readAll();
-   return QString(responseData);
+    QObject::connect(manager, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
+    eventLoop.exec();
+    responseData = reply->readAll();
+    return QString(responseData);
 }
 
 
 QString QUIWidget::getNetIP(const QString& webCode)
 {
-   QString web = webCode;
+    QString web = webCode;
 
-   web = web.replace(' ', "");
-   web = web.replace("\r", "");
-   web = web.replace("\n", "");
-   QStringList list = web.split("<br/>");
-   QString     tar  = list.at(3);
-   QStringList ip   = tar.split("=");
-   return ip.at(1);
+    web = web.replace(' ', "");
+    web = web.replace("\r", "");
+    web = web.replace("\n", "");
+    QStringList list = web.split("<br/>");
+    QString     tar  = list.at(3);
+    QStringList ip   = tar.split("=");
+    return ip.at(1);
 }
 
 
 QString QUIWidget::getLocalIP()
 {
-   QString ip;
+    QString ip;
 
-   QList<QHostAddress> addrs = QNetworkInterface::allAddresses();
+    QList<QHostAddress> addrs = QNetworkInterface::allAddresses();
 
-   foreach(QHostAddress addr, addrs)
-   {
-      ip = addr.toString();
+    foreach(QHostAddress addr, addrs)
+    {
+        ip = addr.toString();
 
-      if (ip != "127.0.0.1")
-      {
-         break;
-      }
-   }
+        if (ip != "127.0.0.1")
+        {
+            break;
+        }
+    }
 
-   return ip;
+    return ip;
 }
 
 
 QString QUIWidget::urlToIP(const QString& url)
 {
-   QHostInfo host = QHostInfo::fromName(url);
+    QHostInfo host = QHostInfo::fromName(url);
 
-   return host.addresses().at(0).toString();
+    return host.addresses().at(0).toString();
 }
 
 
 bool QUIWidget::isWebOk()
 {
-   //能接通百度IP说明可以通外网
-   return ipLive("115.239.211.112", 80);
+    //能接通百度IP说明可以通外网
+    return ipLive("115.239.211.112", 80);
 }
 
 
 void QUIWidget::showMessageBoxInfo(const QString& info, int closeSec)
 {
-   QUIMessageBox::Instance()->setMessage(info, 0, closeSec);
-   QUIMessageBox::Instance()->show();
+    QUIMessageBox::Instance()->setMessage(info, 0, closeSec);
+    QUIMessageBox::Instance()->show();
 }
 
 
 void QUIWidget::showMessageBoxError(const QString& info, int closeSec)
 {
-   QUIMessageBox::Instance()->setMessage(info, 2, closeSec);
-   QUIMessageBox::Instance()->show();
+    QUIMessageBox::Instance()->setMessage(info, 2, closeSec);
+    QUIMessageBox::Instance()->show();
 }
 
 
 int QUIWidget::showMessageBoxQuestion(const QString& info)
 {
-   QUIMessageBox msg;
+    QUIMessageBox msg;
 
-   msg.setMessage(info, 1);
-   return msg.exec();
+    msg.setMessage(info, 1);
+    return msg.exec();
 }
 
 
 QString QUIWidget::showInputBox(bool& ok, const QString& title, int type, int closeSec,
                                 QString defaultValue, bool pwd)
 {
-   QUIInputBox input;
+    QUIInputBox input;
 
-   input.setParameter(title, type, closeSec, defaultValue, pwd);
-   ok = input.exec();
-   return input.getValue();
+    input.setParameter(title, type, closeSec, defaultValue, pwd);
+    ok = input.exec();
+    return input.getValue();
 }
 
 
 QUIWidget::QUIWidget(QWidget *parent) : QDialog(parent)
 {
-   this->initControl();
-   this->initForm();
+    this->initControl();
+    this->initForm();
 }
 
 
 QUIWidget::~QUIWidget()
 {
-   delete widgetMain;
+    delete widgetMain;
 }
 
 
 bool QUIWidget::eventFilter(QObject *obj, QEvent *evt)
 {
-   static QPoint mousePoint;
-   static bool   mousePressed = false;
+    static QPoint mousePoint;
+    static bool   mousePressed = false;
 
-   QMouseEvent *event = static_cast<QMouseEvent *>(evt);
+    QMouseEvent *event = static_cast<QMouseEvent *>(evt);
 
-   if (event->type() == QEvent::MouseButtonPress)
-   {
-      if (event->button() == Qt::LeftButton)
-      {
-         mousePressed = true;
-         mousePoint   = event->globalPos() - this->pos();
-         return true;
-      }
-   }
-   else if (event->type() == QEvent::MouseButtonRelease)
-   {
-      mousePressed = false;
-      return true;
-   }
-   else if (event->type() == QEvent::MouseMove)
-   {
-      if (!max && mousePressed && (event->buttons() && Qt::LeftButton))
-      {
-         this->move(event->globalPos() - mousePoint);
-         return true;
-      }
-   }
-   else if (event->type() == QEvent::MouseButtonDblClick)
-   {
-      //以下写法可以将双击识别限定在标题栏
-      //if (this->btnMenu_Max->isVisible() && obj == this->widgetTitle) {
-      if (this->btnMenuMax->isVisible())
-      {
-         this->on_btnMenu_Max_clicked();
-         return true;
-      }
-   }
+    if (event->type() == QEvent::MouseButtonPress)
+    {
+        if (event->button() == Qt::LeftButton)
+        {
+            mousePressed = true;
+            mousePoint   = event->globalPos() - this->pos();
+            return true;
+        }
+    }
+    else if (event->type() == QEvent::MouseButtonRelease)
+    {
+        mousePressed = false;
+        return true;
+    }
+    else if (event->type() == QEvent::MouseMove)
+    {
+        if (!max && mousePressed && (event->buttons() && Qt::LeftButton))
+        {
+            this->move(event->globalPos() - mousePoint);
+            return true;
+        }
+    }
+    else if (event->type() == QEvent::MouseButtonDblClick)
+    {
+        //以下写法可以将双击识别限定在标题栏
+        //if (this->btnMenu_Max->isVisible() && obj == this->widgetTitle) {
+        if (this->btnMenuMax->isVisible())
+        {
+            this->on_btnMenu_Max_clicked();
+            return true;
+        }
+    }
 
-   return QWidget::eventFilter(obj, evt);
+    return QWidget::eventFilter(obj, evt);
 }
 
 
 QLabel *QUIWidget::getLabIco() const
 {
-   return this->labelIcon;
+    return this->labelIcon;
 }
 
 
 QLabel *QUIWidget::getLabTitle() const
 {
-   return this->labelTitle;
+    return this->labelTitle;
 }
 
 
 QToolButton *QUIWidget::getBtnMenu() const
 {
-   return this->btnMenuThemes;
+    return this->btnMenuThemes;
 }
 
 
 QPushButton *QUIWidget::getBtnMenuMin() const
 {
-   return this->btnMenuMin;
+    return this->btnMenuMin;
 }
 
 
 QPushButton *QUIWidget::getBtnMenuMax() const
 {
-   return this->btnMenuMax;
+    return this->btnMenuMax;
 }
 
 
 QPushButton *QUIWidget::getBtnMenuMClose() const
 {
-   return this->btnMenuClose;
+    return this->btnMenuClose;
 }
 
 
 QString QUIWidget::getTitle() const
 {
-   return this->title;
+    return this->title;
 }
 
 
 Qt::Alignment QUIWidget::getAlignment() const
 {
-   return this->alignment;
+    return this->alignment;
 }
 
 
 QSize QUIWidget::sizeHint() const
 {
-   return QSize(600, 450);
+    return QSize(600, 450);
 }
 
 
 QSize QUIWidget::minimumSizeHint() const
 {
-   return QSize(200, 150);
+    return QSize(200, 150);
 }
 
 
 void QUIWidget::initControl()
 {
-   this->setObjectName(QString::fromUtf8("QUIWidget"));
-   this->resize(900, 750);
-   verticalLayout1 = new QVBoxLayout(this);
-   verticalLayout1->setSpacing(0);
-   verticalLayout1->setContentsMargins(11, 11, 11, 11);
-   verticalLayout1->setObjectName(QString::fromUtf8("verticalLayout1"));
-   verticalLayout1->setContentsMargins(1, 1, 1, 1);
-   widgetMain = new QWidget(this);
-   widgetMain->setObjectName(QString::fromUtf8("widgetMain"));
-   widgetMain->setStyleSheet(QString::fromUtf8(""));
-   verticalLayout2 = new QVBoxLayout(widgetMain);
-   verticalLayout2->setSpacing(0);
-   verticalLayout2->setContentsMargins(11, 11, 11, 11);
-   verticalLayout2->setObjectName(QString::fromUtf8("verticalLayout2"));
-   verticalLayout2->setContentsMargins(0, 0, 0, 0);
-   widgetTitle = new QWidget(widgetMain);
-   widgetTitle->setObjectName(QString::fromUtf8("widgetTitle"));
-   QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-   sizePolicy.setHorizontalStretch(0);
-   sizePolicy.setVerticalStretch(0);
-   sizePolicy.setHeightForWidth(widgetTitle->sizePolicy().hasHeightForWidth());
-   widgetTitle->setSizePolicy(sizePolicy);
-   widgetTitle->setMinimumSize(QSize(0, 30));
-   horizontalLayout4 = new QHBoxLayout(widgetTitle);
-   horizontalLayout4->setSpacing(0);
-   horizontalLayout4->setContentsMargins(11, 11, 11, 11);
-   horizontalLayout4->setObjectName(QString::fromUtf8("horizontalLayout4"));
-   horizontalLayout4->setContentsMargins(0, 0, 0, 0);
-   labelIcon = new QLabel(widgetTitle);
-   labelIcon->setObjectName(QString::fromUtf8("labIco"));
-   QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Preferred);
-   sizePolicy1.setHorizontalStretch(0);
-   sizePolicy1.setVerticalStretch(0);
-   sizePolicy1.setHeightForWidth(labelIcon->sizePolicy().hasHeightForWidth());
-   labelIcon->setSizePolicy(sizePolicy1);
-   labelIcon->setMinimumSize(QSize(30, 0));
-   labelIcon->setAlignment(Qt::AlignCenter);
+    this->setObjectName(QString::fromUtf8("QUIWidget"));
+    this->resize(900, 750);
+    verticalLayout1 = new QVBoxLayout(this);
+    verticalLayout1->setSpacing(0);
+    verticalLayout1->setContentsMargins(11, 11, 11, 11);
+    verticalLayout1->setObjectName(QString::fromUtf8("verticalLayout1"));
+    verticalLayout1->setContentsMargins(1, 1, 1, 1);
+    widgetMain = new QWidget(this);
+    widgetMain->setObjectName(QString::fromUtf8("widgetMain"));
+    widgetMain->setStyleSheet(QString::fromUtf8(""));
+    verticalLayout2 = new QVBoxLayout(widgetMain);
+    verticalLayout2->setSpacing(0);
+    verticalLayout2->setContentsMargins(11, 11, 11, 11);
+    verticalLayout2->setObjectName(QString::fromUtf8("verticalLayout2"));
+    verticalLayout2->setContentsMargins(0, 0, 0, 0);
+    widgetTitle = new QWidget(widgetMain);
+    widgetTitle->setObjectName(QString::fromUtf8("widgetTitle"));
+    QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    sizePolicy.setHorizontalStretch(0);
+    sizePolicy.setVerticalStretch(0);
+    sizePolicy.setHeightForWidth(widgetTitle->sizePolicy().hasHeightForWidth());
+    widgetTitle->setSizePolicy(sizePolicy);
+    widgetTitle->setMinimumSize(QSize(0, 30));
+    horizontalLayout4 = new QHBoxLayout(widgetTitle);
+    horizontalLayout4->setSpacing(0);
+    horizontalLayout4->setContentsMargins(11, 11, 11, 11);
+    horizontalLayout4->setObjectName(QString::fromUtf8("horizontalLayout4"));
+    horizontalLayout4->setContentsMargins(0, 0, 0, 0);
+    labelIcon = new QLabel(widgetTitle);
+    labelIcon->setObjectName(QString::fromUtf8("labIco"));
+    QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Preferred);
+    sizePolicy1.setHorizontalStretch(0);
+    sizePolicy1.setVerticalStretch(0);
+    sizePolicy1.setHeightForWidth(labelIcon->sizePolicy().hasHeightForWidth());
+    labelIcon->setSizePolicy(sizePolicy1);
+    labelIcon->setMinimumSize(QSize(30, 0));
+    labelIcon->setAlignment(Qt::AlignCenter);
 
-   horizontalLayout4->addWidget(labelIcon);
+    horizontalLayout4->addWidget(labelIcon);
 
-   labelTitle = new QLabel(widgetTitle);
-   labelTitle->setObjectName(QString::fromUtf8("labTitle"));
-   QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Preferred);
-   sizePolicy2.setHorizontalStretch(0);
-   sizePolicy2.setVerticalStretch(0);
-   sizePolicy2.setHeightForWidth(labelTitle->sizePolicy().hasHeightForWidth());
-   labelTitle->setSizePolicy(sizePolicy2);
-   labelTitle->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignVCenter);
+    labelTitle = new QLabel(widgetTitle);
+    labelTitle->setObjectName(QString::fromUtf8("labTitle"));
+    QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    sizePolicy2.setHorizontalStretch(0);
+    sizePolicy2.setVerticalStretch(0);
+    sizePolicy2.setHeightForWidth(labelTitle->sizePolicy().hasHeightForWidth());
+    labelTitle->setSizePolicy(sizePolicy2);
+    labelTitle->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignVCenter);
 
-   horizontalLayout4->addWidget(labelTitle);
+    horizontalLayout4->addWidget(labelTitle);
 
-   widgetMenu = new QWidget(widgetTitle);
-   widgetMenu->setObjectName(QString::fromUtf8("widgetMenu"));
-   sizePolicy1.setHeightForWidth(widgetMenu->sizePolicy().hasHeightForWidth());
-   widgetMenu->setSizePolicy(sizePolicy1);
-   horizontalLayout = new QHBoxLayout(widgetMenu);
-   horizontalLayout->setSpacing(0);
-   horizontalLayout->setContentsMargins(11, 11, 11, 11);
-   horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-   horizontalLayout->setContentsMargins(0, 0, 0, 0);
-   btnMenuThemes = new QToolButton(widgetMenu);
-   btnMenuThemes->setObjectName(QString::fromUtf8("btnMenu"));
-   QSizePolicy sizePolicy3(QSizePolicy::Fixed, QSizePolicy::Expanding);
-   sizePolicy3.setHorizontalStretch(0);
-   sizePolicy3.setVerticalStretch(0);
-   sizePolicy3.setHeightForWidth(btnMenuThemes->sizePolicy().hasHeightForWidth());
-   btnMenuThemes->setSizePolicy(sizePolicy3);
-   btnMenuThemes->setMinimumSize(QSize(30, 0));
-   btnMenuThemes->setMaximumSize(QSize(30, 16777215));
-   btnMenuThemes->setFocusPolicy(Qt::NoFocus);
-   btnMenuThemes->setPopupMode(QToolButton::InstantPopup);
+    widgetMenu = new QWidget(widgetTitle);
+    widgetMenu->setObjectName(QString::fromUtf8("widgetMenu"));
+    sizePolicy1.setHeightForWidth(widgetMenu->sizePolicy().hasHeightForWidth());
+    widgetMenu->setSizePolicy(sizePolicy1);
+    horizontalLayout = new QHBoxLayout(widgetMenu);
+    horizontalLayout->setSpacing(0);
+    horizontalLayout->setContentsMargins(11, 11, 11, 11);
+    horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+    horizontalLayout->setContentsMargins(0, 0, 0, 0);
+    btnMenuThemes = new QToolButton(widgetMenu);
+    btnMenuThemes->setObjectName(QString::fromUtf8("btnMenu"));
+    QSizePolicy sizePolicy3(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    sizePolicy3.setHorizontalStretch(0);
+    sizePolicy3.setVerticalStretch(0);
+    sizePolicy3.setHeightForWidth(btnMenuThemes->sizePolicy().hasHeightForWidth());
+    btnMenuThemes->setSizePolicy(sizePolicy3);
+    btnMenuThemes->setMinimumSize(QSize(30, 0));
+    btnMenuThemes->setMaximumSize(QSize(30, 16777215));
+    btnMenuThemes->setFocusPolicy(Qt::NoFocus);
+    btnMenuThemes->setPopupMode(QToolButton::InstantPopup);
 
-   horizontalLayout->addWidget(btnMenuThemes);
+    horizontalLayout->addWidget(btnMenuThemes);
 
-   btnMenuMin = new QPushButton(widgetMenu);
-   btnMenuMin->setObjectName(QString::fromUtf8("btnMenu_Min"));
-   QSizePolicy sizePolicy4(QSizePolicy::Minimum, QSizePolicy::Expanding);
-   sizePolicy4.setHorizontalStretch(0);
-   sizePolicy4.setVerticalStretch(0);
-   sizePolicy4.setHeightForWidth(btnMenuMin->sizePolicy().hasHeightForWidth());
-   btnMenuMin->setSizePolicy(sizePolicy4);
-   btnMenuMin->setMinimumSize(QSize(30, 0));
-   btnMenuMin->setMaximumSize(QSize(30, 16777215));
-   btnMenuMin->setCursor(QCursor(Qt::ArrowCursor));
-   btnMenuMin->setFocusPolicy(Qt::NoFocus);
+    btnMenuMin = new QPushButton(widgetMenu);
+    btnMenuMin->setObjectName(QString::fromUtf8("btnMenu_Min"));
+    QSizePolicy sizePolicy4(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    sizePolicy4.setHorizontalStretch(0);
+    sizePolicy4.setVerticalStretch(0);
+    sizePolicy4.setHeightForWidth(btnMenuMin->sizePolicy().hasHeightForWidth());
+    btnMenuMin->setSizePolicy(sizePolicy4);
+    btnMenuMin->setMinimumSize(QSize(30, 0));
+    btnMenuMin->setMaximumSize(QSize(30, 16777215));
+    btnMenuMin->setCursor(QCursor(Qt::ArrowCursor));
+    btnMenuMin->setFocusPolicy(Qt::NoFocus);
 
-   horizontalLayout->addWidget(btnMenuMin);
+    horizontalLayout->addWidget(btnMenuMin);
 
-   btnMenuMax = new QPushButton(widgetMenu);
-   btnMenuMax->setObjectName(QString::fromUtf8("btnMenu_Max"));
-   sizePolicy3.setHeightForWidth(btnMenuMax->sizePolicy().hasHeightForWidth());
-   btnMenuMax->setSizePolicy(sizePolicy3);
-   btnMenuMax->setMinimumSize(QSize(30, 0));
-   btnMenuMax->setMaximumSize(QSize(30, 16777215));
-   btnMenuMax->setCursor(QCursor(Qt::ArrowCursor));
-   btnMenuMax->setFocusPolicy(Qt::NoFocus);
+    btnMenuMax = new QPushButton(widgetMenu);
+    btnMenuMax->setObjectName(QString::fromUtf8("btnMenu_Max"));
+    sizePolicy3.setHeightForWidth(btnMenuMax->sizePolicy().hasHeightForWidth());
+    btnMenuMax->setSizePolicy(sizePolicy3);
+    btnMenuMax->setMinimumSize(QSize(30, 0));
+    btnMenuMax->setMaximumSize(QSize(30, 16777215));
+    btnMenuMax->setCursor(QCursor(Qt::ArrowCursor));
+    btnMenuMax->setFocusPolicy(Qt::NoFocus);
 
-   horizontalLayout->addWidget(btnMenuMax);
+    horizontalLayout->addWidget(btnMenuMax);
 
-   btnMenuClose = new QPushButton(widgetMenu);
-   btnMenuClose->setObjectName(QString::fromUtf8("btnMenu_Close"));
-   sizePolicy3.setHeightForWidth(btnMenuClose->sizePolicy().hasHeightForWidth());
-   btnMenuClose->setSizePolicy(sizePolicy3);
-   btnMenuClose->setMinimumSize(QSize(30, 0));
-   btnMenuClose->setMaximumSize(QSize(30, 16777215));
-   btnMenuClose->setCursor(QCursor(Qt::ArrowCursor));
-   btnMenuClose->setFocusPolicy(Qt::NoFocus);
+    btnMenuClose = new QPushButton(widgetMenu);
+    btnMenuClose->setObjectName(QString::fromUtf8("btnMenu_Close"));
+    sizePolicy3.setHeightForWidth(btnMenuClose->sizePolicy().hasHeightForWidth());
+    btnMenuClose->setSizePolicy(sizePolicy3);
+    btnMenuClose->setMinimumSize(QSize(30, 0));
+    btnMenuClose->setMaximumSize(QSize(30, 16777215));
+    btnMenuClose->setCursor(QCursor(Qt::ArrowCursor));
+    btnMenuClose->setFocusPolicy(Qt::NoFocus);
 
-   horizontalLayout->addWidget(btnMenuClose);
-   horizontalLayout4->addWidget(widgetMenu);
-   verticalLayout2->addWidget(widgetTitle);
+    horizontalLayout->addWidget(btnMenuClose);
+    horizontalLayout4->addWidget(widgetMenu);
+    verticalLayout2->addWidget(widgetTitle);
 
-   widget = new QWidget(widgetMain);
-   widget->setObjectName(QString::fromUtf8("widget"));
-   verticalLayout3 = new QVBoxLayout(widget);
-   verticalLayout3->setSpacing(0);
-   verticalLayout3->setContentsMargins(11, 11, 11, 11);
-   verticalLayout3->setObjectName(QString::fromUtf8("verticalLayout3"));
-   verticalLayout3->setContentsMargins(0, 0, 0, 0);
+    widget = new QWidget(widgetMain);
+    widget->setObjectName(QString::fromUtf8("widget"));
+    verticalLayout3 = new QVBoxLayout(widget);
+    verticalLayout3->setSpacing(0);
+    verticalLayout3->setContentsMargins(11, 11, 11, 11);
+    verticalLayout3->setObjectName(QString::fromUtf8("verticalLayout3"));
+    verticalLayout3->setContentsMargins(0, 0, 0, 0);
 
-   verticalLayout2->addWidget(widget);
-   verticalLayout1->addWidget(widgetMain);
+    verticalLayout2->addWidget(widget);
+    verticalLayout1->addWidget(widgetMain);
 
-   connect(this->btnMenuMin, SIGNAL(clicked(bool)), this, SLOT(on_btnMenu_Min_clicked()));
-   connect(this->btnMenuMax, SIGNAL(clicked(bool)), this, SLOT(on_btnMenu_Max_clicked()));
-   connect(this->btnMenuClose, SIGNAL(clicked(bool)), this, SLOT(on_btnMenu_Close_clicked()));
+    connect(this->btnMenuMin, SIGNAL(clicked(bool)), this, SLOT(on_btnMenu_Min_clicked()));
+    connect(this->btnMenuMax, SIGNAL(clicked(bool)), this, SLOT(on_btnMenu_Max_clicked()));
+    connect(this->btnMenuClose, SIGNAL(clicked(bool)), this, SLOT(on_btnMenu_Close_clicked()));
 }
 
 
 void QUIWidget::initForm()
 {
-   //设置图形字体
-   setIcon(QUIWidget::TitleIcon, QUIConfig::iconMain, 11);
-   setIcon(QUIWidget::BtnMenuThemes, QUIConfig::iconMenu);
-   setIcon(QUIWidget::BtnMenuMin, QUIConfig::iconMin);
-   setIcon(QUIWidget::BtnMenuNormal, QUIConfig::iconNormal);
-   setIcon(QUIWidget::BtnMenuClose, QUIConfig::iconClose);
+    //设置图形字体
+    setIcon(QUIWidget::TitleIcon, QUIConfig::iconMain, 11);
+    setIcon(QUIWidget::BtnMenuThemes, QUIConfig::iconMenu);
+    setIcon(QUIWidget::BtnMenuMin, QUIConfig::iconMin);
+    setIcon(QUIWidget::BtnMenuNormal, QUIConfig::iconNormal);
+    setIcon(QUIWidget::BtnMenuClose, QUIConfig::iconClose);
 
-   this->max      = false;
-   this->location = this->geometry();
-   this->setProperty("form", true);
-   this->widgetTitle->setProperty("form", "title");
-   this->setWindowFlags((Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint));
+    this->max      = false;
+    this->location = this->geometry();
+    this->setProperty("form", true);
+    this->widgetTitle->setProperty("form", "title");
+    this->setWindowFlags((Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint));
 
-   //设置标题及对齐方式
-   title      = "QUI Demo";
-   alignment  = Qt::AlignLeft | Qt::AlignVCenter;
-   minHide    = false;
-   mainWidget = 0;
+    //设置标题及对齐方式
+    title      = "QUI Demo";
+    alignment  = Qt::AlignLeft | Qt::AlignVCenter;
+    minHide    = false;
+    mainWidget = 0;
 
-   setVisible(QUIWidget::BtnMenuThemes, false);
+    setVisible(QUIWidget::BtnMenuThemes, false);
 
-   //绑定事件过滤器监听鼠标移动
-   this->installEventFilter(this);
-   this->widgetTitle->installEventFilter(this);
+    //绑定事件过滤器监听鼠标移动
+    this->installEventFilter(this);
+    this->widgetTitle->installEventFilter(this);
 
-   //添加换肤菜单
-   QStringList name;
-   name << "银色" << "蓝色" << "浅蓝色" << "深蓝色" << "灰色" << "浅灰色" << "深灰色" << "黑色"
-        << "浅黑色" << "深黑色" << "PS黑色" << "黑色扁平" << "白色扁平";
+    //添加换肤菜单
+    QStringList name;
+    name << "银色" << "蓝色" << "浅蓝色" << "深蓝色" << "灰色" << "浅灰色" << "深灰色" << "黑色"
+         << "浅黑色" << "深黑色" << "PS黑色" << "黑色扁平" << "白色扁平";
 
-   //换肤菜单下是QAction
-   foreach(QString str, name)
-   {
-      QAction *action = new QAction(str, this);
+    //换肤菜单下是QAction
+    foreach(QString str, name)
+    {
+        QAction *action = new QAction(str, this);
 
-      // 菜单加入Action
-      this->btnMenuThemes->addAction(action);
+        // 菜单加入Action
+        this->btnMenuThemes->addAction(action);
 
-      // 点击Action触发changeStyle()
-      connect(action, SIGNAL(triggered(bool)), this, SLOT(changeStyle()));
-   }
+        // 点击Action触发changeStyle()
+        connect(action, SIGNAL(triggered(bool)), this, SLOT(changeStyle()));
+    }
 }
 
 
 void QUIWidget::changeStyle()
 {
-   QAction *act    = (QAction *)sender();
-   QString name    = act->text();
-   QString qssFile = ":/qss/blue.css";
+    QAction *act    = (QAction *)sender();
+    QString name    = act->text();
+    QString qssFile = ":/qss/blue.css";
 
-   if (name == "银色")
-   {
-      qssFile = ":/qss/silvery.css";
-      setStyle(QUIWidget::StyleSilvery);
-   }
-   else if (name == "蓝色")
-   {
-      qssFile = ":/qss/blue.css";
-      setStyle(QUIWidget::StyleBlue);
-   }
-   else if (name == "浅蓝色")
-   {
-      qssFile = ":/qss/lightblue.css";
-      setStyle(QUIWidget::StyleLightBlue);
-   }
-   else if (name == "深蓝色")
-   {
-      qssFile = ":/qss/darkblue.css";
-      setStyle(QUIWidget::StyleDarkBlue);
-   }
-   else if (name == "灰色")
-   {
-      qssFile = ":/qss/gray.css";
-      setStyle(QUIWidget::StyleGray);
-   }
-   else if (name == "浅灰色")
-   {
-      qssFile = ":/qss/lightgray.css";
-      setStyle(QUIWidget::StyleLightGray);
-   }
-   else if (name == "深灰色")
-   {
-      qssFile = ":/qss/darkgray.css";
-      setStyle(QUIWidget::StyleDarkGray);
-   }
-   else if (name == "黑色")
-   {
-      qssFile = ":/qss/black.css";
-      setStyle(QUIWidget::StyleBlack);
-   }
-   else if (name == "浅黑色")
-   {
-      qssFile = ":/qss/lightblack.css";
-      setStyle(QUIWidget::StyleLightBlack);
-   }
-   else if (name == "深黑色")
-   {
-      qssFile = ":/qss/darkblack.css";
-      setStyle(QUIWidget::StyleDarkBlack);
-   }
-   else if (name == "PS黑色")
-   {
-      qssFile = ":/qss/psblack.css";
-      setStyle(QUIWidget::StylePSBlack);
-   }
-   else if (name == "黑色扁平")
-   {
-      qssFile = ":/qss/flatblack.css";
-      setStyle(QUIWidget::StyleFlatBlack);
-   }
-   else if (name == "白色扁平")
-   {
-      qssFile = ":/qss/flatwhite.css";
-      setStyle(QUIWidget::StyleFlatWhite);
-   }
+    if (name == "银色")
+    {
+        qssFile = ":/qss/silvery.css";
+        setStyle(QUIWidget::StyleSilvery);
+    }
+    else if (name == "蓝色")
+    {
+        qssFile = ":/qss/blue.css";
+        setStyle(QUIWidget::StyleBlue);
+    }
+    else if (name == "浅蓝色")
+    {
+        qssFile = ":/qss/lightblue.css";
+        setStyle(QUIWidget::StyleLightBlue);
+    }
+    else if (name == "深蓝色")
+    {
+        qssFile = ":/qss/darkblue.css";
+        setStyle(QUIWidget::StyleDarkBlue);
+    }
+    else if (name == "灰色")
+    {
+        qssFile = ":/qss/gray.css";
+        setStyle(QUIWidget::StyleGray);
+    }
+    else if (name == "浅灰色")
+    {
+        qssFile = ":/qss/lightgray.css";
+        setStyle(QUIWidget::StyleLightGray);
+    }
+    else if (name == "深灰色")
+    {
+        qssFile = ":/qss/darkgray.css";
+        setStyle(QUIWidget::StyleDarkGray);
+    }
+    else if (name == "黑色")
+    {
+        qssFile = ":/qss/black.css";
+        setStyle(QUIWidget::StyleBlack);
+    }
+    else if (name == "浅黑色")
+    {
+        qssFile = ":/qss/lightblack.css";
+        setStyle(QUIWidget::StyleLightBlack);
+    }
+    else if (name == "深黑色")
+    {
+        qssFile = ":/qss/darkblack.css";
+        setStyle(QUIWidget::StyleDarkBlack);
+    }
+    else if (name == "PS黑色")
+    {
+        qssFile = ":/qss/psblack.css";
+        setStyle(QUIWidget::StylePSBlack);
+    }
+    else if (name == "黑色扁平")
+    {
+        qssFile = ":/qss/flatblack.css";
+        setStyle(QUIWidget::StyleFlatBlack);
+    }
+    else if (name == "白色扁平")
+    {
+        qssFile = ":/qss/flatwhite.css";
+        setStyle(QUIWidget::StyleFlatWhite);
+    }
 
-   emit changeStyle(qssFile);
+    emit changeStyle(qssFile);
 }
 
 
 void QUIWidget::setIcon(QUIWidget::TitleElements widget, QChar str, quint32 size)
 {
-   if (widget == QUIWidget::TitleIcon)
-   {
-      setIconMain(str, size);
-   }
-   else if (widget == QUIWidget::BtnMenuThemes)
-   {
-      QUIConfig::iconMenu = str;
-      IconHelper::Instance()->setIcon(this->btnMenuThemes, str, size);
-   }
-   else if (widget == QUIWidget::BtnMenuMin)
-   {
-      QUIConfig::iconMin = str;
-      IconHelper::Instance()->setIcon(this->btnMenuMin, str, size);
-   }
-   else if (widget == QUIWidget::BtnMenuMax)
-   {
-      QUIConfig::iconMax = str;
-      IconHelper::Instance()->setIcon(this->btnMenuMax, str, size);
-   }
-   else if (widget == QUIWidget::BtnMenuNormal)
-   {
-      QUIConfig::iconNormal = str;
-      IconHelper::Instance()->setIcon(this->btnMenuMax, str, size);
-   }
-   else if (widget == QUIWidget::BtnMenuClose)
-   {
-      QUIConfig::iconClose = str;
-      IconHelper::Instance()->setIcon(this->btnMenuClose, str, size);
-   }
+    if (widget == QUIWidget::TitleIcon)
+    {
+        setIconMain(str, size);
+    }
+    else if (widget == QUIWidget::BtnMenuThemes)
+    {
+        QUIConfig::iconMenu = str;
+        IconHelper::Instance()->setIcon(this->btnMenuThemes, str, size);
+    }
+    else if (widget == QUIWidget::BtnMenuMin)
+    {
+        QUIConfig::iconMin = str;
+        IconHelper::Instance()->setIcon(this->btnMenuMin, str, size);
+    }
+    else if (widget == QUIWidget::BtnMenuMax)
+    {
+        QUIConfig::iconMax = str;
+        IconHelper::Instance()->setIcon(this->btnMenuMax, str, size);
+    }
+    else if (widget == QUIWidget::BtnMenuNormal)
+    {
+        QUIConfig::iconNormal = str;
+        IconHelper::Instance()->setIcon(this->btnMenuMax, str, size);
+    }
+    else if (widget == QUIWidget::BtnMenuClose)
+    {
+        QUIConfig::iconClose = str;
+        IconHelper::Instance()->setIcon(this->btnMenuClose, str, size);
+    }
 }
 
 
 void QUIWidget::setIconMain(QChar str, quint32 size)
 {
-   QUIConfig::iconMain = str;
-   IconHelper::Instance()->setIcon(this->labelIcon, str, size);
-   QUIMessageBox::Instance()->setIconMain(str, size);
-   QUIInputBox::Instance()->setIconMain(str, size);
+    QUIConfig::iconMain = str;
+
+    IconHelper::Instance()->setIcon(this->labelIcon, str, size);
+    QUIMessageBox::Instance()->setIconMain(str, size);
+    QUIInputBox::Instance()->setIconMain(str, size);
 }
 
 
 void QUIWidget::setPixmap(QUIWidget::TitleElements widget, const QString& file, const QSize& size)
 {
-   QPixmap pix = QPixmap(file);
+    QPixmap pix = QPixmap(file);
 
-   //按照宽高比自动缩放
-   pix = pix.scaled(size, Qt::KeepAspectRatio);
+    //按照宽高比自动缩放
+    pix = pix.scaled(size, Qt::KeepAspectRatio);
 
-   if (widget == QUIWidget::TitleIcon)
-   {
-      this->labelIcon->setPixmap(pix);
-   }
-   else if (widget == QUIWidget::BtnMenuThemes)
-   {
-      this->btnMenuThemes->setIcon(QIcon(file));
-   }
-   else if (widget == QUIWidget::BtnMenuMin)
-   {
-      this->btnMenuMin->setIcon(QIcon(file));
-   }
-   else if (widget == QUIWidget::BtnMenuMax)
-   {
-      this->btnMenuMax->setIcon(QIcon(file));
-   }
-   else if (widget == QUIWidget::BtnMenuClose)
-   {
-      this->btnMenuClose->setIcon(QIcon(file));
-   }
+    if (widget == QUIWidget::TitleIcon)
+    {
+        this->labelIcon->setPixmap(pix);
+    }
+    else if (widget == QUIWidget::BtnMenuThemes)
+    {
+        this->btnMenuThemes->setIcon(QIcon(file));
+    }
+    else if (widget == QUIWidget::BtnMenuMin)
+    {
+        this->btnMenuMin->setIcon(QIcon(file));
+    }
+    else if (widget == QUIWidget::BtnMenuMax)
+    {
+        this->btnMenuMax->setIcon(QIcon(file));
+    }
+    else if (widget == QUIWidget::BtnMenuClose)
+    {
+        this->btnMenuClose->setIcon(QIcon(file));
+    }
 }
 
 
 void QUIWidget::setVisible(QUIWidget::TitleElements widget, bool visible)
 {
-   if (widget == QUIWidget::TitleIcon)
-   {
-      this->labelIcon->setVisible(visible);
-   }
-   else if (widget == QUIWidget::BtnMenuThemes)
-   {
-      this->btnMenuThemes->setVisible(visible);
-   }
-   else if (widget == QUIWidget::BtnMenuMin)
-   {
-      this->btnMenuMin->setVisible(visible);
-   }
-   else if (widget == QUIWidget::BtnMenuMax)
-   {
-      this->btnMenuMax->setVisible(visible);
-   }
-   else if (widget == QUIWidget::BtnMenuClose)
-   {
-      this->btnMenuClose->setVisible(visible);
-   }
+    if (widget == QUIWidget::TitleIcon)
+    {
+        this->labelIcon->setVisible(visible);
+    }
+    else if (widget == QUIWidget::BtnMenuThemes)
+    {
+        this->btnMenuThemes->setVisible(visible);
+    }
+    else if (widget == QUIWidget::BtnMenuMin)
+    {
+        this->btnMenuMin->setVisible(visible);
+    }
+    else if (widget == QUIWidget::BtnMenuMax)
+    {
+        this->btnMenuMax->setVisible(visible);
+    }
+    else if (widget == QUIWidget::BtnMenuClose)
+    {
+        this->btnMenuClose->setVisible(visible);
+    }
 }
 
 
 void QUIWidget::setOnlyCloseBtn()
 {
-   this->btnMenuThemes->setVisible(false);
-   this->btnMenuMin->setVisible(false);
-   this->btnMenuMax->setVisible(false);
+    this->btnMenuThemes->setVisible(false);
+    this->btnMenuMin->setVisible(false);
+    this->btnMenuMax->setVisible(false);
 }
 
 
 void QUIWidget::setTitleHeight(int height)
 {
-   this->widgetTitle->setFixedHeight(height);
+    this->widgetTitle->setFixedHeight(height);
 }
 
 
 void QUIWidget::setBtnWidth(int width)
 {
-   this->labelIcon->setFixedWidth(width);
-   this->btnMenuThemes->setFixedWidth(width);
-   this->btnMenuMin->setFixedWidth(width);
-   this->btnMenuMax->setFixedWidth(width);
-   this->btnMenuClose->setFixedWidth(width);
+    this->labelIcon->setFixedWidth(width);
+    this->btnMenuThemes->setFixedWidth(width);
+    this->btnMenuMin->setFixedWidth(width);
+    this->btnMenuMax->setFixedWidth(width);
+    this->btnMenuClose->setFixedWidth(width);
 }
 
 
 void QUIWidget::setTitle(const QString& title)
 {
-   if (this->title != title)
-   {
-      this->title = title;
-      this->labelTitle->setText(title);
-      this->setWindowTitle(this->labelTitle->text());
-   }
+    if (this->title != title)
+    {
+        this->title = title;
+        this->labelTitle->setText(title);
+        this->setWindowTitle(this->labelTitle->text());
+    }
 }
 
 
 void QUIWidget::setAlignment(Qt::Alignment alignment)
 {
-   if (this->alignment != alignment)
-   {
-      this->alignment = alignment;
-      this->labelTitle->setAlignment(alignment);
-   }
+    if (this->alignment != alignment)
+    {
+        this->alignment = alignment;
+        this->labelTitle->setAlignment(alignment);
+    }
 }
 
 
 void QUIWidget::setMinHide(bool minHide)
 {
-   if (this->minHide != minHide)
-   {
-      this->minHide = minHide;
-   }
+    if (this->minHide != minHide)
+    {
+        this->minHide = minHide;
+    }
 }
 
 
 void QUIWidget::setMainWidget(QWidget *mainWidget)
 {
-   //一个QUI窗体对象只能设置一个主窗体
-   if (this->mainWidget == 0)
-   {
-      //将子窗体添加到布局
-      this->widget->layout()->addWidget(mainWidget);
-      //自动设置大小
-      resize(mainWidget->width(), mainWidget->height() + this->widgetTitle->height());
+    //一个QUI窗体对象只能设置一个主窗体
+    if (this->mainWidget == 0)
+    {
+        //将子窗体添加到布局
+        this->widget->layout()->addWidget(mainWidget);
+        //自动设置大小
+        resize(mainWidget->width(), mainWidget->height() + this->widgetTitle->height());
 
-      this->mainWidget = mainWidget;
-   }
+        this->mainWidget = mainWidget;
+    }
 }
 
 
 void QUIWidget::on_btnMenu_Min_clicked()
 {
-   if (minHide)
-   {
-      hide();
-   }
-   else
-   {
-      showMinimized();
-   }
+    if (minHide)
+    {
+        hide();
+    }
+    else
+    {
+        showMinimized();
+    }
 }
 
 
 void QUIWidget::on_btnMenu_Max_clicked()
 {
-   if (max)
-   {
-      this->setGeometry(location);
-      setIcon(QUIWidget::BtnMenuNormal, QUIConfig::iconNormal);
-   }
-   else
-   {
-      location = this->geometry();
-      this->setGeometry(qApp->desktop()->availableGeometry());
-      setIcon(QUIWidget::BtnMenuMax, QUIConfig::iconMax);
-   }
+    if (max)
+    {
+        this->setGeometry(location);
+        setIcon(QUIWidget::BtnMenuNormal, QUIConfig::iconNormal);
+    }
+    else
+    {
+        location = this->geometry();
+        this->setGeometry(qApp->desktop()->availableGeometry());
+        setIcon(QUIWidget::BtnMenuMax, QUIConfig::iconMax);
+    }
 
-   max = !max;
+    max = !max;
 }
 
 
 void QUIWidget::on_btnMenu_Close_clicked()
 {
-   emit closing();
+    emit closing();
 
-   exit(0);
+    exit(0);
 }
 
 
 QUIMessageBox *QUIMessageBox::self = 0;
 QUIMessageBox::QUIMessageBox(QWidget *parent) : QDialog(parent)
 {
-   this->initControl();
-   this->initForm();
+    this->initControl();
+    this->initForm();
 }
 
 
 QUIMessageBox::~QUIMessageBox()
 {
-   delete widgetMain;
+    delete widgetMain;
 }
 
 
 void QUIMessageBox::initControl()
 {
-   this->setObjectName(QString::fromUtf8("QUIMessageBox"));
+    this->setObjectName(QString::fromUtf8("QUIMessageBox"));
 
 #ifdef __arm__
-   this->resize(300, 160);
+    this->resize(300, 160);
 #else
-   this->resize(280, 150);
+    this->resize(280, 150);
 #endif
 
-   verticalLayout1 = new QVBoxLayout(this);
-   verticalLayout1->setSpacing(0);
-   verticalLayout1->setObjectName(QString::fromUtf8("verticalLayout1"));
-   verticalLayout1->setContentsMargins(1, 1, 1, 1);
-   widgetTitle = new QWidget(this);
-   widgetTitle->setObjectName(QString::fromUtf8("widgetTitle"));
-   QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-   sizePolicy.setHorizontalStretch(0);
-   sizePolicy.setVerticalStretch(0);
-   sizePolicy.setHeightForWidth(widgetTitle->sizePolicy().hasHeightForWidth());
-   widgetTitle->setSizePolicy(sizePolicy);
-   widgetTitle->setMinimumSize(QSize(0, 30));
-   horizontalLayout3 = new QHBoxLayout(widgetTitle);
-   horizontalLayout3->setSpacing(0);
-   horizontalLayout3->setObjectName(QString::fromUtf8("horizontalLayout3"));
-   horizontalLayout3->setContentsMargins(0, 0, 0, 0);
-   labelIcon = new QLabel(widgetTitle);
-   labelIcon->setObjectName(QString::fromUtf8("labIco"));
-   QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Preferred);
-   sizePolicy1.setHorizontalStretch(0);
-   sizePolicy1.setVerticalStretch(0);
-   sizePolicy1.setHeightForWidth(labelIcon->sizePolicy().hasHeightForWidth());
-   labelIcon->setSizePolicy(sizePolicy1);
-   labelIcon->setMinimumSize(QSize(30, 0));
-   labelIcon->setAlignment(Qt::AlignCenter);
+    verticalLayout1 = new QVBoxLayout(this);
+    verticalLayout1->setSpacing(0);
+    verticalLayout1->setObjectName(QString::fromUtf8("verticalLayout1"));
+    verticalLayout1->setContentsMargins(1, 1, 1, 1);
+    widgetTitle = new QWidget(this);
+    widgetTitle->setObjectName(QString::fromUtf8("widgetTitle"));
+    QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    sizePolicy.setHorizontalStretch(0);
+    sizePolicy.setVerticalStretch(0);
+    sizePolicy.setHeightForWidth(widgetTitle->sizePolicy().hasHeightForWidth());
+    widgetTitle->setSizePolicy(sizePolicy);
+    widgetTitle->setMinimumSize(QSize(0, 30));
+    horizontalLayout3 = new QHBoxLayout(widgetTitle);
+    horizontalLayout3->setSpacing(0);
+    horizontalLayout3->setObjectName(QString::fromUtf8("horizontalLayout3"));
+    horizontalLayout3->setContentsMargins(0, 0, 0, 0);
+    labelIcon = new QLabel(widgetTitle);
+    labelIcon->setObjectName(QString::fromUtf8("labIco"));
+    QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Preferred);
+    sizePolicy1.setHorizontalStretch(0);
+    sizePolicy1.setVerticalStretch(0);
+    sizePolicy1.setHeightForWidth(labelIcon->sizePolicy().hasHeightForWidth());
+    labelIcon->setSizePolicy(sizePolicy1);
+    labelIcon->setMinimumSize(QSize(30, 0));
+    labelIcon->setAlignment(Qt::AlignCenter);
 
-   horizontalLayout3->addWidget(labelIcon);
+    horizontalLayout3->addWidget(labelIcon);
 
-   labelTitle = new QLabel(widgetTitle);
-   labelTitle->setObjectName(QString::fromUtf8("labTitle"));
-   labelTitle->setStyleSheet(QString::fromUtf8(""));
-   labelTitle->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignVCenter);
+    labelTitle = new QLabel(widgetTitle);
+    labelTitle->setObjectName(QString::fromUtf8("labTitle"));
+    labelTitle->setStyleSheet(QString::fromUtf8(""));
+    labelTitle->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignVCenter);
 
-   horizontalLayout3->addWidget(labelTitle);
+    horizontalLayout3->addWidget(labelTitle);
 
-   labelTime = new QLabel(widgetTitle);
-   labelTime->setObjectName(QString::fromUtf8("labTime"));
-   QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Preferred);
-   sizePolicy2.setHorizontalStretch(0);
-   sizePolicy2.setVerticalStretch(0);
-   sizePolicy2.setHeightForWidth(labelTime->sizePolicy().hasHeightForWidth());
-   labelTime->setSizePolicy(sizePolicy2);
-   labelTime->setAlignment(Qt::AlignCenter);
+    labelTime = new QLabel(widgetTitle);
+    labelTime->setObjectName(QString::fromUtf8("labTime"));
+    QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    sizePolicy2.setHorizontalStretch(0);
+    sizePolicy2.setVerticalStretch(0);
+    sizePolicy2.setHeightForWidth(labelTime->sizePolicy().hasHeightForWidth());
+    labelTime->setSizePolicy(sizePolicy2);
+    labelTime->setAlignment(Qt::AlignCenter);
 
-   horizontalLayout3->addWidget(labelTime);
+    horizontalLayout3->addWidget(labelTime);
 
-   widgetMenu = new QWidget(widgetTitle);
-   widgetMenu->setObjectName(QString::fromUtf8("widgetMenu"));
-   sizePolicy1.setHeightForWidth(widgetMenu->sizePolicy().hasHeightForWidth());
-   widgetMenu->setSizePolicy(sizePolicy1);
-   horizontalLayout4 = new QHBoxLayout(widgetMenu);
-   horizontalLayout4->setSpacing(0);
-   horizontalLayout4->setObjectName(QString::fromUtf8("horizontalLayout4"));
-   horizontalLayout4->setContentsMargins(0, 0, 0, 0);
-   btnMenuClose = new QPushButton(widgetMenu);
-   btnMenuClose->setObjectName(QString::fromUtf8("btnMenu_Close"));
-   QSizePolicy sizePolicy3(QSizePolicy::Minimum, QSizePolicy::Expanding);
-   sizePolicy3.setHorizontalStretch(0);
-   sizePolicy3.setVerticalStretch(0);
-   sizePolicy3.setHeightForWidth(btnMenuClose->sizePolicy().hasHeightForWidth());
-   btnMenuClose->setSizePolicy(sizePolicy3);
-   btnMenuClose->setMinimumSize(QSize(30, 0));
-   btnMenuClose->setMaximumSize(QSize(30, 16777215));
-   btnMenuClose->setCursor(QCursor(Qt::ArrowCursor));
-   btnMenuClose->setFocusPolicy(Qt::NoFocus);
-   btnMenuClose->setFlat(true);
+    widgetMenu = new QWidget(widgetTitle);
+    widgetMenu->setObjectName(QString::fromUtf8("widgetMenu"));
+    sizePolicy1.setHeightForWidth(widgetMenu->sizePolicy().hasHeightForWidth());
+    widgetMenu->setSizePolicy(sizePolicy1);
+    horizontalLayout4 = new QHBoxLayout(widgetMenu);
+    horizontalLayout4->setSpacing(0);
+    horizontalLayout4->setObjectName(QString::fromUtf8("horizontalLayout4"));
+    horizontalLayout4->setContentsMargins(0, 0, 0, 0);
+    btnMenuClose = new QPushButton(widgetMenu);
+    btnMenuClose->setObjectName(QString::fromUtf8("btnMenu_Close"));
+    QSizePolicy sizePolicy3(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    sizePolicy3.setHorizontalStretch(0);
+    sizePolicy3.setVerticalStretch(0);
+    sizePolicy3.setHeightForWidth(btnMenuClose->sizePolicy().hasHeightForWidth());
+    btnMenuClose->setSizePolicy(sizePolicy3);
+    btnMenuClose->setMinimumSize(QSize(30, 0));
+    btnMenuClose->setMaximumSize(QSize(30, 16777215));
+    btnMenuClose->setCursor(QCursor(Qt::ArrowCursor));
+    btnMenuClose->setFocusPolicy(Qt::NoFocus);
+    btnMenuClose->setFlat(true);
 
-   horizontalLayout4->addWidget(btnMenuClose);
-   horizontalLayout3->addWidget(widgetMenu);
-   verticalLayout1->addWidget(widgetTitle);
+    horizontalLayout4->addWidget(btnMenuClose);
+    horizontalLayout3->addWidget(widgetMenu);
+    verticalLayout1->addWidget(widgetTitle);
 
-   widgetMain = new QWidget(this);
-   widgetMain->setObjectName(QString::fromUtf8("widgetMain"));
-   widgetMain->setStyleSheet(QString::fromUtf8(""));
-   verticalLayout2 = new QVBoxLayout(widgetMain);
-   verticalLayout2->setSpacing(5);
-   verticalLayout2->setObjectName(QString::fromUtf8("verticalLayout2"));
-   verticalLayout2->setContentsMargins(5, 5, 5, 5);
-   frame = new QFrame(widgetMain);
-   frame->setObjectName(QString::fromUtf8("frame"));
-   frame->setFrameShape(QFrame::Box);
-   frame->setFrameShadow(QFrame::Sunken);
-   verticalLayout4 = new QVBoxLayout(frame);
-   verticalLayout4->setObjectName(QString::fromUtf8("verticalLayout4"));
-   verticalLayout4->setContentsMargins(-1, 9, -1, -1);
-   horizontalLayout1 = new QHBoxLayout();
-   horizontalLayout1->setObjectName(QString::fromUtf8("horizontalLayout1"));
-   labelIcoMain = new QLabel(frame);
-   labelIcoMain->setObjectName(QString::fromUtf8("labIcoMain"));
-   labelIcoMain->setMinimumSize(QSize(30, 30));
-   labelIcoMain->setMaximumSize(QSize(30, 30));
-   labelIcoMain->setStyleSheet(QString::fromUtf8("border-image: url(:/image/msg_info.png);"));
+    widgetMain = new QWidget(this);
+    widgetMain->setObjectName(QString::fromUtf8("widgetMain"));
+    widgetMain->setStyleSheet(QString::fromUtf8(""));
+    verticalLayout2 = new QVBoxLayout(widgetMain);
+    verticalLayout2->setSpacing(5);
+    verticalLayout2->setObjectName(QString::fromUtf8("verticalLayout2"));
+    verticalLayout2->setContentsMargins(5, 5, 5, 5);
+    frame = new QFrame(widgetMain);
+    frame->setObjectName(QString::fromUtf8("frame"));
+    frame->setFrameShape(QFrame::Box);
+    frame->setFrameShadow(QFrame::Sunken);
+    verticalLayout4 = new QVBoxLayout(frame);
+    verticalLayout4->setObjectName(QString::fromUtf8("verticalLayout4"));
+    verticalLayout4->setContentsMargins(-1, 9, -1, -1);
+    horizontalLayout1 = new QHBoxLayout();
+    horizontalLayout1->setObjectName(QString::fromUtf8("horizontalLayout1"));
+    labelIcoMain = new QLabel(frame);
+    labelIcoMain->setObjectName(QString::fromUtf8("labIcoMain"));
+    labelIcoMain->setMinimumSize(QSize(30, 30));
+    labelIcoMain->setMaximumSize(QSize(30, 30));
+    labelIcoMain->setStyleSheet(QString::fromUtf8("border-image: url(:/image/msg_info.png);"));
 
-   horizontalLayout1->addWidget(labelIcoMain);
+    horizontalLayout1->addWidget(labelIcoMain);
 
-   horizontalSpacer1 = new QSpacerItem(5, 0, QSizePolicy::Minimum, QSizePolicy::Minimum);
+    horizontalSpacer1 = new QSpacerItem(5, 0, QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-   horizontalLayout1->addItem(horizontalSpacer1);
+    horizontalLayout1->addItem(horizontalSpacer1);
 
-   labelInfo = new QLabel(frame);
-   labelInfo->setObjectName(QString::fromUtf8("labInfo"));
-   QSizePolicy sizePolicy4(QSizePolicy::Expanding, QSizePolicy::Expanding);
-   sizePolicy4.setHorizontalStretch(0);
-   sizePolicy4.setVerticalStretch(0);
-   sizePolicy4.setHeightForWidth(labelInfo->sizePolicy().hasHeightForWidth());
-   labelInfo->setSizePolicy(sizePolicy4);
-   labelInfo->setMinimumSize(QSize(0, 33));
-   labelInfo->setScaledContents(false);
-   labelInfo->setWordWrap(true);
+    labelInfo = new QLabel(frame);
+    labelInfo->setObjectName(QString::fromUtf8("labInfo"));
+    QSizePolicy sizePolicy4(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    sizePolicy4.setHorizontalStretch(0);
+    sizePolicy4.setVerticalStretch(0);
+    sizePolicy4.setHeightForWidth(labelInfo->sizePolicy().hasHeightForWidth());
+    labelInfo->setSizePolicy(sizePolicy4);
+    labelInfo->setMinimumSize(QSize(0, 33));
+    labelInfo->setScaledContents(false);
+    labelInfo->setWordWrap(true);
 
-   horizontalLayout1->addWidget(labelInfo);
+    horizontalLayout1->addWidget(labelInfo);
 
 
-   verticalLayout4->addLayout(horizontalLayout1);
+    verticalLayout4->addLayout(horizontalLayout1);
 
-   horizontalLayout2 = new QHBoxLayout();
-   horizontalLayout2->setObjectName(QString::fromUtf8("horizontalLayout2"));
-   horizontalSpacer2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    horizontalLayout2 = new QHBoxLayout();
+    horizontalLayout2->setObjectName(QString::fromUtf8("horizontalLayout2"));
+    horizontalSpacer2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-   horizontalLayout2->addItem(horizontalSpacer2);
+    horizontalLayout2->addItem(horizontalSpacer2);
 
-   btnOk = new QPushButton(frame);
-   btnOk->setObjectName(QString::fromUtf8("btnOk"));
-   btnOk->setMinimumSize(QSize(80, 0));
-   btnOk->setFocusPolicy(Qt::StrongFocus);
-   btnOk->setStyleSheet(QString::fromUtf8(""));
-   QIcon icon;
-   icon.addFile(QString::fromUtf8(":/image/btn_ok.png"), QSize(), QIcon::Normal, QIcon::Off);
-   btnOk->setIcon(icon);
+    btnOk = new QPushButton(frame);
+    btnOk->setObjectName(QString::fromUtf8("btnOk"));
+    btnOk->setMinimumSize(QSize(80, 0));
+    btnOk->setFocusPolicy(Qt::StrongFocus);
+    btnOk->setStyleSheet(QString::fromUtf8(""));
+    QIcon icon;
+    icon.addFile(QString::fromUtf8(":/image/btn_ok.png"), QSize(), QIcon::Normal, QIcon::Off);
+    btnOk->setIcon(icon);
 
-   horizontalLayout2->addWidget(btnOk);
+    horizontalLayout2->addWidget(btnOk);
 
-   btnCancel = new QPushButton(frame);
-   btnCancel->setObjectName(QString::fromUtf8("btnCancel"));
-   btnCancel->setMinimumSize(QSize(80, 0));
-   btnCancel->setFocusPolicy(Qt::StrongFocus);
-   btnCancel->setStyleSheet(QString::fromUtf8(""));
-   QIcon icon1;
-   icon1.addFile(QString::fromUtf8(":/image/btn_close.png"), QSize(), QIcon::Normal, QIcon::Off);
-   btnCancel->setIcon(icon1);
+    btnCancel = new QPushButton(frame);
+    btnCancel->setObjectName(QString::fromUtf8("btnCancel"));
+    btnCancel->setMinimumSize(QSize(80, 0));
+    btnCancel->setFocusPolicy(Qt::StrongFocus);
+    btnCancel->setStyleSheet(QString::fromUtf8(""));
+    QIcon icon1;
+    icon1.addFile(QString::fromUtf8(":/image/btn_close.png"), QSize(), QIcon::Normal, QIcon::Off);
+    btnCancel->setIcon(icon1);
 
-   horizontalLayout2->addWidget(btnCancel);
-   verticalLayout4->addLayout(horizontalLayout2);
-   verticalLayout2->addWidget(frame);
-   verticalLayout1->addWidget(widgetMain);
+    horizontalLayout2->addWidget(btnCancel);
+    verticalLayout4->addLayout(horizontalLayout2);
+    verticalLayout2->addWidget(frame);
+    verticalLayout1->addWidget(widgetMain);
 
-   widgetTitle->raise();
-   widgetMain->raise();
-   frame->raise();
+    widgetTitle->raise();
+    widgetMain->raise();
+    frame->raise();
 
-   this->btnOk->setText("确定");
-   this->btnCancel->setText("取消");
+    this->btnOk->setText("确定");
+    this->btnCancel->setText("取消");
 
-   connect(this->btnOk, SIGNAL(clicked()), this, SLOT(on_btnOk_clicked()));
-   connect(this->btnMenuClose, SIGNAL(clicked(bool)), this, SLOT(on_btnMenuClose_clicked()));
-   connect(this->btnCancel, SIGNAL(clicked()), this, SLOT(on_btnMenuClose_clicked()));
+    connect(this->btnOk, SIGNAL(clicked()), this, SLOT(on_btnOk_clicked()));
+    connect(this->btnMenuClose, SIGNAL(clicked(bool)), this, SLOT(on_btnMenuClose_clicked()));
+    connect(this->btnCancel, SIGNAL(clicked()), this, SLOT(on_btnMenuClose_clicked()));
 }
 
 
 void QUIMessageBox::initForm()
 {
-   IconHelper::Instance()->setIcon(labelIcon, QUIConfig::iconMain, QUIConfig::fontSize + 2);
-   IconHelper::Instance()->setIcon(btnMenuClose, QUIConfig::iconClose, QUIConfig::fontSize);
+    IconHelper::Instance()->setIcon(labelIcon, QUIConfig::iconMain, QUIConfig::fontSize + 2);
+    IconHelper::Instance()->setIcon(btnMenuClose, QUIConfig::iconClose, QUIConfig::fontSize);
 
-   this->setProperty("form", true);
-   this->widgetTitle->setProperty("form", "title");
-   this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint | Qt::WindowStaysOnTopHint);
-   this->setFixedSize(280, 150);
-   this->setWindowTitle(this->labelTitle->text());
+    this->setProperty("form", true);
+    this->widgetTitle->setProperty("form", "title");
+    this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint | Qt::WindowStaysOnTopHint);
+    this->setFixedSize(280, 150);
+    this->setWindowTitle(this->labelTitle->text());
 
-   int width      = 80;
-   int iconWidth  = 18;
-   int iconHeight = 18;
-   this->labelIcoMain->setFixedSize(30, 30);
+    int width      = 80;
+    int iconWidth  = 18;
+    int iconHeight = 18;
+    this->labelIcoMain->setFixedSize(30, 30);
 
-   QList<QPushButton *> btns1 = this->frame->findChildren<QPushButton *>();
+    QList<QPushButton *> btns1 = this->frame->findChildren<QPushButton *>();
 
-   foreach(QPushButton * btn, btns1)
-   {
-      btn->setMinimumWidth(width);
-      btn->setIconSize(QSize(iconWidth, iconHeight));
-   }
+    foreach(QPushButton * btn, btns1)
+    {
+        btn->setMinimumWidth(width);
+        btn->setIconSize(QSize(iconWidth, iconHeight));
+    }
 
-   closeSec   = 0;
-   currentSec = 0;
+    closeSec   = 0;
+    currentSec = 0;
 
-   QTimer *timer = new QTimer(this);
-   timer->setInterval(1000);
-   connect(timer, SIGNAL(timeout()), this, SLOT(checkSec()));
-   timer->start();
+    QTimer *timer = new QTimer(this);
+    timer->setInterval(1000);
+    connect(timer, SIGNAL(timeout()), this, SLOT(checkSec()));
+    timer->start();
 
-   this->installEventFilter(this);
+    this->installEventFilter(this);
 }
 
 
 void QUIMessageBox::checkSec()
 {
-   if (closeSec == 0)
-   {
-      return;
-   }
+    if (closeSec == 0)
+    {
+        return;
+    }
 
-   if (currentSec < closeSec)
-   {
-      currentSec++;
-   }
-   else
-   {
-      this->close();
-   }
+    if (currentSec < closeSec)
+    {
+        currentSec++;
+    }
+    else
+    {
+        this->close();
+    }
 
-   QString str = QString("关闭倒计时 %1 s").arg(closeSec - currentSec + 1);
-   this->labelTime->setText(str);
+    QString str = QString("关闭倒计时 %1 s").arg(closeSec - currentSec + 1);
+    this->labelTime->setText(str);
 }
 
 
 void QUIMessageBox::setMessage(const QString& msg, int type, int closeSec)
 {
-   this->closeSec   = closeSec;
-   this->currentSec = 0;
-   this->labelTime->clear();
+    this->closeSec   = closeSec;
+    this->currentSec = 0;
+    this->labelTime->clear();
 
-   checkSec();
+    checkSec();
 
-   if (type == 0)
-   {
-      this->labelIcoMain->setStyleSheet("border-image: url(:/image/msg_info.png);");
-      this->btnCancel->setVisible(false);
-      this->labelTitle->setText("提示");
-   }
-   else if (type == 1)
-   {
-      this->labelIcoMain->setStyleSheet("border-image: url(:/image/msg_question.png);");
-      this->labelTitle->setText("询问");
-   }
-   else if (type == 2)
-   {
-      this->labelIcoMain->setStyleSheet("border-image: url(:/image/msg_error.png);");
-      this->btnCancel->setVisible(false);
-      this->labelTitle->setText("错误");
-   }
+    if (type == 0)
+    {
+        this->labelIcoMain->setStyleSheet("border-image: url(:/image/msg_info.png);");
+        this->btnCancel->setVisible(false);
+        this->labelTitle->setText("提示");
+    }
+    else if (type == 1)
+    {
+        this->labelIcoMain->setStyleSheet("border-image: url(:/image/msg_question.png);");
+        this->labelTitle->setText("询问");
+    }
+    else if (type == 2)
+    {
+        this->labelIcoMain->setStyleSheet("border-image: url(:/image/msg_error.png);");
+        this->btnCancel->setVisible(false);
+        this->labelTitle->setText("错误");
+    }
 
-   this->labelInfo->setText(msg);
-   this->setWindowTitle(this->labelTitle->text());
+    this->labelInfo->setText(msg);
+    this->setWindowTitle(this->labelTitle->text());
 }
 
 
 void QUIMessageBox::closeEvent(QCloseEvent *)
 {
-   closeSec   = 0;
-   currentSec = 0;
+    closeSec   = 0;
+    currentSec = 0;
 }
 
 
 bool QUIMessageBox::eventFilter(QObject *obj, QEvent *evt)
 {
-   static QPoint mousePoint;
-   static bool   mousePressed = false;
+    static QPoint mousePoint;
+    static bool   mousePressed = false;
 
-   QMouseEvent *event = static_cast<QMouseEvent *>(evt);
+    QMouseEvent *event = static_cast<QMouseEvent *>(evt);
 
-   if (event->type() == QEvent::MouseButtonPress)
-   {
-      if (event->button() == Qt::LeftButton)
-      {
-         mousePressed = true;
-         mousePoint   = event->globalPos() - this->pos();
-         return true;
-      }
-   }
-   else if (event->type() == QEvent::MouseButtonRelease)
-   {
-      mousePressed = false;
-      return true;
-   }
-   else if (event->type() == QEvent::MouseMove)
-   {
-      if (mousePressed && (event->buttons() && Qt::LeftButton))
-      {
-         this->move(event->globalPos() - mousePoint);
-         return true;
-      }
-   }
+    if (event->type() == QEvent::MouseButtonPress)
+    {
+        if (event->button() == Qt::LeftButton)
+        {
+            mousePressed = true;
+            mousePoint   = event->globalPos() - this->pos();
+            return true;
+        }
+    }
+    else if (event->type() == QEvent::MouseButtonRelease)
+    {
+        mousePressed = false;
+        return true;
+    }
+    else if (event->type() == QEvent::MouseMove)
+    {
+        if (mousePressed && (event->buttons() && Qt::LeftButton))
+        {
+            this->move(event->globalPos() - mousePoint);
+            return true;
+        }
+    }
 
-   return QWidget::eventFilter(obj, evt);
+    return QWidget::eventFilter(obj, evt);
 }
 
 
 void QUIMessageBox::on_btnOk_clicked()
 {
-   done(QMessageBox::Yes);
-   close();
+    done(QMessageBox::Yes);
+    close();
 }
 
 
 void QUIMessageBox::on_btnMenuClose_clicked()
 {
-   done(QMessageBox::No);
-   close();
+    done(QMessageBox::No);
+    close();
 }
 
 
 void QUIMessageBox::setIconMain(QChar str, quint32 size)
 {
-   IconHelper::Instance()->setIcon(this->labelIcon, str, size);
+    IconHelper::Instance()->setIcon(this->labelIcon, str, size);
 }
 
 
 QUIInputBox *QUIInputBox::self = 0;
 QUIInputBox::QUIInputBox(QWidget *parent) : QDialog(parent)
 {
-   this->initControl();
-   this->initForm();
+    this->initControl();
+    this->initForm();
 }
 
 
 QUIInputBox::~QUIInputBox()
 {
-   delete widgetMain;
+    delete widgetMain;
 }
 
 
 void QUIInputBox::initControl()
 {
-   this->setObjectName(QString::fromUtf8("QUIInputBox"));
+    this->setObjectName(QString::fromUtf8("QUIInputBox"));
 
 #ifdef __arm__
-   this->resize(300, 160);
+    this->resize(300, 160);
 #else
-   this->resize(280, 150);
+    this->resize(280, 150);
 #endif
 
-   verticalLayout1 = new QVBoxLayout(this);
-   verticalLayout1->setSpacing(0);
-   verticalLayout1->setObjectName(QString::fromUtf8("verticalLayout1"));
-   verticalLayout1->setContentsMargins(1, 1, 1, 1);
-   widgetTitle = new QWidget(this);
-   widgetTitle->setObjectName(QString::fromUtf8("widgetTitle"));
-   QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-   sizePolicy.setHorizontalStretch(0);
-   sizePolicy.setVerticalStretch(0);
-   sizePolicy.setHeightForWidth(widgetTitle->sizePolicy().hasHeightForWidth());
-   widgetTitle->setSizePolicy(sizePolicy);
-   widgetTitle->setMinimumSize(QSize(0, 30));
-   horizontalLayout1 = new QHBoxLayout(widgetTitle);
-   horizontalLayout1->setSpacing(0);
-   horizontalLayout1->setObjectName(QString::fromUtf8("horizontalLayout1"));
-   horizontalLayout1->setContentsMargins(0, 0, 0, 0);
-   labIco = new QLabel(widgetTitle);
-   labIco->setObjectName(QString::fromUtf8("labIco"));
-   QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Preferred);
-   sizePolicy1.setHorizontalStretch(0);
-   sizePolicy1.setVerticalStretch(0);
-   sizePolicy1.setHeightForWidth(labIco->sizePolicy().hasHeightForWidth());
-   labIco->setSizePolicy(sizePolicy1);
-   labIco->setMinimumSize(QSize(30, 0));
-   labIco->setAlignment(Qt::AlignCenter);
+    verticalLayout1 = new QVBoxLayout(this);
+    verticalLayout1->setSpacing(0);
+    verticalLayout1->setObjectName(QString::fromUtf8("verticalLayout1"));
+    verticalLayout1->setContentsMargins(1, 1, 1, 1);
+    widgetTitle = new QWidget(this);
+    widgetTitle->setObjectName(QString::fromUtf8("widgetTitle"));
+    QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    sizePolicy.setHorizontalStretch(0);
+    sizePolicy.setVerticalStretch(0);
+    sizePolicy.setHeightForWidth(widgetTitle->sizePolicy().hasHeightForWidth());
+    widgetTitle->setSizePolicy(sizePolicy);
+    widgetTitle->setMinimumSize(QSize(0, 30));
+    horizontalLayout1 = new QHBoxLayout(widgetTitle);
+    horizontalLayout1->setSpacing(0);
+    horizontalLayout1->setObjectName(QString::fromUtf8("horizontalLayout1"));
+    horizontalLayout1->setContentsMargins(0, 0, 0, 0);
+    labIco = new QLabel(widgetTitle);
+    labIco->setObjectName(QString::fromUtf8("labIco"));
+    QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Preferred);
+    sizePolicy1.setHorizontalStretch(0);
+    sizePolicy1.setVerticalStretch(0);
+    sizePolicy1.setHeightForWidth(labIco->sizePolicy().hasHeightForWidth());
+    labIco->setSizePolicy(sizePolicy1);
+    labIco->setMinimumSize(QSize(30, 0));
+    labIco->setAlignment(Qt::AlignCenter);
 
-   horizontalLayout1->addWidget(labIco);
+    horizontalLayout1->addWidget(labIco);
 
-   labTitle = new QLabel(widgetTitle);
-   labTitle->setObjectName(QString::fromUtf8("labTitle"));
-   labTitle->setStyleSheet(QString::fromUtf8(""));
-   labTitle->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignVCenter);
+    labTitle = new QLabel(widgetTitle);
+    labTitle->setObjectName(QString::fromUtf8("labTitle"));
+    labTitle->setStyleSheet(QString::fromUtf8(""));
+    labTitle->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignVCenter);
 
-   horizontalLayout1->addWidget(labTitle);
+    horizontalLayout1->addWidget(labTitle);
 
-   labTime = new QLabel(widgetTitle);
-   labTime->setObjectName(QString::fromUtf8("labTime"));
-   QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Preferred);
-   sizePolicy2.setHorizontalStretch(0);
-   sizePolicy2.setVerticalStretch(0);
-   sizePolicy2.setHeightForWidth(labTime->sizePolicy().hasHeightForWidth());
-   labTime->setSizePolicy(sizePolicy2);
-   labTime->setAlignment(Qt::AlignCenter);
+    labTime = new QLabel(widgetTitle);
+    labTime->setObjectName(QString::fromUtf8("labTime"));
+    QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    sizePolicy2.setHorizontalStretch(0);
+    sizePolicy2.setVerticalStretch(0);
+    sizePolicy2.setHeightForWidth(labTime->sizePolicy().hasHeightForWidth());
+    labTime->setSizePolicy(sizePolicy2);
+    labTime->setAlignment(Qt::AlignCenter);
 
-   horizontalLayout1->addWidget(labTime);
+    horizontalLayout1->addWidget(labTime);
 
-   widgetMenu = new QWidget(widgetTitle);
-   widgetMenu->setObjectName(QString::fromUtf8("widgetMenu"));
-   sizePolicy1.setHeightForWidth(widgetMenu->sizePolicy().hasHeightForWidth());
-   widgetMenu->setSizePolicy(sizePolicy1);
-   horizontalLayout2 = new QHBoxLayout(widgetMenu);
-   horizontalLayout2->setSpacing(0);
-   horizontalLayout2->setObjectName(QString::fromUtf8("horizontalLayout2"));
-   horizontalLayout2->setContentsMargins(0, 0, 0, 0);
-   btnMenu_Close = new QPushButton(widgetMenu);
-   btnMenu_Close->setObjectName(QString::fromUtf8("btnMenu_Close"));
-   QSizePolicy sizePolicy3(QSizePolicy::Minimum, QSizePolicy::Expanding);
-   sizePolicy3.setHorizontalStretch(0);
-   sizePolicy3.setVerticalStretch(0);
-   sizePolicy3.setHeightForWidth(btnMenu_Close->sizePolicy().hasHeightForWidth());
-   btnMenu_Close->setSizePolicy(sizePolicy3);
-   btnMenu_Close->setMinimumSize(QSize(30, 0));
-   btnMenu_Close->setMaximumSize(QSize(30, 16777215));
-   btnMenu_Close->setCursor(QCursor(Qt::ArrowCursor));
-   btnMenu_Close->setFocusPolicy(Qt::NoFocus);
-   btnMenu_Close->setFlat(true);
+    widgetMenu = new QWidget(widgetTitle);
+    widgetMenu->setObjectName(QString::fromUtf8("widgetMenu"));
+    sizePolicy1.setHeightForWidth(widgetMenu->sizePolicy().hasHeightForWidth());
+    widgetMenu->setSizePolicy(sizePolicy1);
+    horizontalLayout2 = new QHBoxLayout(widgetMenu);
+    horizontalLayout2->setSpacing(0);
+    horizontalLayout2->setObjectName(QString::fromUtf8("horizontalLayout2"));
+    horizontalLayout2->setContentsMargins(0, 0, 0, 0);
+    btnMenu_Close = new QPushButton(widgetMenu);
+    btnMenu_Close->setObjectName(QString::fromUtf8("btnMenu_Close"));
+    QSizePolicy sizePolicy3(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    sizePolicy3.setHorizontalStretch(0);
+    sizePolicy3.setVerticalStretch(0);
+    sizePolicy3.setHeightForWidth(btnMenu_Close->sizePolicy().hasHeightForWidth());
+    btnMenu_Close->setSizePolicy(sizePolicy3);
+    btnMenu_Close->setMinimumSize(QSize(30, 0));
+    btnMenu_Close->setMaximumSize(QSize(30, 16777215));
+    btnMenu_Close->setCursor(QCursor(Qt::ArrowCursor));
+    btnMenu_Close->setFocusPolicy(Qt::NoFocus);
+    btnMenu_Close->setFlat(true);
 
-   horizontalLayout2->addWidget(btnMenu_Close);
-   horizontalLayout1->addWidget(widgetMenu);
-   verticalLayout1->addWidget(widgetTitle);
+    horizontalLayout2->addWidget(btnMenu_Close);
+    horizontalLayout1->addWidget(widgetMenu);
+    verticalLayout1->addWidget(widgetTitle);
 
-   widgetMain = new QWidget(this);
-   widgetMain->setObjectName(QString::fromUtf8("widgetMain"));
-   widgetMain->setStyleSheet(QString::fromUtf8(""));
-   verticalLayout2 = new QVBoxLayout(widgetMain);
-   verticalLayout2->setSpacing(5);
-   verticalLayout2->setObjectName(QString::fromUtf8("verticalLayout2"));
-   verticalLayout2->setContentsMargins(5, 5, 5, 5);
-   frame = new QFrame(widgetMain);
-   frame->setObjectName(QString::fromUtf8("frame"));
-   frame->setFrameShape(QFrame::Box);
-   frame->setFrameShadow(QFrame::Sunken);
-   verticalLayout3 = new QVBoxLayout(frame);
-   verticalLayout3->setObjectName(QString::fromUtf8("verticalLayout3"));
-   labInfo = new QLabel(frame);
-   labInfo->setObjectName(QString::fromUtf8("labInfo"));
-   labInfo->setScaledContents(false);
-   labInfo->setWordWrap(true);
+    widgetMain = new QWidget(this);
+    widgetMain->setObjectName(QString::fromUtf8("widgetMain"));
+    widgetMain->setStyleSheet(QString::fromUtf8(""));
+    verticalLayout2 = new QVBoxLayout(widgetMain);
+    verticalLayout2->setSpacing(5);
+    verticalLayout2->setObjectName(QString::fromUtf8("verticalLayout2"));
+    verticalLayout2->setContentsMargins(5, 5, 5, 5);
+    frame = new QFrame(widgetMain);
+    frame->setObjectName(QString::fromUtf8("frame"));
+    frame->setFrameShape(QFrame::Box);
+    frame->setFrameShadow(QFrame::Sunken);
+    verticalLayout3 = new QVBoxLayout(frame);
+    verticalLayout3->setObjectName(QString::fromUtf8("verticalLayout3"));
+    labInfo = new QLabel(frame);
+    labInfo->setObjectName(QString::fromUtf8("labInfo"));
+    labInfo->setScaledContents(false);
+    labInfo->setWordWrap(true);
 
-   verticalLayout3->addWidget(labInfo);
+    verticalLayout3->addWidget(labInfo);
 
-   txtValue = new QLineEdit(frame);
-   txtValue->setObjectName(QString::fromUtf8("txtValue"));
+    txtValue = new QLineEdit(frame);
+    txtValue->setObjectName(QString::fromUtf8("txtValue"));
 
-   verticalLayout3->addWidget(txtValue);
+    verticalLayout3->addWidget(txtValue);
 
-   cboxValue = new QComboBox(frame);
-   cboxValue->setObjectName(QString::fromUtf8("cboxValue"));
+    cboxValue = new QComboBox(frame);
+    cboxValue->setObjectName(QString::fromUtf8("cboxValue"));
 
-   verticalLayout3->addWidget(cboxValue);
+    verticalLayout3->addWidget(cboxValue);
 
-   lay = new QHBoxLayout();
-   lay->setObjectName(QString::fromUtf8("lay"));
-   horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    lay = new QHBoxLayout();
+    lay->setObjectName(QString::fromUtf8("lay"));
+    horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-   lay->addItem(horizontalSpacer);
+    lay->addItem(horizontalSpacer);
 
-   btnOk = new QPushButton(frame);
-   btnOk->setObjectName(QString::fromUtf8("btnOk"));
-   btnOk->setMinimumSize(QSize(80, 0));
-   btnOk->setStyleSheet(QString::fromUtf8(""));
-   QIcon icon;
-   icon.addFile(QString::fromUtf8(":/image/btn_ok.png"), QSize(), QIcon::Normal, QIcon::Off);
-   btnOk->setIcon(icon);
+    btnOk = new QPushButton(frame);
+    btnOk->setObjectName(QString::fromUtf8("btnOk"));
+    btnOk->setMinimumSize(QSize(80, 0));
+    btnOk->setStyleSheet(QString::fromUtf8(""));
+    QIcon icon;
+    icon.addFile(QString::fromUtf8(":/image/btn_ok.png"), QSize(), QIcon::Normal, QIcon::Off);
+    btnOk->setIcon(icon);
 
-   lay->addWidget(btnOk);
+    lay->addWidget(btnOk);
 
-   btnCancel = new QPushButton(frame);
-   btnCancel->setObjectName(QString::fromUtf8("btnCancel"));
-   btnCancel->setMinimumSize(QSize(80, 0));
-   btnCancel->setStyleSheet(QString::fromUtf8(""));
-   QIcon icon1;
-   icon1.addFile(QString::fromUtf8(":/image/btn_close.png"), QSize(), QIcon::Normal, QIcon::Off);
-   btnCancel->setIcon(icon1);
+    btnCancel = new QPushButton(frame);
+    btnCancel->setObjectName(QString::fromUtf8("btnCancel"));
+    btnCancel->setMinimumSize(QSize(80, 0));
+    btnCancel->setStyleSheet(QString::fromUtf8(""));
+    QIcon icon1;
+    icon1.addFile(QString::fromUtf8(":/image/btn_close.png"), QSize(), QIcon::Normal, QIcon::Off);
+    btnCancel->setIcon(icon1);
 
-   lay->addWidget(btnCancel);
-   verticalLayout3->addLayout(lay);
-   verticalLayout2->addWidget(frame);
-   verticalLayout1->addWidget(widgetMain);
+    lay->addWidget(btnCancel);
+    verticalLayout3->addLayout(lay);
+    verticalLayout2->addWidget(frame);
+    verticalLayout1->addWidget(widgetMain);
 
-   setTabOrder(txtValue, btnOk);
-   setTabOrder(btnOk, btnCancel);
+    setTabOrder(txtValue, btnOk);
+    setTabOrder(btnOk, btnCancel);
 
-   this->labTitle->setText("输入框");
-   this->btnOk->setText("确定");
-   this->btnCancel->setText("取消");
+    this->labTitle->setText("输入框");
+    this->btnOk->setText("确定");
+    this->btnCancel->setText("取消");
 
-   connect(this->btnOk, SIGNAL(clicked()), this, SLOT(on_btnOk_clicked()));
-   connect(this->btnMenu_Close, SIGNAL(clicked(bool)), this, SLOT(on_btnMenu_Close_clicked()));
-   connect(this->btnCancel, SIGNAL(clicked()), this, SLOT(on_btnMenu_Close_clicked()));
+    connect(this->btnOk, SIGNAL(clicked()), this, SLOT(on_btnOk_clicked()));
+    connect(this->btnMenu_Close, SIGNAL(clicked(bool)), this, SLOT(on_btnMenu_Close_clicked()));
+    connect(this->btnCancel, SIGNAL(clicked()), this, SLOT(on_btnMenu_Close_clicked()));
 }
 
 
 void QUIInputBox::initForm()
 {
-   IconHelper::Instance()->setIcon(labIco, QUIConfig::iconMain, QUIConfig::fontSize + 2);
-   IconHelper::Instance()->setIcon(btnMenu_Close, QUIConfig::iconClose, QUIConfig::fontSize);
+    IconHelper::Instance()->setIcon(labIco, QUIConfig::iconMain, QUIConfig::fontSize + 2);
+    IconHelper::Instance()->setIcon(btnMenu_Close, QUIConfig::iconClose, QUIConfig::fontSize);
 
-   this->setProperty("form", true);
-   this->widgetTitle->setProperty("form", "title");
-   this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint | Qt::WindowStaysOnTopHint);
-   this->setFixedSize(280, 150);
-   this->setWindowTitle(this->labTitle->text());
+    this->setProperty("form", true);
+    this->widgetTitle->setProperty("form", "title");
+    this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint | Qt::WindowStaysOnTopHint);
+    this->setFixedSize(280, 150);
+    this->setWindowTitle(this->labTitle->text());
 
-   int width      = 80;
-   int iconWidth  = 18;
-   int iconHeight = 18;
+    int width      = 80;
+    int iconWidth  = 18;
+    int iconHeight = 18;
 
-   QList<QPushButton *> btns = this->frame->findChildren<QPushButton *>();
+    QList<QPushButton *> btns = this->frame->findChildren<QPushButton *>();
 
-   foreach(QPushButton * btn, btns)
-   {
-      btn->setMinimumWidth(width);
-      btn->setIconSize(QSize(iconWidth, iconHeight));
-   }
+    foreach(QPushButton * btn, btns)
+    {
+        btn->setMinimumWidth(width);
+        btn->setIconSize(QSize(iconWidth, iconHeight));
+    }
 
-   closeSec   = 0;
-   currentSec = 0;
+    closeSec   = 0;
+    currentSec = 0;
 
-   QTimer *timer = new QTimer(this);
-   timer->setInterval(1000);
-   connect(timer, SIGNAL(timeout()), this, SLOT(checkSec()));
-   timer->start();
+    QTimer *timer = new QTimer(this);
+    timer->setInterval(1000);
+    connect(timer, SIGNAL(timeout()), this, SLOT(checkSec()));
+    timer->start();
 
-   this->installEventFilter(this);
+    this->installEventFilter(this);
 }
 
 
 void QUIInputBox::checkSec()
 {
-   if (closeSec == 0)
-   {
-      return;
-   }
+    if (closeSec == 0)
+    {
+        return;
+    }
 
-   if (currentSec < closeSec)
-   {
-      currentSec++;
-   }
-   else
-   {
-      this->close();
-   }
+    if (currentSec < closeSec)
+    {
+        currentSec++;
+    }
+    else
+    {
+        this->close();
+    }
 
-   QString str = QString("关闭倒计时 %1 s").arg(closeSec - currentSec + 1);
-   this->labTime->setText(str);
+    QString str = QString("关闭倒计时 %1 s").arg(closeSec - currentSec + 1);
+    this->labTime->setText(str);
 }
 
 
 void QUIInputBox::setParameter(const QString& title, int type, int closeSec,
                                QString defaultValue, bool pwd)
 {
-   this->closeSec   = closeSec;
-   this->currentSec = 0;
-   this->labTime->clear();
-   this->labInfo->setText(title);
+    this->closeSec   = closeSec;
+    this->currentSec = 0;
+    this->labTime->clear();
+    this->labInfo->setText(title);
 
-   checkSec();
+    checkSec();
 
-   if (type == 0)
-   {
-      this->cboxValue->setVisible(false);
-      this->txtValue->setPlaceholderText(defaultValue);
+    if (type == 0)
+    {
+        this->cboxValue->setVisible(false);
+        this->txtValue->setPlaceholderText(defaultValue);
 
-      if (pwd)
-      {
-         this->txtValue->setEchoMode(QLineEdit::Password);
-      }
-   }
-   else if (type == 1)
-   {
-      this->txtValue->setVisible(false);
-      this->cboxValue->addItems(defaultValue.split("|"));
-   }
+        if (pwd)
+        {
+            this->txtValue->setEchoMode(QLineEdit::Password);
+        }
+    }
+    else if (type == 1)
+    {
+        this->txtValue->setVisible(false);
+        this->cboxValue->addItems(defaultValue.split("|"));
+    }
 }
 
 
 QString QUIInputBox::getValue() const
 {
-   return this->value;
+    return this->value;
 }
 
 
 void QUIInputBox::closeEvent(QCloseEvent *)
 {
-   closeSec   = 0;
-   currentSec = 0;
+    closeSec   = 0;
+    currentSec = 0;
 }
 
 
 bool QUIInputBox::eventFilter(QObject *obj, QEvent *evt)
 {
-   static QPoint mousePoint;
-   static bool   mousePressed = false;
+    static QPoint mousePoint;
+    static bool   mousePressed = false;
 
-   QMouseEvent *event = static_cast<QMouseEvent *>(evt);
+    QMouseEvent *event = static_cast<QMouseEvent *>(evt);
 
-   if (event->type() == QEvent::MouseButtonPress)
-   {
-      if (event->button() == Qt::LeftButton)
-      {
-         mousePressed = true;
-         mousePoint   = event->globalPos() - this->pos();
-         return true;
-      }
-   }
-   else if (event->type() == QEvent::MouseButtonRelease)
-   {
-      mousePressed = false;
-      return true;
-   }
-   else if (event->type() == QEvent::MouseMove)
-   {
-      if (mousePressed && (event->buttons() && Qt::LeftButton))
-      {
-         this->move(event->globalPos() - mousePoint);
-         return true;
-      }
-   }
+    if (event->type() == QEvent::MouseButtonPress)
+    {
+        if (event->button() == Qt::LeftButton)
+        {
+            mousePressed = true;
+            mousePoint   = event->globalPos() - this->pos();
+            return true;
+        }
+    }
+    else if (event->type() == QEvent::MouseButtonRelease)
+    {
+        mousePressed = false;
+        return true;
+    }
+    else if (event->type() == QEvent::MouseMove)
+    {
+        if (mousePressed && (event->buttons() && Qt::LeftButton))
+        {
+            this->move(event->globalPos() - mousePoint);
+            return true;
+        }
+    }
 
-   return QWidget::eventFilter(obj, evt);
+    return QWidget::eventFilter(obj, evt);
 }
 
 
 void QUIInputBox::on_btnOk_clicked()
 {
-   if (this->txtValue->isVisible())
-   {
-      value = this->txtValue->text();
-   }
-   else if (this->cboxValue->isVisible())
-   {
-      value = this->cboxValue->currentText();
-   }
+    if (this->txtValue->isVisible())
+    {
+        value = this->txtValue->text();
+    }
+    else if (this->cboxValue->isVisible())
+    {
+        value = this->cboxValue->currentText();
+    }
 
-   done(QMessageBox::Ok);
-   close();
+    done(QMessageBox::Ok);
+    close();
 }
 
 
 void QUIInputBox::on_btnMenu_Close_clicked()
 {
-   done(QMessageBox::Cancel);
-   close();
+    done(QMessageBox::Cancel);
+    close();
 }
 
 
 void QUIInputBox::setIconMain(QChar str, quint32 size)
 {
-   IconHelper::Instance()->setIcon(this->labIco, str, size);
+    IconHelper::Instance()->setIcon(this->labIco, str, size);
 }
 
 
 IconHelper *IconHelper::self = 0;
 IconHelper::IconHelper(QObject *) : QObject(qApp)
 {
-   int         fontId   = QFontDatabase::addApplicationFont(":/image/Font-Awesome-5-Free-Solid-900.otf");
-   QStringList fontName = QFontDatabase::applicationFontFamilies(fontId);
+    int         fontId   = QFontDatabase::addApplicationFont(":/image/Font-Awesome-5-Free-Solid-900.otf");
+    QStringList fontName = QFontDatabase::applicationFontFamilies(fontId);
 
-   if (fontName.count() > 0)
-   {
-      iconFont = QFont(fontName.at(0));
-   }
-   else
-   {
-      qDebug() << "Failed to load Font Awesome.";
-   }
+    if (fontName.count() > 0)
+    {
+        iconFont = QFont(fontName.at(0));
+    }
+    else
+    {
+        qDebug() << "Failed to load Font Awesome.";
+    }
 }
 
 
 void IconHelper::setIcon(QLabel *lab, QChar c, quint32 size)
 {
-   iconFont.setPointSize(size);
-   lab->setFont(iconFont);
-   lab->setText(c);
+    iconFont.setPointSize(size);
+    lab->setFont(iconFont);
+    lab->setText(c);
 }
 
 
 void IconHelper::setIcon(QAbstractButton *btn, QChar c, quint32 size)
 {
-   iconFont.setPointSize(size);
-   btn->setFont(iconFont);
-   btn->setText(c);
+    iconFont.setPointSize(size);
+    btn->setFont(iconFont);
+    btn->setText(c);
 }
 
 
 QPixmap IconHelper::getPixmap(const QString& color, QChar c, quint32 size,
                               quint32 pixWidth, quint32 pixHeight)
 {
-   QPixmap pix(pixWidth, pixHeight);
+    QPixmap pix(pixWidth, pixHeight);
 
-   pix.fill(Qt::transparent);
+    pix.fill(Qt::transparent);
 
-   QPainter painter;
-   painter.begin(&pix);
-   painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-   painter.setPen(QColor(color));
-   painter.setBrush(QColor(color));
+    QPainter painter;
+    painter.begin(&pix);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+    painter.setPen(QColor(color));
+    painter.setBrush(QColor(color));
 
-   iconFont.setPointSize(size);
-   painter.setFont(iconFont);
-   painter.drawText(pix.rect(), Qt::AlignCenter, c);
-   painter.end();
+    iconFont.setPointSize(size);
+    painter.setFont(iconFont);
+    painter.drawText(pix.rect(), Qt::AlignCenter, c);
+    painter.end();
 
-   return pix;
+    return pix;
 }
 
 
 QPixmap IconHelper::getPixmap(QToolButton *btn, bool normal)
 {
-   QPixmap pix;
-   int     index = btns.indexOf(btn);
+    QPixmap pix;
+    int     index = btns.indexOf(btn);
 
-   if (index >= 0)
-   {
-      if (normal)
-      {
-         pix = pixNormal.at(index);
-      }
-      else
-      {
-         pix = pixDark.at(index);
-      }
-   }
+    if (index >= 0)
+    {
+        if (normal)
+        {
+            pix = pixNormal.at(index);
+        }
+        else
+        {
+            pix = pixDark.at(index);
+        }
+    }
 
-   return pix;
+    return pix;
 }
 
 
@@ -2702,40 +2703,40 @@ void IconHelper::setStyle(QWidget *widget, const QString& type, int borderWidth,
                           const QString& normalBgColor, const QString& darkBgColor,
                           const QString& normalTextColor, const QString& darkTextColor)
 {
-   QString strBorder;
+    QString strBorder;
 
-   if (type == "top")
-   {
-      strBorder = QString("border-width:%1px 0px 0px 0px;padding:%1px %2px %2px %2px;")
-                     .arg(borderWidth).arg(borderWidth * 2);
-   }
-   else if (type == "right")
-   {
-      strBorder = QString("border-width:0px %1px 0px 0px;padding:%2px %1px %2px %2px;")
-                     .arg(borderWidth).arg(borderWidth * 2);
-   }
-   else if (type == "bottom")
-   {
-      strBorder = QString("border-width:0px 0px %1px 0px;padding:%2px %2px %1px %2px;")
-                     .arg(borderWidth).arg(borderWidth * 2);
-   }
-   else if (type == "left")
-   {
-      strBorder = QString("border-width:0px 0px 0px %1px;padding:%2px %2px %2px %1px;")
-                     .arg(borderWidth).arg(borderWidth * 2);
-   }
+    if (type == "top")
+    {
+        strBorder = QString("border-width:%1px 0px 0px 0px;padding:%1px %2px %2px %2px;")
+                       .arg(borderWidth).arg(borderWidth * 2);
+    }
+    else if (type == "right")
+    {
+        strBorder = QString("border-width:0px %1px 0px 0px;padding:%2px %1px %2px %2px;")
+                       .arg(borderWidth).arg(borderWidth * 2);
+    }
+    else if (type == "bottom")
+    {
+        strBorder = QString("border-width:0px 0px %1px 0px;padding:%2px %2px %1px %2px;")
+                       .arg(borderWidth).arg(borderWidth * 2);
+    }
+    else if (type == "left")
+    {
+        strBorder = QString("border-width:0px 0px 0px %1px;padding:%2px %2px %2px %1px;")
+                       .arg(borderWidth).arg(borderWidth * 2);
+    }
 
-   QStringList qss;
-   qss.append(QString("QWidget[flag=\"%1\"] QAbstractButton{border-style:none;border-radius:0px;padding:5px;color:%2;background:%3;}")
-                 .arg(type).arg(normalTextColor).arg(normalBgColor));
+    QStringList qss;
+    qss.append(QString("QWidget[flag=\"%1\"] QAbstractButton{border-style:none;border-radius:0px;padding:5px;color:%2;background:%3;}")
+                  .arg(type).arg(normalTextColor).arg(normalBgColor));
 
-   qss.append(QString("QWidget[flag=\"%1\"] QAbstractButton:hover,"
-                      "QWidget[flag=\"%1\"] QAbstractButton:pressed,"
-                      "QWidget[flag=\"%1\"] QAbstractButton:checked{"
-                      "border-style:solid;%2border-color:%3;color:%4;background:%5;}")
-                 .arg(type).arg(strBorder).arg(borderColor).arg(darkTextColor).arg(darkBgColor));
+    qss.append(QString("QWidget[flag=\"%1\"] QAbstractButton:hover,"
+                       "QWidget[flag=\"%1\"] QAbstractButton:pressed,"
+                       "QWidget[flag=\"%1\"] QAbstractButton:checked{"
+                       "border-style:solid;%2border-color:%3;color:%4;background:%5;}")
+                  .arg(type).arg(strBorder).arg(borderColor).arg(darkTextColor).arg(darkBgColor));
 
-   widget->setStyleSheet(qss.join(""));
+    widget->setStyleSheet(qss.join(""));
 }
 
 
@@ -2745,70 +2746,70 @@ void IconHelper::setStyle(QWidget *widget, QList<QToolButton *> btns, QList<int>
                           const QString& normalBgColor, const QString& darkBgColor,
                           const QString& normalTextColor, const QString& darkTextColor)
 {
-   int btnCount  = btns.count();
-   int charCount = pixChar.count();
+    int btnCount  = btns.count();
+    int charCount = pixChar.count();
 
-   if ((btnCount <= 0) || (charCount <= 0) || (btnCount != charCount))
-   {
-      return;
-   }
+    if ((btnCount <= 0) || (charCount <= 0) || (btnCount != charCount))
+    {
+        return;
+    }
 
-   QString strBorder;
-   if (type == "top")
-   {
-      strBorder = QString("border-width:%1px 0px 0px 0px;padding:%1px %2px %2px %2px;")
-                     .arg(borderWidth).arg(borderWidth * 2);
-   }
-   else if (type == "right")
-   {
-      strBorder = QString("border-width:0px %1px 0px 0px;padding:%2px %1px %2px %2px;")
-                     .arg(borderWidth).arg(borderWidth * 2);
-   }
-   else if (type == "bottom")
-   {
-      strBorder = QString("border-width:0px 0px %1px 0px;padding:%2px %2px %1px %2px;")
-                     .arg(borderWidth).arg(borderWidth * 2);
-   }
-   else if (type == "left")
-   {
-      strBorder = QString("border-width:0px 0px 0px %1px;padding:%2px %2px %2px %1px;")
-                     .arg(borderWidth).arg(borderWidth * 2);
-   }
+    QString strBorder;
+    if (type == "top")
+    {
+        strBorder = QString("border-width:%1px 0px 0px 0px;padding:%1px %2px %2px %2px;")
+                       .arg(borderWidth).arg(borderWidth * 2);
+    }
+    else if (type == "right")
+    {
+        strBorder = QString("border-width:0px %1px 0px 0px;padding:%2px %1px %2px %2px;")
+                       .arg(borderWidth).arg(borderWidth * 2);
+    }
+    else if (type == "bottom")
+    {
+        strBorder = QString("border-width:0px 0px %1px 0px;padding:%2px %2px %1px %2px;")
+                       .arg(borderWidth).arg(borderWidth * 2);
+    }
+    else if (type == "left")
+    {
+        strBorder = QString("border-width:0px 0px 0px %1px;padding:%2px %2px %2px %1px;")
+                       .arg(borderWidth).arg(borderWidth * 2);
+    }
 
-   QStringList qss;
-   qss.append(QString("QWidget[flag=\"%1\"] QAbstractButton{border-style:none;border-radius:0px;padding:5px;color:%2;background:%3;}")
-                 .arg(type).arg(normalTextColor).arg(normalBgColor));
+    QStringList qss;
+    qss.append(QString("QWidget[flag=\"%1\"] QAbstractButton{border-style:none;border-radius:0px;padding:5px;color:%2;background:%3;}")
+                  .arg(type).arg(normalTextColor).arg(normalBgColor));
 
-   qss.append(QString("QWidget[flag=\"%1\"] QAbstractButton:hover,"
-                      "QWidget[flag=\"%1\"] QAbstractButton:pressed,"
-                      "QWidget[flag=\"%1\"] QAbstractButton:checked{"
-                      "border-style:solid;%2border-color:%3;color:%4;background:%5;}")
-                 .arg(type).arg(strBorder).arg(borderColor).arg(darkTextColor).arg(darkBgColor));
+    qss.append(QString("QWidget[flag=\"%1\"] QAbstractButton:hover,"
+                       "QWidget[flag=\"%1\"] QAbstractButton:pressed,"
+                       "QWidget[flag=\"%1\"] QAbstractButton:checked{"
+                       "border-style:solid;%2border-color:%3;color:%4;background:%5;}")
+                  .arg(type).arg(strBorder).arg(borderColor).arg(darkTextColor).arg(darkBgColor));
 
-   qss.append(QString("QWidget#%1{background:%2;}").arg(widget->objectName()).arg(normalBgColor));
+    qss.append(QString("QWidget#%1{background:%2;}").arg(widget->objectName()).arg(normalBgColor));
 
-   qss.append(QString("QToolButton{border-width:0px;}"));
-   qss.append(QString("QToolButton{background-color:%1;color:%2;}")
-                 .arg(normalBgColor).arg(normalTextColor));
-   qss.append(QString("QToolButton:hover,QToolButton:pressed,QToolButton:checked{background-color:%1;color:%2;}")
-                 .arg(darkBgColor).arg(darkTextColor));
+    qss.append(QString("QToolButton{border-width:0px;}"));
+    qss.append(QString("QToolButton{background-color:%1;color:%2;}")
+                  .arg(normalBgColor).arg(normalTextColor));
+    qss.append(QString("QToolButton:hover,QToolButton:pressed,QToolButton:checked{background-color:%1;color:%2;}")
+                  .arg(darkBgColor).arg(darkTextColor));
 
-   widget->setStyleSheet(qss.join(""));
+    widget->setStyleSheet(qss.join(""));
 
-   for (int i = 0; i < btnCount; i++)
-   {
-      //存储对应按钮对象,方便鼠标移上去的时候切换图片
-      QPixmap pixNormal = getPixmap(normalTextColor, QChar(pixChar.at(i)), iconSize, iconWidth, iconHeight);
-      QPixmap pixDark   = getPixmap(darkTextColor, QChar(pixChar.at(i)), iconSize, iconWidth, iconHeight);
+    for (int i = 0; i < btnCount; i++)
+    {
+        //存储对应按钮对象,方便鼠标移上去的时候切换图片
+        QPixmap pixNormal = getPixmap(normalTextColor, QChar(pixChar.at(i)), iconSize, iconWidth, iconHeight);
+        QPixmap pixDark   = getPixmap(darkTextColor, QChar(pixChar.at(i)), iconSize, iconWidth, iconHeight);
 
-      btns.at(i)->setIcon(QIcon(pixNormal));
-      btns.at(i)->setIconSize(QSize(iconWidth, iconHeight));
-      btns.at(i)->installEventFilter(this);
+        btns.at(i)->setIcon(QIcon(pixNormal));
+        btns.at(i)->setIconSize(QSize(iconWidth, iconHeight));
+        btns.at(i)->installEventFilter(this);
 
-      this->btns.append(btns.at(i));
-      this->pixNormal.append(pixNormal);
-      this->pixDark.append(pixDark);
-   }
+        this->btns.append(btns.at(i));
+        this->pixNormal.append(pixNormal);
+        this->pixDark.append(pixDark);
+    }
 }
 
 
@@ -2817,67 +2818,67 @@ void IconHelper::setStyle(QFrame *frame, QList<QToolButton *> btns, QList<int> p
                           const QString& normalBgColor, const QString& darkBgColor,
                           const QString& normalTextColor, const QString& darkTextColor)
 {
-   int btnCount  = btns.count();
-   int charCount = pixChar.count();
+    int btnCount  = btns.count();
+    int charCount = pixChar.count();
 
-   if ((btnCount <= 0) || (charCount <= 0) || (btnCount != charCount))
-   {
-      return;
-   }
+    if ((btnCount <= 0) || (charCount <= 0) || (btnCount != charCount))
+    {
+        return;
+    }
 
-   QStringList qss;
-   qss.append(QString("QToolButton{border-width:0px;}"));
-   qss.append(QString("QToolButton{background-color:%1;color:%2;}")
-                 .arg(normalBgColor).arg(normalTextColor));
-   qss.append(QString("QToolButton:hover,QToolButton:pressed,QToolButton:checked{background-color:%1;color:%2;}")
-                 .arg(darkBgColor).arg(darkTextColor));
+    QStringList qss;
+    qss.append(QString("QToolButton{border-width:0px;}"));
+    qss.append(QString("QToolButton{background-color:%1;color:%2;}")
+                  .arg(normalBgColor).arg(normalTextColor));
+    qss.append(QString("QToolButton:hover,QToolButton:pressed,QToolButton:checked{background-color:%1;color:%2;}")
+                  .arg(darkBgColor).arg(darkTextColor));
 
-   frame->setStyleSheet(qss.join(""));
+    frame->setStyleSheet(qss.join(""));
 
-   for (int i = 0; i < btnCount; i++)
-   {
-      //存储对应按钮对象,方便鼠标移上去的时候切换图片
-      QPixmap pixNormal = getPixmap(normalTextColor, QChar(pixChar.at(i)), iconSize, iconWidth, iconHeight);
-      QPixmap pixDark   = getPixmap(darkTextColor, QChar(pixChar.at(i)), iconSize, iconWidth, iconHeight);
+    for (int i = 0; i < btnCount; i++)
+    {
+        //存储对应按钮对象,方便鼠标移上去的时候切换图片
+        QPixmap pixNormal = getPixmap(normalTextColor, QChar(pixChar.at(i)), iconSize, iconWidth, iconHeight);
+        QPixmap pixDark   = getPixmap(darkTextColor, QChar(pixChar.at(i)), iconSize, iconWidth, iconHeight);
 
-      btns.at(i)->setIcon(QIcon(pixNormal));
-      btns.at(i)->setIconSize(QSize(iconWidth, iconHeight));
-      btns.at(i)->installEventFilter(this);
+        btns.at(i)->setIcon(QIcon(pixNormal));
+        btns.at(i)->setIconSize(QSize(iconWidth, iconHeight));
+        btns.at(i)->installEventFilter(this);
 
-      this->btns.append(btns.at(i));
-      this->pixNormal.append(pixNormal);
-      this->pixDark.append(pixDark);
-   }
+        this->btns.append(btns.at(i));
+        this->pixNormal.append(pixNormal);
+        this->pixDark.append(pixDark);
+    }
 }
 
 
 bool IconHelper::eventFilter(QObject *watched, QEvent *event)
 {
-   if (watched->inherits("QToolButton"))
-   {
-      QToolButton *btn  = (QToolButton *)watched;
-      int         index = btns.indexOf(btn);
-      if (index >= 0)
-      {
-         if (event->type() == QEvent::Enter)
-         {
-            btn->setIcon(QIcon(pixDark.at(index)));
-         }
-         else if (event->type() == QEvent::Leave)
-         {
-            if (btn->isChecked())
+    if (watched->inherits("QToolButton"))
+    {
+        QToolButton *btn  = (QToolButton *)watched;
+        int         index = btns.indexOf(btn);
+        if (index >= 0)
+        {
+            if (event->type() == QEvent::Enter)
             {
-               btn->setIcon(QIcon(pixDark.at(index)));
+                btn->setIcon(QIcon(pixDark.at(index)));
             }
-            else
+            else if (event->type() == QEvent::Leave)
             {
-               btn->setIcon(QIcon(pixNormal.at(index)));
+                if (btn->isChecked())
+                {
+                    btn->setIcon(QIcon(pixDark.at(index)));
+                }
+                else
+                {
+                    btn->setIcon(QIcon(pixNormal.at(index)));
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
-   return QObject::eventFilter(watched, event);
+    return QObject::eventFilter(watched, event);
 }
 
 
@@ -2908,24 +2909,24 @@ QString QUIConfig::highlightColor   = "#F0F0F0";
 
 void QUIConfig::readConfig()
 {
-   if (!checkConfig())
-   {
-      return;
-   }
+    if (!checkConfig())
+    {
+        return;
+    }
 
-   QSettings set(QUIConfig::configFile, QSettings::IniFormat);
+    QSettings set(QUIConfig::configFile, QSettings::IniFormat);
 
-   set.beginGroup("BaseConfig");
-   set.endGroup();
+    set.beginGroup("BaseConfig");
+    set.endGroup();
 }
 
 
 void QUIConfig::writeConfig()
 {
-   QSettings set(QUIConfig::configFile, QSettings::IniFormat);
+    QSettings set(QUIConfig::configFile, QSettings::IniFormat);
 
-   set.beginGroup("BaseConfig");
-   set.endGroup();
+    set.beginGroup("BaseConfig");
+    set.endGroup();
 }
 
 
@@ -2933,54 +2934,54 @@ void QUIConfig::newConfig()
 {
 #if (QT_VERSION <= QT_VERSION_CHECK(5, 0, 0))
 #endif
-   writeConfig();
+    writeConfig();
 }
 
 
 bool QUIConfig::checkConfig()
 {
-   //如果配置文件大小为0,则以初始值继续运行,并生成配置文件
-   QFile file(QUIConfig::configFile);
+    //如果配置文件大小为0,则以初始值继续运行,并生成配置文件
+    QFile file(QUIConfig::configFile);
 
-   if (file.size() == 0)
-   {
-      newConfig();
-      return false;
-   }
+    if (file.size() == 0)
+    {
+        newConfig();
+        return false;
+    }
 
-   //如果配置文件不完整,则以初始值继续运行,并生成配置文件
-   if (file.open(QFile::ReadOnly))
-   {
-      bool ok = true;
+    //如果配置文件不完整,则以初始值继续运行,并生成配置文件
+    if (file.open(QFile::ReadOnly))
+    {
+        bool ok = true;
 
-      while (!file.atEnd())
-      {
-         QString line = file.readLine();
-         line = line.replace("\r", "");
-         line = line.replace("\n", "");
-         QStringList list = line.split("=");
+        while (!file.atEnd())
+        {
+            QString line = file.readLine();
+            line = line.replace("\r", "");
+            line = line.replace("\n", "");
+            QStringList list = line.split("=");
 
-         if (list.count() == 2)
-         {
-            if (list.at(1) == "")
+            if (list.count() == 2)
             {
-               ok = false;
-               break;
+                if (list.at(1) == "")
+                {
+                    ok = false;
+                    break;
+                }
             }
-         }
-      }
+        }
 
-      if (!ok)
-      {
-         newConfig();
-         return false;
-      }
-   }
-   else
-   {
-      newConfig();
-      return false;
-   }
+        if (!ok)
+        {
+            newConfig();
+            return false;
+        }
+    }
+    else
+    {
+        newConfig();
+        return false;
+    }
 
-   return true;
+    return true;
 }

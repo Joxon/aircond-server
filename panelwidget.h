@@ -7,29 +7,29 @@
 
 class PanelWidget : public QWidget
 {
-   Q_OBJECT
+    Q_OBJECT
 public:
-   explicit PanelWidget(QWidget *parent = 0);
+    explicit PanelWidget(QWidget *parent = 0);
 
 protected:
-   void resizeEvent(QResizeEvent *);
+    void resizeEvent(QResizeEvent *);
 
 private:
-   QScrollArea *scrollArea;
-   QWidget *scrollAreaWidgetContents;
-   QFrame *frame;
-   QVBoxLayout *verticalLayout;
-   QGridLayout *gridLayout;
+    QScrollArea *scrollArea;
+    QWidget *scrollAreaWidgetContents;
+    QFrame *frame;
+    QVBoxLayout *verticalLayout;
+    QGridLayout *gridLayout;
 
 public:
-   QSize sizeHint()                const;
-   QSize minimumSizeHint()         const;
+    QSize sizeHint()                const;
+    QSize minimumSizeHint()         const;
 
 public slots:
-   void setWidget(QList<QWidget *> widgets, int columnCount);
-   void setMargin(int left, int top, int right, int bottom);
-   void setMargin(int margin);
-   void setSpacing(int space);
+    void setWidget(QList<QWidget *> widgets, int columnCount);
+    void setMargin(int left, int top, int right, int bottom);
+    void setMargin(int margin);
+    void setSpacing(int space);
 };
 
 #endif // PANELWIDGET_H
