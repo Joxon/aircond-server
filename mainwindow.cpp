@@ -128,7 +128,7 @@ void MainWindow::on_toolButtonPower_toggled(bool checked)
 
         ui->labelArrowDown->hide();
         //aniSizeChange->setStartValue(parent->geometry());
-        aniSizeChange->setEndValue(QRect(parent->x(), parent->y(), 800, 600));
+        aniSizeChange->setEndValue(QRect(parent->x(), parent->y() - 200, 1000, 600));
         aniSizeChange->start();
 
         aniOpacityChange->setStartValue(0.1);
@@ -142,7 +142,7 @@ void MainWindow::on_toolButtonPower_toggled(bool checked)
         ui->labelArrowDown->show();
 
         //aniSizeChange->setStartValue(parent->geometry());
-        aniSizeChange->setEndValue(QRect(parent->x(), parent->y(), 800, 200));
+        aniSizeChange->setEndValue(QRect(parent->x(), parent->y() + 200, 1000, 200));
         aniSizeChange->start();
 
         aniOpacityChange->setStartValue(1.0);
@@ -158,8 +158,8 @@ void MainWindow::storeSockets()
 
     sockets.append(socket);
 
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readFromSockets()));
-    connect(socket, &QTcpSocket::readyRead, [socket, this]() {
+    connect(socket, SIGNAL(readyRead), this, SLOT(readFromSockets()));
+    connect(socket, &QTcpSocket::disconnected, [socket, this]() {
         int clientIdx = sockets.indexOf(socket);
         if (clientIdx == -1)
         {
@@ -168,8 +168,8 @@ void MainWindow::storeSockets()
         Client *client = qobject_cast<Client *>(clients[clientIdx]);
         client->setWorking(Client::WorkingNo);
         client->setServing(Client::ServingNo);
-        client->setCurrentTemp(-1.0);
-        client->setTargetTemp(-1.0);
+        client->setCurrentTemp(0.0);
+        client->setTargetTemp(0.0);
         client->setSpeed(Client::SpeedNone);
     });
 }

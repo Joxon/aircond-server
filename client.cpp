@@ -48,6 +48,22 @@ void Client::setId(const QString& value)
 }
 
 
+void Client::setConn(Client::Conn c)
+{
+    conn = c;
+    switch (c)
+    {
+    case Client::ConnOffline:
+        ui->labelConn->setText("离线");
+        break;
+
+    case Client::ConnOnline:
+        ui->labelConn->setText("在线");
+        break;
+    }
+}
+
+
 //void Client::setConn(Client::Conn conn)
 //{
 //   switch (conn)
@@ -74,105 +90,104 @@ void Client::setId(const QString& value)
 //}
 
 
-void Client::setWorking(Client::Working work)
+void Client::setWorking(Client::Working w)
 {
-    switch (work)
+    working = w;
+    switch (w)
     {
     case WorkingNo:
-        working = WorkingNo;
         ui->labelWorking->setText(tr("工作状态：否"));
         ui->labelTargetTemp->setText(tr("目标温度：N/A"));
         ui->labelSpeed->setText(tr("风速：N/A"));
         break;
 
     case WorkingYes:
-        working = WorkingYes;
         ui->labelWorking->setText(tr("工作状态：是"));
         break;
 
     case WorkingDone:
-        working = WorkingDone;
         ui->labelWorking->setText(tr("工作状态：完成"));
         ui->labelSpeed->setText(tr("风速：N/A"));
-        break;
-
-    default:
         break;
     }
 }
 
 
-void Client::setServing(Client::Serving serve)
+void Client::setServing(Client::Serving s)
 {
-    switch (serve)
+    serving = s;
+    switch (s)
     {
     case ServingNo:
-        serving = ServingNo;
         ui->labelServing->setText(tr("服务状态：否"));
         break;
 
     case ServingYes:
-        serving = ServingYes;
         ui->labelServing->setText(tr("服务状态：是"));
-        break;
-
-    default:
         break;
     }
 }
 
 
-void Client::setCurrentTemp(double temp)
+void Client::setCurrentTemp(double t)
 {
-    currentTemp = temp;
-    ui->labelCurrentTemp->setText(QString("当前温度：%1 ℃").arg(temp));
+    currentTemp = t;
+    if (qFuzzyIsNull(t))
+    {
+        ui->labelCurrentTemp->setText("当前温度：N/A");
+    }
+    else
+    {
+        ui->labelCurrentTemp->setText(QString("当前温度：%1 ℃").arg(t));
+    }
 }
 
 
-void Client::setTargetTemp(double temp)
+void Client::setTargetTemp(double t)
 {
-    targetTemp = temp;
-    ui->labelTargetTemp->setText(QString("目标温度：%1 ℃").arg(temp));
+    targetTemp = t;
+    if (qFuzzyIsNull(t))
+    {
+        ui->labelCurrentTemp->setText("目标温度：N/A");
+    }
+    else
+    {
+        ui->labelTargetTemp->setText(QString("目标温度：%1 ℃").arg(t));
+    }
 }
 
 
-void Client::setSpeed(Client::Speed _speed)
+void Client::setSpeed(Client::Speed s)
 {
-    switch (_speed)
+    speed = s;
+    switch (s)
     {
     case SpeedNone:
-        speed = SpeedNone;
         ui->labelSpeed->setText(QString("风速：无"));
         break;
 
     case SpeedLow:
-        speed = SpeedLow;
         ui->labelSpeed->setText(QString("风速：低"));
         break;
 
     case SpeedHigh:
-        speed = SpeedHigh;
         ui->labelSpeed->setText(QString("风速：高"));
-        break;
-
-    default:
-        ui->labelSpeed->setText(QString("风速：未知"));
         break;
     }
 }
 
 
-void Client::setEnergy(double _energy)
+void Client::setEnergy(double e)
 {
-    energy = _energy;
-    ui->labelEnergy->setText(QString("能量：%1 度").arg(_energy));
+    energy = e;
+    ui->labelEnergy->setText(QString("能量：%1 度").arg(e));
 }
 
 
-void Client::setCost(double _cost)
+void Client::setCost(double c)
 {
-    cost = _cost;
-    ui->labelCost->setText(QString("费用：%1 元").arg(_cost));
+    cost = c;
+    ui->labelCost->setText(QString("费用：%1 元").arg(c));
 }
 
 

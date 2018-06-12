@@ -21,14 +21,14 @@ class Client : public QWidget
     Q_OBJECT
 
 public:
-    explicit Client(QWidget *parent = 0);
+    explicit Client(QWidget *parent = nullptr);
     ~Client();
 
-//   enum Conn
-//   {
-//      ConnOffline,
-//      ConnOnline
-//   };
+    enum Conn
+    {
+        ConnOffline,
+        ConnOnline
+    };
 
     enum Working
     {
@@ -53,15 +53,14 @@ public:
 public slots:
     void setId(const QString& value);
 
-//   void setConn(Client::Conn conn);
-
+    void setConn(Client::Conn c);
     void setWorking(Client::Working work);
-    void setServing(Client::Serving serve);
-    void setCurrentTemp(double temp);
-    void setTargetTemp(double temp);
-    void setSpeed(Client::Speed _speed);
-    void setEnergy(double _energy);
-    void setCost(double _cost);
+    void setServing(Client::Serving s);
+    void setCurrentTemp(double t);
+    void setTargetTemp(double t);
+    void setSpeed(Client::Speed s);
+    void setEnergy(double e);
+    void setCost(double c);
     void setStartTime();
 
     double getCurrentTemp() const;
@@ -91,7 +90,7 @@ private:
     QFont font;
 
     QString id;
-//   Conn conn;                                              // 连接状态
+    Conn conn;               // 连接状态
     Working working;         // 工作状态
     Serving serving;         // 服务状态
     double currentTemp;      // 当前温度

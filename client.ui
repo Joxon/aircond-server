@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>152</width>
-    <height>148</height>
+    <height>153</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -60,6 +60,13 @@
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelConn">
+        <property name="text">
+         <string>在线</string>
         </property>
        </widget>
       </item>
@@ -211,7 +218,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>工作状态：是</string>
+           <string>工作状态：</string>
           </property>
          </widget>
         </item>
@@ -224,7 +231,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>服务状态：是</string>
+           <string>服务状态：</string>
           </property>
          </widget>
         </item>
