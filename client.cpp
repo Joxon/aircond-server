@@ -172,6 +172,7 @@ void Client::setEnergy(double _energy)
 void Client::setCost(double _cost)
 {
     cost = _cost;
+   ui->labelCost->setText(QString("费用：%1 元").arg(_cost));
 }
 
 
@@ -243,12 +244,14 @@ void Client::calCost(double new_n)                   // 为了计算需要1个�
         wind = 2;
         break;
     }
-    double temp = qAbs(new_n - currentTemp) * ((double)wind / 2) * 1;
-    qDebug() << DATETIME << "now temp : " << new_n << " ever temp : " << currentTemp << "Wind : " << speed;
-    // 还需要编一个公式计算能量 暂定为 cost * 1.25
-    cost  += temp;
-    energy = cost * 1.25;
-    qDebug() << DATETIME << "now cost : " << cost << " temp cost : " << temp;
+   double temp = qAbs(new_n - currentTemp) * ((double)wind / 2) * 1;
+   qDebug() << DATETIME << "now temp : " << new_n << " ever temp : " << currentTemp << "Wind : " << speed;
+   // 还需要编一个公式计算能量 暂定为 cost * 1.25
+   cost  += temp;
+   energy = cost * 1.25;
+   ui->labelEnergy->setText(QString("能量：%1 度").arg(energy));
+   ui->labelCost->setText(QString("费用：%1 元").arg(cost));
+   qDebug() << DATETIME << "now cost : " << cost << " temp cost : " << temp;
 }
 
 
