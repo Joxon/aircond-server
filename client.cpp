@@ -266,6 +266,10 @@ bool Client::isWorking()
     return this->working == WorkingYes;
 }
 
+bool Client::isTarget()
+{
+    return targetTemp == currentTemp;
+}
 
 bool Client::hasWind()
 {

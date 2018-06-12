@@ -294,8 +294,16 @@ void MainWindow::readFromSockets()
             }
             else
             {
-                qDebug() << "kill one resource for room--" << room;
-                sendCommonMessage(socket, 1, 0, 0, 0, 0);
+                if(client->isTarget())
+                {   // 达到目标温度
+                    qDebug() << "Room reach the target room--" << room;
+                    sendCommonMessage(socket, 1, 0, 0, 0, 0);
+                }
+                else
+                {   // 未达到目标温度
+                    qDebug() << "kill one resource for room--" << room;
+                    sendCommonMessage(socket, 1, 0, 0, -1, 0);
+                }
             }
         }
         //请求报文
@@ -410,8 +418,16 @@ void MainWindow::readFromSockets()
             }
             else
             {
-                qDebug() << "kill one resource for room--" << room;
-                sendCommonMessage(socket, 1, 0, 0, 0, 0);
+                if(client->isTarget())
+                {   // 达到目标温度
+                    qDebug() << "Room reach the target room--" << room;
+                    sendCommonMessage(socket, 1, 0, 0, 0, 0);
+                }
+                else
+                {   // 未达到目标温度
+                    qDebug() << "kill one resource for room--" << room;
+                    sendCommonMessage(socket, 1, 0, 0, -1, 0);
+                }
             }
 //        else
 //        {

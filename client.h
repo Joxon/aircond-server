@@ -73,6 +73,7 @@ public slots:
     void calCost(double new_n);                        // 计算价格
     bool isServing();                                  // 判断服务
     bool isWorking();                                  // 判断工作
+    bool isTarget();
     bool hasWind();                                    // 判断风速
 
     void writeDetailedList(QString roomid);            // 写入数据库
