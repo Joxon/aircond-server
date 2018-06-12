@@ -205,6 +205,10 @@ double Client::getCurrentTemp() const
     return currentTemp;
 }
 
+QString Client::getRoomId()
+{
+    return id;
+}
 
 Client::Speed Client::getSpeed() const
 {

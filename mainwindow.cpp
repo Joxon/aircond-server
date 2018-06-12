@@ -158,10 +158,10 @@ void MainWindow::storeSockets()
 
     sockets.append(socket);
 
-    connect(socket, SIGNAL(readyRead), this, SLOT(readFromSockets()));
+    connect(socket, SIGNAL(readyRead()), this, SLOT(readFromSockets()));
     connect(socket, &QTcpSocket::disconnected, [socket, this]() {
         int clientIdx = sockets.indexOf(socket);
-        if (clientIdx == -1)
+        if (clientIdx == -1 && clientIdx >= sockets.size())
         {
             return;
         }
@@ -171,6 +171,7 @@ void MainWindow::storeSockets()
         client->setCurrentTemp(0.0);
         client->setTargetTemp(0.0);
         client->setSpeed(Client::SpeedNone);
+        // 再算一次钱或者不算
     });
 }
 
@@ -230,10 +231,14 @@ void MainWindow::readFromSockets()
                     {
                         room = room_value.toString();
                     }
-                    if (room == "")
+                    if (!room_socket.contains(room))
                     {
-                        continue;
+                        room_socket[room] = socket;
                     }
+//                    if (room == "")
+//                    {
+//                        continue;
+//                    }
                 }
                 if (jsonObj.contains("switch"))
                 {
@@ -267,11 +272,13 @@ void MainWindow::readFromSockets()
             continue;
         }
 
+
         //新的ID，新增client
         Client *client;
         int    clientIdx = clientIDs.indexOf(room);
         if (clientIdx == -1)
         {
+            if(room == "")  continue;
             clientIDs.append(room);
 
             client = new Client;
@@ -286,6 +293,14 @@ void MainWindow::readFromSockets()
         //旧的ID，更新client
         else
         {
+//            if(client->isconnect())
+//            {
+//                // 更新状态
+//            }
+//            else
+//            {
+//                // 新房间开启
+//            }
             qDebug() << "client at 更新 (起点): ___ ";
             client = qobject_cast<Client *>(clients.at(clientIdx));
             qDebug() << "client at 更新 (终点): ___";
@@ -475,6 +490,9 @@ void MainWindow::resourceAllocation()
         qDebug() << "client at 置零 (起点): ___";
         Client *client = qobject_cast<Client *>(clients.at(i));
         qDebug() << "client at 置零 (终点): ___";
+        last_serving[i] = false;
+        if(client->isServing())
+            last_serving[i] = true;
         client->setServing(Client::ServingNo);
     }
 
@@ -560,6 +578,26 @@ void MainWindow::rrIncrease()
         }
     }
     resourceAllocation();
+    // send
+    for (int i = 0; i < clients.size(); i++)
+    {
+        Client *client = qobject_cast<Client *>(clients.at(i));
+        if(!client->isServing() && last_serving[i])
+        {   // 剥夺资源
+            if (client->isTarget())
+            {   // 达到目标温度
+                sendCommonMessage(room_socket[client->getRoomId()], 1, 0, 0, 0, 0);
+            }
+            else
+            {   // 未达到目标温度
+                sendCommonMessage(room_socket[client->getRoomId()], 1, 0, 0, -1, 0);
+            }
+        }
+        if(client->isServing())
+        {
+            sendCommonMessage(room_socket[client->getRoomId()], 1, 1, client->getCurrentTemp(), (int)client->getSpeed(), client->getCost());
+        }
+    }
 }
 
 

@@ -56,9 +56,11 @@ private:
     QStringList lowSpeedList;
     QStringList highSpeedList;
 
+    QMap <QString, QTcpSocket *> room_socket;
+
     const int RES_NUM = 5;
     int turn[3];
-
+    bool last_serving[8];
     void initDatabase();
     void initNetwork();
     void initFont();
