@@ -154,10 +154,24 @@ void MainWindow::on_toolButtonPower_toggled(bool checked)
 
 void MainWindow::storeSockets()
 {
-    //将已经建立连接的套接字加入容器
-    sockets.append(server->nextPendingConnection());
-    connect(sockets.last(), SIGNAL(readyRead()), this, SLOT(readFromSockets()));
-    //connect(sockets.last(), SIGNAL(disconnected()), sockets.last(), SLOT(deleteLater()));
+    QTcpSocket *socket = server->nextPendingConnection();
+
+    sockets.append(socket);
+
+    connect(socket, SIGNAL(readyRead()), this, SLOT(readFromSockets()));
+    connect(socket, &QTcpSocket::readyRead, [socket, this]() {
+        int clientIdx = sockets.indexOf(socket);
+        if (clientIdx == -1)
+        {
+            return;
+        }
+        Client *client = qobject_cast<Client *>(clients[clientIdx]);
+        client->setWorking(Client::WorkingNo);
+        client->setServing(Client::ServingNo);
+        client->setCurrentTemp(-1.0);
+        client->setTargetTemp(-1.0);
+        client->setSpeed(Client::SpeedNone);
+    });
 }
 
 
@@ -294,7 +308,7 @@ void MainWindow::readFromSockets()
             }
             else
             {
-                if(client->isTarget())
+                if (client->isTarget())
                 {   // 达到目标温度
                     qDebug() << "Room reach the target room--" << room;
                     sendCommonMessage(socket, 1, 0, 0, 0, 0);
@@ -418,7 +432,7 @@ void MainWindow::readFromSockets()
             }
             else
             {
-                if(client->isTarget())
+                if (client->isTarget())
                 {   // 达到目标温度
                     qDebug() << "Room reach the target room--" << room;
                     sendCommonMessage(socket, 1, 0, 0, 0, 0);
@@ -576,119 +590,75 @@ void MainWindow::roundRobin(Client::Speed speed, int resNum)            // 轮�
 }
 
 
-// void MainWindow::sendRequestMessage(QTcpSocket *tsock, int type, int isServed)
-// {
-//    QJsonObject json;
-
-//    json.insert("type", type);
-//    json.insert("isServed", isServed);
-// //   json.insert("cost",  cost);
-
-//    QJsonDocument document;
-//    document.setObject(json);
-//    QByteArray byte_array = document.toJson(QJsonDocument::Compact);
-
-//    tsock->write(byte_array);
-
-//    qDebug() << DATETIME << " sendRequestMessage: ";
-
-// //   QByteArray  block;
-// //   QDataStream out(&block, QIODevice::WriteOnly);
-
-// //   out.setVersion(QDataStream::Qt_5_5);
-
-// //   out << (quint16)0;
-// //   out << type;
-// //   out << isServed;
-// //   out.device()->seek(0);
-// //   out << (quint16)(block.size() - sizeof(quint16));
-
-// //   tsock->write(block);
-
-// //   qDebug() << DATETIME << " sendRequestMessage: ";
-// }
-
-
-void MainWindow::sendCommonMessage(QTcpSocket *tsock, int type, int switchh, double dTemp, int usWind, double cost)
+void MainWindow::sendRequestMessage(QTcpSocket *socket, int type, int isServed)
 {
+#ifdef USE_JSON
     QJsonObject json;
-
     json.insert("type", type);
-    json.insert("switch", switchh);
-    json.insert("temperature", dTemp);
-    json.insert("wind", usWind);
-    json.insert("cost", cost);
-    qDebug() << DATETIME << "sendCommonMessage: Type:" << type << " Switch:" << switchh << " Temp:" << dTemp << " Wind:" << usWind << " cost:" << cost;
+    json.insert("isServed", isServed);
+    //json.insert("cost",  cost);
+
     QJsonDocument document;
     document.setObject(json);
 
-    QByteArray byte_array = document.toJson(QJsonDocument::Compact);
-    tsock->write(byte_array);
+    QByteArray bytes = document.toJson(QJsonDocument::Compact);
+    socket->write(bytes);
 
-
-//   QByteArray  block;
-//   QDataStream out(&block, QIODevice::WriteOnly);
-
-    // 设置数据流的版本，客户端和服务器端使用的版本要相同
-//   out.setVersion(QDataStream::Qt_5_5);
-//   out << (quint16)0;
-//    out << QString("0");
-//    out << roomMap[room];
-//   out << type;
-//   out << Switch;
-//   out << temperature;
-//   out << wind;
-//   out << cost;
-//   out.device()->seek(0);
-//   out << (quint16)(block.size() - sizeof(quint16));
-//   tsock->write(block);
-//clientConnection->disconnectFromHost();
-// 发送数据成功后，显示提示
-//    roomMap[room]++;
+    qDebug() << DATETIME << " sendRequestMessage: ";
+#else
+    QByteArray  block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_5);
+    out << (quint16)0;
+    out << type;
+    out << isServed;
+    out.device()->seek(0);
+    out << (quint16)(block.size() - sizeof(quint16));
+    tsock->write(block);
+    qDebug() << DATETIME << " sendRequestMessage: ";
+#endif
 }
 
 
-//void MainWindow::Cycle_Check()
-//{
-//   // 资源分配，通告信息
-//   Service_Allocation();
-//   // 送信
-//}
+void MainWindow::sendCommonMessage(QTcpSocket *tsock, int type, int switchh, double temp, int wind, double cost)
+{
+#ifdef USE_JSON
+    QJsonObject json;
+    json.insert("type", type);
+    json.insert("switch", switchh);
+    json.insert("temperature", temp);
+    json.insert("wind", wind);
+    json.insert("cost", cost);
+    qDebug() << DATETIME << "sendCommonMessage: Type:" << type
+             << " Switch:" << switchh
+             << " Temp:" << temp
+             << " Wind:" << wind
+             << " cost:" << cost;
 
+    QJsonDocument document;
+    document.setObject(json);
 
-//void MainWindow::Service_Allocation()
-//{
-//   int Working = 0;
+    QByteArray bytes = document.toJson(QJsonDocument::Compact);
+    tsock->write(bytes);
+#else
+    QByteArray  block;
+    QDataStream out(&block, QIODevice::WriteOnly);
 
-//   for (int i = 0; i < Num; i++)
-//   {
-//      if (rooms[i].Link && rooms[i].Work)       // 链接且工作
-//      {
-//         Working++;
-//      }
-//   }
-//   if (Working < 6)             // 直接分配
-//   {
-//      // 对这些房间直接允许服务
-//      for (int i = 0; i < Num; i++)
-//      {
-//         if (rooms[i].Link && rooms[i].Work)    // 链接且工作
-//         {
-//            rooms[i].Service = true;
-//         }
-//      }
-//   }
-//   else                  // 超过阈值，轮转算法
-//   {                     // 外部一个调用，在T的周期下调用整个Servive函数，全局有个k用于简单轮转
-//      int Remainder = 5; // 剩余工作数
-//      for (int i = k; (i + 1) % Num != k; i++)
-//      {
-//         if (rooms[i].Link && rooms[i].Work && Remainder)       // 链接且工作且有剩余
-//         {
-//            rooms[i].Service = true;
-//            Remainder--;
-//         }
-//      }
-//      k = (k + 1) % Num;
-//   }
-//}
+    //设置数据流的版本，客户端和服务器端使用的版本要相同
+    out.setVersion(QDataStream::Qt_5_5);
+    out << (quint16)0;
+    out << QString("0");
+    out << roomMap[room];
+    out << type;
+    out << Switch;
+    out << temperature;
+    out << wind;
+    out << cost;
+    out.device()->seek(0);
+    out << (quint16)(block.size() - sizeof(quint16));
+    tsock->write(block);
+    clientConnection->disconnectFromHost();
+    //发送数据成功后，显示提示
+    roomMap[room]++;
+#endif
+}

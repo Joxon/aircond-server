@@ -10,18 +10,18 @@ class detailList;
 
 class detailList : public QDialog
 {
-   Q_OBJECT
+    Q_OBJECT
 
 public:
-   detailList(QSqlQuery tquery, QWidget *parent = 0);
-   ~detailList();
+    detailList(QSqlQuery tquery, QWidget *parent = 0);
+    ~detailList();
 
 private slots:
-   void on_exit_clicked();
+    void on_exit_clicked();
 
 private:
-   Ui::detailList *ui;
-   QSqlQuery sql_query;
+    Ui::detailList *ui;
+    QSqlQuery sql_query;
 };
 
 #endif // DETAILLIST_H

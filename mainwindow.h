@@ -5,6 +5,9 @@
 #pragma execution_character_set("utf-8")
 #endif
 
+#define USE_JSON
+//#define USE_DATA_STREAM
+
 #include "client.h"
 
 #include <QtCore>
@@ -30,9 +33,8 @@ private slots:
     void storeSockets();
     void readFromSockets();
 
-    void sendCommonMessage(QTcpSocket *tsock, int msgType, int usSwitch, double dTemp, int usWind, double cost);
-
-    //void sendRequestMessage(QTcpSocket *tsock, int msgType, int isServed);
+    void sendCommonMessage(QTcpSocket *socket, int type, int switchh, double temp, int wind, double cost);
+    void sendRequestMessage(QTcpSocket *socket, int type, int isServed);
 
     void rrIncrease();
 
@@ -51,8 +53,8 @@ private:
     QStringList clientIDs;
 
     QTimer *rrTimer;
-    QList<QString> lowSpeedList;
-    QList<QString> highSpeedList;
+    QStringList lowSpeedList;
+    QStringList highSpeedList;
 
     const int RES_NUM = 5;
     int turn[3];
