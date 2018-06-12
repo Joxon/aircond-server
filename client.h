@@ -64,6 +64,7 @@ public slots:
     void setCost(double _cost);
     void setStartTime();
 
+    QString getRoomId();
     double getCurrentTemp() const;
     Speed getSpeed() const;
     double getCost() const;
