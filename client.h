@@ -18,11 +18,11 @@ class Client;
 
 class Client : public QWidget
 {
-   Q_OBJECT
+    Q_OBJECT
 
 public:
-   explicit Client(QWidget *parent = 0);
-   ~Client();
+    explicit Client(QWidget *parent = 0);
+    ~Client();
 
 //   enum Conn
 //   {
@@ -30,78 +30,77 @@ public:
 //      ConnOnline
 //   };
 
-   enum Working
-   {
-      WorkingNo,
-      WorkingYes,
-      WorkingDone
-   };
+    enum Working
+    {
+        WorkingNo,
+        WorkingYes,
+        WorkingDone
+    };
 
-   enum Serving
-   {
-      ServingNo,
-      ServingYes
-   };
+    enum Serving
+    {
+        ServingNo,
+        ServingYes
+    };
 
-   enum Speed
-   {
-      SpeedNone,
-      SpeedLow,
-      SpeedHigh
-   };
+    enum Speed
+    {
+        SpeedNone,
+        SpeedLow,
+        SpeedHigh
+    };
 
 public slots:
-   void setId(const QString& value);
+    void setId(const QString& value);
 
 //   void setConn(Client::Conn conn);
 
-   void setWorking(Client::Working work);
-   void setServing(Client::Serving serve);
+    void setWorking(Client::Working work);
+    void setServing(Client::Serving serve);
+    void setCurrentTemp(double temp);
+    void setTargetTemp(double temp);
+    void setSpeed(Client::Speed _speed);
+    void setEnergy(double _energy);
+    void setCost(double _cost);
+    void setStartTime();
 
-   void setCurrentTemp(double temp);
-   void setTargetTemp(double temp);
-   void setSpeed(Client::Speed _speed);
+    double getCurrentTemp() const;
+    Speed getSpeed() const;
+    double getCost() const;
+    QDateTime getTime();                               // 获得start_t;
+    void setTime(QDateTime time);                      // 设置start_t;
 
-   void setEnergy(double _energy);
-   void setCost(double _cost);
-   void setST();
+    void calCost(double new_n);                        // 计算价格
+    bool isServing();                                  // 判断服务
+    bool isWorking();                                  // 判断工作
+    bool hasWind();                                    // 判断风速
 
-   double getCurrentTemp() const;
-   Speed getSpeed() const;
-   double getCost() const;
-   QDateTime getTime();                                     // 获得start_t;
-   void setTime(QDateTime temp_t);                                          // 设置start_t;
-   void Cost_Cal(double new_n);                              // 计算价格
-   bool CheckServing();                                      // 判断服务
-   bool CheckWorking();                                      // 判断工作
-   bool CheckWind();                                         // 判断风速
-   void write_detail_list(QString roomid);                   // 写入数据库
-   void read_detail_list(QString roomid);                   // 打印详单
+    void writeDetailedList(QString roomid);            // 写入数据库
+    void readDetailedList(QString roomid);             // 打印详单
 
 private slots:
 
-   void on_toolButtonDetails_clicked();
+    void on_toolButtonDetails_clicked();
 
 private:
-   Ui::Client *ui;
+    Ui::Client *ui;
 
-   int fontId;
-   QString fontName;
-   QFont font;
+    int fontId;
+    QString fontName;
+    QFont font;
 
-   QString id;
+    QString id;
 //   Conn conn;                                              // 连接状态
-   Working working;                                        // 工作状态
-   Serving serving;                                        // 服务状态
-   double currentTemp;                                     // 当前温度
-   double targetTemp;                                      // 目标温度
-   Speed speed;                                            // 风速
-   double energy;                                          // 消耗的能量
-   double cost;                                            // 费用
+    Working working;         // 工作状态
+    Serving serving;         // 服务状态
+    double currentTemp;      // 当前温度
+    double targetTemp;       // 目标温度
+    Speed speed;             // 风速
+    double energy;           // 消耗的能量
+    double cost;             // 费用
 
-   QDateTime start_t;                                      // 计费开启时间
-   QDateTime begin_t;                                       // 开启时间
-//   void Init_Room();                                       // 初始化房间
+    QDateTime costStartTime; // 计费开启时间
+    QDateTime connStartTime; // 连接开启时间
 };
 
 #endif // CLIENT_H

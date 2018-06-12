@@ -18,49 +18,53 @@ class MainWindow;
 
 class MainWindow : public QMainWindow
 {
-   Q_OBJECT
+    Q_OBJECT
 
 public:
-   explicit MainWindow(QWidget *parent = 0);
-   ~MainWindow();
+    explicit MainWindow(QWidget *parent = 0);
+    ~MainWindow();
 
 private slots:
-   void on_toolButtonPower_toggled(bool checked);
+    void on_toolButtonPower_toggled(bool checked);
 
-   void storeSockets();
-   void readFromSockets();
+    void storeSockets();
+    void readFromSockets();
 
-   void sendCommonMessage(QTcpSocket *tsock, int msgType, int usSwitch, double dTemp, int usWind, double cost);
+    void sendCommonMessage(QTcpSocket *tsock, int msgType, int usSwitch, double dTemp, int usWind, double cost);
 
-   //void sendRequestMessage(QTcpSocket *tsock, int msgType, int isServed);
+    //void sendRequestMessage(QTcpSocket *tsock, int msgType, int isServed);
 
-   void RRinc();
+    void rrIncrease();
 
 private:
-   QWidget *parent;
-   Ui::MainWindow *ui;
-   QFont fontAwesomeSolid;
+    QWidget *parent;
+    Ui::MainWindow *ui;
+    QFont fontAwesomeSolid;
 
-   QPropertyAnimation *aniSizeChange;
-   QPropertyAnimation *aniOpacityChange;
-   QGraphicsOpacityEffect *effOpacity;
+    QPropertyAnimation *aniSizeChange;
+    QPropertyAnimation *aniOpacityChange;
+    QGraphicsOpacityEffect *effOpacity;
 
-   QTcpServer *server;
-   QVector<QTcpSocket *> sockets;
-   QList<QWidget *> clients;
-   QStringList clientIDs;
-   QList<QString> LowSpeedList;
-   QList<QString> HighSpeedList;
+    QTcpServer *server;
+    QVector<QTcpSocket *> sockets;
+    QList<QWidget *> clients;
+    QStringList clientIDs;
 
-   int turn[3];
+    QTimer *rrTimer;
+    QList<QString> lowSpeedList;
+    QList<QString> highSpeedList;
 
-   void initDatabase();
-   void initNetwork();
-   void initFont();
-   void initAnimation();
-   void initClientPanel();
-   void resourceAllocation();
-   void RoundRobin(int level, int maxx);
+    const int RES_NUM = 5;
+    int turn[3];
+
+    void initDatabase();
+    void initNetwork();
+    void initFont();
+    void initAnimation();
+    void initClientPanel();
+    void initAllocation();
+    void resourceAllocation();
+    void roundRobin(Client::Speed speed, int resNum);
 };
 
 #endif // MAINWINDOW_H
