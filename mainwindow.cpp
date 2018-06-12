@@ -202,11 +202,11 @@ void MainWindow::readFromSockets()
 
 
         //JSON解析
-        int             type;
-        int             switchh;
-        int             wind;
-        QString         room;
-        double          temp;
+        int             type      = -1;
+        int             switchh   = -1;
+        int             wind      = -1;
+        QString         room      = "";
+        double          temp      = -1.0;
         QByteArray      jsonBytes = socket->readLine();
         QJsonParseError jsonErr;
         QJsonDocument   jsonDoc = QJsonDocument::fromJson(jsonBytes, &jsonErr);
@@ -262,6 +262,10 @@ void MainWindow::readFromSockets()
             }
         }
 //      qDebug() << DATETIME << "receive message : Type : " <<  type << " Temp : " << dTemp;
+        else
+        {
+            continue;
+        }
 
         //新的ID，新增client
         Client *client;
