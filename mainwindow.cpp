@@ -15,12 +15,18 @@ MainWindow::MainWindow(QWidget *parent) :
     initAnimation();
     initClientPanel();
     initAllocation();
+    initNetwork();
 }
 
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete aniOpacityChange;
+    delete aniSizeChange;
+    delete effOpacity;
+
+    delete server;
     delete rrTimer;
 }
 
@@ -111,8 +117,6 @@ void MainWindow::on_toolButtonPower_toggled(bool checked)
 {
     if (checked)
     {
-        initNetwork();
-
         ui->labelArrowDown->hide();
         //aniSizeChange->setStartValue(parent->geometry());
         aniSizeChange->setEndValue(QRect(parent->x(), parent->y() - 200, 1000, 600));
@@ -124,8 +128,6 @@ void MainWindow::on_toolButtonPower_toggled(bool checked)
     }
     else
     {
-        delete server;
-
         ui->labelArrowDown->show();
 
         //aniSizeChange->setStartValue(parent->geometry());
@@ -153,7 +155,7 @@ void MainWindow::initNetwork()
 
 void MainWindow::storeSockets()
 {
-    if (server->hasPendingConnections())
+    while (server->hasPendingConnections())
     {
         QTcpSocket *socket = server->nextPendingConnection();
 
