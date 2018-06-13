@@ -306,7 +306,7 @@ void MainWindow::storeSockets()
             {
                 if (client->isServing())
                 {
-                    client->calCost(temp);
+                    client->calCost();
                 }
                 client->setCurrentTemp(temp);
                 if(client->isTarget())

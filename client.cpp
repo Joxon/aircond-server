@@ -264,7 +264,7 @@ double Client::getTargetTemp()
 //}
 
 
-void Client::calCost(double new_n)                   // 为了计算需要1个周期计算一次，不然需要不断获取上一次的温度风速等信息
+void Client::calCost()                   // 为了计算需要1个周期计算一次，不然需要不断获取上一次的温度风速等信息
 {
     //cost += wind * S;             S == 1;
     double wind = 0;
@@ -410,6 +410,7 @@ void Client::writeDetailedList(int option)
 
 void Client::readDetailedList(QString roomid)
 {
+//    readBill();
     QSqlQuery query;
     QString   select = "select * from Info_list where roomid = \"" + roomid
                        + "\" and start_t >= \"" + connStartTime.toString("yyyy-MM-dd hh:mm:ss") + "\"";
@@ -428,6 +429,10 @@ void Client::readDetailedList(QString roomid)
     }
 }
 
+void Client::readBill() // 打印账单
+{
+    QMessageBox::about(NULL, "账单", "Start time: " + connStartTime.toString("yyyy-MM-dd hh:mm:ss") + "\n End time: " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + "\t Cost: " + QString::number(cost, 10, 4) + " Energy: " + QString::number(energy, 10,4));
+}
 
 void Client::on_toolButtonDetails_clicked()
 {
