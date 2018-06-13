@@ -63,6 +63,7 @@ public:
     void setCost(double c);
     void setStartTime();
     void setSocket(QTcpSocket *s);
+    void setTempState();
 
     QString getId();
     int getLastSpeed();
@@ -70,8 +71,8 @@ public:
     double getCurrentTemp() const;
     Speed getSpeed() const;
     double getCost() const;
-    QDateTime getTime();                               // 获得start_t;
-    void setTime(QDateTime time);                      // 设置start_t;
+//    QDateTime getTime();                               // 获得start_t;
+//    void setTime(QDateTime time);                      // 设置start_t;
     QTcpSocket *getSocket() const;
 
     void calCost(double new_n);                        // 计算价格
@@ -82,7 +83,7 @@ public:
     bool hasWind();                                    // 判断风速
 
 public slots:
-    void writeDetailedList(QString roomid);            // 写入数据库
+    void writeDetailedList(int option);            // 写入数据库
     void readDetailedList(QString roomid);             // 打印详单
 
 private slots:
@@ -105,7 +106,7 @@ private:
     Speed lastSpeed;         // 上次风速
     double energy;           // 消耗的能量
     double cost;             // 费用
-
+    bool tempState;          // 趋近关系 true 下 false 上
     QDateTime costStartTime; // 计费开启时间
     QDateTime connStartTime; // 连接开启时间
 

@@ -41,6 +41,28 @@ void MainWindow::initDatabase()
         qDebug() << DATETIME << "initDatabase:" << database.lastError();
         exit(EXIT_FAILURE);
     }
+    QSqlQuery query;
+    QString   built_sql = ("CREATE TABLE IF NOT EXISTS Info_list ("
+                            "id     INT      PRIMARY KEY,"
+                            "roomid CHAR     NOT NULL,"
+                            "time   DATETIME NOT NULL,"
+                            "wind   INT      NOT NULL,"
+                            "currt  DOUBLE   NOT NULL,"
+                            "targt  DOUBLE   NOT NULL,"
+                            "option INT      NOT NULL,"
+                            "cost_p DOUBLE   NOT NULL,"
+                            "cost_e DOUBLE   NOT NULL );");
+
+    qDebug() << "built sql : " << built_sql;
+
+    if (!query.exec(built_sql))
+    {
+        qDebug() << DATETIME << "bulit the detail list failed:" << query.lastError();
+    }
+    else
+    {
+        qDebug() << DATETIME << "bulit the detail list success";
+    }
 }
 
 
@@ -233,9 +255,9 @@ void MainWindow::storeSockets()
                         }
                     }
                 }
-//                qDebug() << DATETIME << "receive message : ";
-//                qDebug() << "\t\t\t Type : " <<  type << "Room : " << room << " Sitch : " << switchh;
-//                qDebug() << "\t\t\t Temp : " << temp << "Wind : " << wind;
+                qDebug() << DATETIME << "receive message : ";
+                qDebug() << "\t\t\t Type : " << type << "Room : " << room << " Sitch : " << switchh;
+                qDebug() << "\t\t\t Temp : " << temp << "Wind : " << wind;
             }
             //  JSON解析错误
             else
@@ -271,11 +293,12 @@ void MainWindow::storeSockets()
                 client->setConn(Client::ConnOnline);
                 client->setLastSpeed(Client::SpeedNone);
                 client->setId(room);
+                client->setSpeed(0);
                 client->setStartTime();
                 client->setCost(0);
                 client->setCurrentTemp(28);
                 client->setSocket(socket);
-
+                client->writeDetailedList(3);
                 clients.append(client);
             }
             //通告报文
@@ -286,6 +309,11 @@ void MainWindow::storeSockets()
                     client->calCost(temp);
                 }
                 client->setCurrentTemp(temp);
+                if(client->isTarget())
+                {
+                    client->setCurrentTemp(client->getTargetTemp());
+                    client->writeDetailedList(1);   // reach target
+                }
 
 //                qDebug() << DATETIME << " readFromSockets: " << type << " " << room << " " << temp;
                 if(client->isTarget())
@@ -312,17 +340,22 @@ void MainWindow::storeSockets()
                 }
                 else if(client->isServing())
                 {
-//                    qDebug() << "give a resource to room " << room;
+                    qDebug() << "give a resource to room " << room;
                     sendCommonMessage(socket, 1, 1, client->getCurrentTemp(), (int)client->getSpeed(), client->getCost());
+                    qDebug() << DATETIME << "send message when receive common: ";
+                    qDebug() << "\t\t\t Type : " << type << "Room : " << room << " Sitch : " << switchh;
+                    qDebug() << "\t\t\t Temp : " << temp << "Wind : " << wind;
                 }
                 else if(client->isBackTemp())
                 {
                     // take it to waiting list
                     int speedLevel = client->getLastSpeed();
 //                    qDebug() << "speedlevel = " << speedLevel;
-                    client->setSpeed(speedLevel);
                     if(speedLevel)
+                    {
+                        client->setSpeed(speedLevel);
                         SpeedList[speedLevel].append(room);
+                    }
                 }
             }
             //请求报文
@@ -347,12 +380,14 @@ void MainWindow::storeSockets()
                         }
                     }
                     client->setWorking(Client::WorkingNo);
-//                    client->writeDetailedList(room);
+                    client->writeDetailedList(4);
                     break;
 
                 case 1:
                     client->setTargetTemp(temp);
+                    client->setTempState();
                     client->setSpeed(wind);
+                    client->writeDetailedList(2);
                     if (wind == 0)
                     {
                         // remove from speedlist
@@ -369,11 +404,12 @@ void MainWindow::storeSockets()
                         }
 //                        client->writeDetailedList(room);
                     }
-                    else
+                    else if(wind < 4)
                     {
                         // update the speed list
                         for(i = 1; i < 4; i++)
                         {
+                            si = -1;
                             if(i == wind)
                             {
                                 if (SpeedList[i].size())
@@ -396,6 +432,7 @@ void MainWindow::storeSockets()
                                     SpeedList[i].removeAt(si);
                                 }
                             }
+//                            qDebug() << "SpeedListSize : " << SpeedList[i].size() << "when level = " << i;
                         }
                     }
 
@@ -438,16 +475,21 @@ void MainWindow::storeSockets()
                 }
                 else if(client->isServing())
                 {
-//                    qDebug() << "give a resource to room " << room;
+                    qDebug() << "give a resource to room " << room;
                     sendCommonMessage(socket, 1, 1, client->getCurrentTemp(), (int)client->getSpeed(), client->getCost());
+                    qDebug() << DATETIME << "send message when receive request: ";
+                    qDebug() << "\t\t\t Type : " << type << "Room : " << room << " Sitch : " << switchh;
+                    qDebug() << "\t\t\t Temp : " << temp << "Wind : " << wind;
                 }
                 else if(client->isBackTemp())
                 {
                     // take it to waiting list
                     int speedLevel = client->getLastSpeed();
-                    client->setSpeed(speedLevel);
                     if(speedLevel)
+                    {
+                        client->setSpeed(speedLevel);
                         SpeedList[speedLevel].append(room);
+                    }
                 }
 
 //                if (client->isServing())     // 分配成功
@@ -497,8 +539,8 @@ void MainWindow::storeSockets()
             client->setServing(Client::ServingNo);
             client->setCurrentTemp(0.0);
             client->setTargetTemp(0.0);
-            client->setSpeed(Client::SpeedNone);
-            // 再算一次钱或者不算
+            client->setSpeed(0);
+            client->writeDetailedList(5);
         });
     }
 }
@@ -528,9 +570,10 @@ void MainWindow::resourceAllocation()
     {
         if(resSize <= 0)    break;          // there is no resource.
         listSize = SpeedList[i].size();
+//        qDebug() << "listSize : " << listSize << "when level = " << i;
         if(listSize <= resSize)
         {   // 不需要轮转 直接分配
-            for(int j = 0; j <listSize; j++)
+            for(int j = 0; j < listSize; j++)
             {
                 QString clientID = SpeedList[i].at(j);
                 Client  *client;
@@ -599,7 +642,7 @@ void MainWindow::rrIncrease()
             }
             else
             {   // 未达到目标温度
-                sendCommonMessage(clientSockets[client->getId()], 1, 1, client->getTargetTemp(), 0, client->getCost());
+                sendCommonMessage(clientSockets[client->getId()], 1, 1, client->getTargetTemp(), client->getSpeed(), client->getCost());
             }
         }
         if (client->isServing())

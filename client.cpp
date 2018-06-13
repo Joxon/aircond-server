@@ -205,9 +205,9 @@ void Client::setCost(double c)
 void Client::setStartTime()
 {
     connStartTime = QDateTime::currentDateTime();
-    costStartTime = QDateTime::fromString("2999-12-31 23:59:59", "yyyy-MM-dd hh:mm:ss");
-    qDebug() << connStartTime;
-    qDebug() << costStartTime;
+//    costStartTime = QDateTime::fromString("2999-12-31 23:59:59", "yyyy-MM-dd hh:mm:ss");
+//    qDebug() << connStartTime;
+//    qDebug() << costStartTime;
 }
 
 
@@ -243,16 +243,16 @@ double Client::getTargetTemp()
     return  targetTemp;
 }
 
-QDateTime Client::getTime()                                     // 获得start_t;
-{
-    return costStartTime;
-}
+//QDateTime Client::getTime()                                     // 获得start_t;
+//{
+//    return costStartTime;
+//}
 
 
-void Client::setTime(QDateTime time)                                          // 设置start_t;
-{
-    costStartTime = time;
-}
+//void Client::setTime(QDateTime time)                                          // 设置start_t;
+//{
+//    costStartTime = time;
+//}
 
 
 //void Client::Init_Room()
@@ -266,7 +266,6 @@ void Client::setTime(QDateTime time)                                          //
 
 void Client::calCost(double new_n)                   // 为了计算需要1个周期计算一次，不然需要不断获取上一次的温度风速等信息
 {
-    // 计算公式emmm S是单价 固定了时间所以只需要考虑风速和单价
     //cost += wind * S;             S == 1;
     double wind = 0;
 
@@ -277,21 +276,26 @@ void Client::calCost(double new_n)                   // 为了计算需要1个�
         break;
 
     case SpeedLow:
-        wind = 1;
+        wind = 1.0;
+        break;
+
+    case SpeedMid:
+        wind = 2.0;
         break;
 
     case SpeedHigh:
-        wind = 2;
+        wind = 3.0;
         break;
     }
-    double temp = qAbs(new_n - currentTemp) * ((double)wind / 2) * 1;
-    qDebug() << DATETIME << "now temp : " << new_n << " ever temp : " << currentTemp << "Wind : " << speed;
-    // 还需要编一个公式计算能量 暂定为 cost * 1.25
+    double temp = wind * 0.02;
+
+//    qDebug() << DATETIME << "now temp : " << new_n << " ever temp : " << currentTemp << "Wind : " << speed;
+    // 还需要编一个公式计算能量 暂定为 cost / 2
     cost  += temp;
-    energy = cost * 1.25;
+    energy = cost / 2 ;
     ui->labelEnergy->setText(QString("能量：%1 度").arg(energy));
     ui->labelCost->setText(QString("费用：%1 元").arg(cost));
-    qDebug() << DATETIME << "now cost : " << cost << " temp cost : " << temp;
+//    qDebug() << DATETIME << "now cost : " << cost << " temp cost : " << temp;
 }
 
 
@@ -306,17 +310,33 @@ bool Client::isWorking()
     return this->working == WorkingYes;
 }
 
+void Client::setTempState()
+{
+    tempState = (currentTemp - targetTemp) > 0;
+}
 
 bool Client::isTarget()
 {
-    double tempT = fabs(currentTemp - targetTemp);
+    double tempT = (currentTemp - targetTemp);
+    if(tempState)
+    {   // example 28->26
+        if(tempT > 0)
+            return false;
+    }
+    else
+    {   // 24->26
+        if(tempT < 0)
+            return false;
+    }
+    tempT = fabs(tempT);
     double Diff;
     if(speed == SpeedHigh)
         Diff = 0.2;
     else
         Diff = (double)(0.05 * (int)speed);
 //    qDebug() << "Diff = " << Diff;
-    return tempT < Diff;
+    tempT += 0.001;
+    return tempT <= Diff;
 }
 
 bool Client::isBackTemp()
@@ -342,11 +362,10 @@ bool Client::hasWind()
 }
 
 
-void Client::writeDetailedList(QString roomid)
-{  // 当出现：①达到目标 ②用户停止工作 ③连接断开
-   // 传入当前的房间号roomid
-    QDateTime endt  = QDateTime::currentDateTime();
-    QString   tmp_t = endt.toString("yyyy-MM-dd hh:mm:ss");
+void Client::writeDetailedList(int option)
+{  // 当出现：①达到目标 ②修改任务 ③开机 ④关机 5 断开连接
+    QDateTime now_t  = QDateTime::currentDateTime();
+    QString   now_ts = now_t.toString("yyyy-MM-dd hh:mm:ss");
 
     QString   select_max_sql = "SELECT MAX(id) from Info_list";
     int       max_id         = 0;
@@ -366,21 +385,25 @@ void Client::writeDetailedList(QString roomid)
     }
     max_id++;
 
-    QString id         = QString::number(max_id, 10);
-    QString stat       = costStartTime.toString("yyyy-MM-dd hh:mm:ss");
+    QString mid        = QString::number(max_id, 10);
+    QString roomid     = id;
+    QString wd         = QString::number(speed, 10);
+    QString nt         = QString::number(currentTemp, 10, 4);
+    QString tt         = QString::number(targetTemp, 10, 4);
+    QString op         = QString::number(option, 10);
     QString cp         = QString::number(cost, 10, 4);
     QString ep         = QString::number(energy, 10, 4);
-    QString insert_sql = "insert into Info_list values(" + id + ", \"" + roomid + "\", \"" + stat + "\", \"" + tmp_t + "\", " + cp + ", " + ep + ")";
+    QString insert_sql = "insert into Info_list values(" + mid + ", \"" + roomid + "\", \"" + now_ts + "\", " + wd + ", " + nt + ", " + tt + ", " + op + ", " + cp + ", " + ep + ")";
     qDebug() << "insert sql : " << insert_sql;
     if (!sql_query.exec(insert_sql))
     {
         qDebug() << DATETIME << "write_detail_list:" << sql_query.lastError();
     }
     else
-    {   // 插入成功，将energy, price(cost) start_t置零
-        cost = energy = 0;
-        QString str = "2999-01-12 17:35:00";
-        costStartTime = QDateTime::fromString(str, "yyyy-MM-dd hh:mm:ss");
+    {
+        qDebug() << DATETIME << "write detail list success";
+//        QString str = "2999-01-12 17:35:00";
+//        costStartTime = QDateTime::fromString(str, "yyyy-MM-dd hh:mm:ss");
     }
 }
 
