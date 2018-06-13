@@ -54,11 +54,10 @@ private:
     //QStringList clientIDs;
 
     QTimer *rrTimer;
-    QStringList lowSpeedList;
-    QStringList highSpeedList;
+    QStringList SpeedList[4];
 
     const int RES_NUM = 5;
-    int turn[3];
+    int turn[4];
     bool last_serving[8];
     void initDatabase();
     void initNetwork();
@@ -67,7 +66,7 @@ private:
     void initClientPanel();
     void initAllocation();
     void resourceAllocation();
-    void roundRobin(Client::Speed speed, int resNum);
+    void roundRobin(int speed, int resNum);
 };
 
 #endif // MAINWINDOW_H

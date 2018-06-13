@@ -156,21 +156,32 @@ void Client::setTargetTemp(double t)
     }
 }
 
-
-void Client::setSpeed(Client::Speed s)
+void Client::setLastSpeed(Client::Speed s)
 {
-    speed = s;
+    lastSpeed = s;
+}
+
+void Client::setSpeed(int s)
+{
     switch (s)
     {
-    case SpeedNone:
+    case 0:
+        speed = SpeedNone;
         ui->labelSpeed->setText(QString("风速：无"));
         break;
 
-    case SpeedLow:
+    case 1:
+        speed = SpeedLow;
         ui->labelSpeed->setText(QString("风速：低"));
         break;
 
-    case SpeedHigh:
+    case 2:
+        speed = SpeedMid;
+        ui->labelSpeed->setText(QString("风速：中"));
+        break;
+
+    case 3:
+        speed = SpeedHigh;
         ui->labelSpeed->setText(QString("风速：高"));
         break;
     }
@@ -211,6 +222,10 @@ QString Client::getId()
     return id;
 }
 
+int Client::getLastSpeed()
+{
+    return (int)lastSpeed;
+}
 
 Client::Speed Client::getSpeed() const
 {
@@ -223,6 +238,10 @@ double Client::getCost() const
     return cost;
 }
 
+double Client::getTargetTemp()
+{
+    return  targetTemp;
+}
 
 QDateTime Client::getTime()                                     // 获得start_t;
 {
@@ -290,9 +309,25 @@ bool Client::isWorking()
 
 bool Client::isTarget()
 {
-    return targetTemp == currentTemp;
+    double tempT = fabs(currentTemp - targetTemp);
+    double Diff;
+    if(speed == SpeedHigh)
+        Diff = 0.2;
+    else
+        Diff = (double)(0.05 * (int)speed);
+//    qDebug() << "Diff = " << Diff;
+    return tempT < Diff;
 }
 
+bool Client::isBackTemp()
+{
+    if(!isServing() && isWorking() && fabs(currentTemp - targetTemp) >= 1.0)
+    {
+        return true;
+    }
+    else
+        return false;
+}
 
 bool Client::hasWind()
 {

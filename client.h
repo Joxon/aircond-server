@@ -47,6 +47,7 @@ public:
     {
         SpeedNone,
         SpeedLow,
+        SpeedMid,
         SpeedHigh
     };
 
@@ -56,13 +57,16 @@ public:
     void setServing(Client::Serving s);
     void setCurrentTemp(double t);
     void setTargetTemp(double t);
-    void setSpeed(Client::Speed s);
+    void setSpeed(int s);
+    void setLastSpeed(Client::Speed s);
     void setEnergy(double e);
     void setCost(double c);
     void setStartTime();
     void setSocket(QTcpSocket *s);
 
     QString getId();
+    int getLastSpeed();
+    double getTargetTemp();
     double getCurrentTemp() const;
     Speed getSpeed() const;
     double getCost() const;
@@ -74,6 +78,7 @@ public:
     bool isServing();                                  // 判断服务
     bool isWorking();                                  // 判断工作
     bool isTarget();
+    bool isBackTemp();
     bool hasWind();                                    // 判断风速
 
 public slots:
@@ -97,6 +102,7 @@ private:
     double currentTemp;      // 当前温度
     double targetTemp;       // 目标温度
     Speed speed;             // 风速
+    Speed lastSpeed;         // 上次风速
     double energy;           // 消耗的能量
     double cost;             // 费用
 
