@@ -50,9 +50,7 @@ public:
         SpeedHigh
     };
 
-public slots:
-    void setId(const QString& value);
-
+    void setId(const QString& i);
     void setConn(Client::Conn c);
     void setWorking(Client::Working work);
     void setServing(Client::Serving s);
@@ -62,13 +60,15 @@ public slots:
     void setEnergy(double e);
     void setCost(double c);
     void setStartTime();
+    void setSocket(QTcpSocket *s);
 
-    QString getRoomId();
+    QString getId();
     double getCurrentTemp() const;
     Speed getSpeed() const;
     double getCost() const;
     QDateTime getTime();                               // 获得start_t;
     void setTime(QDateTime time);                      // 设置start_t;
+    QTcpSocket *getSocket() const;
 
     void calCost(double new_n);                        // 计算价格
     bool isServing();                                  // 判断服务
@@ -76,11 +76,11 @@ public slots:
     bool isTarget();
     bool hasWind();                                    // 判断风速
 
+public slots:
     void writeDetailedList(QString roomid);            // 写入数据库
     void readDetailedList(QString roomid);             // 打印详单
 
 private slots:
-
     void on_toolButtonDetails_clicked();
 
 private:
@@ -102,6 +102,8 @@ private:
 
     QDateTime costStartTime; // 计费开启时间
     QDateTime connStartTime; // 连接开启时间
+
+    QTcpSocket *socket;
 };
 
 #endif // CLIENT_H

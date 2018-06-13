@@ -48,15 +48,14 @@ private:
     QGraphicsOpacityEffect *effOpacity;
 
     QTcpServer *server;
-    QVector<QTcpSocket *> sockets;
     QList<QWidget *> clients;
-    QStringList clientIDs;
+    QMap<QString, QTcpSocket *> clientSockets;
+    //QVector<QTcpSocket *> sockets;
+    //QStringList clientIDs;
 
     QTimer *rrTimer;
     QStringList lowSpeedList;
     QStringList highSpeedList;
-
-    QMap <QString, QTcpSocket *> room_socket;
 
     const int RES_NUM = 5;
     int turn[3];

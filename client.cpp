@@ -41,10 +41,10 @@ Client::~Client()
 }
 
 
-void Client::setId(const QString& value)
+void Client::setId(const QString& i)
 {
-    id = value;
-    ui->labelRoomName->setText(QString("房间 %1").arg(value));
+    id = i;
+    ui->labelRoomName->setText(QString("房间 %1").arg(i));
 }
 
 
@@ -205,10 +205,12 @@ double Client::getCurrentTemp() const
     return currentTemp;
 }
 
-QString Client::getRoomId()
+
+QString Client::getId()
 {
     return id;
 }
+
 
 Client::Speed Client::getSpeed() const
 {
@@ -372,4 +374,16 @@ void Client::readDetailedList(QString roomid)
 void Client::on_toolButtonDetails_clicked()
 {
     readDetailedList(this->id);
+}
+
+
+QTcpSocket *Client::getSocket() const
+{
+    return socket;
+}
+
+
+void Client::setSocket(QTcpSocket *s)
+{
+    socket = s;
 }

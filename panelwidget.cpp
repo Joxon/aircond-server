@@ -50,7 +50,7 @@ QSize PanelWidget::minimumSizeHint() const
 void PanelWidget::setWidget(QList<QWidget *> widgets, int columnCount)
 {
     //先清空原有所有元素
-    //qDeleteAll(frame->findChildren<QWidget *>());
+    qDeleteAll(gridLayout->findChildren<QWidget *>());
 
     int row = 0;
     int col = 0;
