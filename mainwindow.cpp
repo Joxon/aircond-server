@@ -255,9 +255,9 @@ void MainWindow::storeSockets()
                         }
                     }
                 }
-                qDebug() << DATETIME << "receive message : ";
-                qDebug() << "\t\t\t Type : " << type << "Room : " << room << " Sitch : " << switchh;
-                qDebug() << "\t\t\t Temp : " << temp << "Wind : " << wind;
+//                qDebug() << DATETIME << "receive message : ";
+//                qDebug() << "\t\t\t Type : " << type << "Room : " << room << " Sitch : " << switchh;
+//                qDebug() << "\t\t\t Temp : " << temp << "Wind : " << wind;
             }
             //  JSON解析错误
             else
@@ -296,8 +296,10 @@ void MainWindow::storeSockets()
                 client->setSpeed(0);
                 client->setStartTime();
                 client->setCost(0);
+                client->setEnergy(0);
                 client->setCurrentTemp(28);
                 client->setSocket(socket);
+                client->setTargetTemp(temp);
                 client->writeDetailedList(3);
                 clients.append(client);
             }
@@ -320,7 +322,8 @@ void MainWindow::storeSockets()
                 {
                     // room reach the target
                     // set wind = 0 and lastwind update
-                    qDebug() << "speedlevel = " << (int)client->getSpeed();
+//                    qDebug() << "speedlevel = " << (int)client->getSpeed();
+                    qDebug() << "here is target" ;
                     client->setLastSpeed(client->getSpeed());
                     client->setSpeed(0);
                     sendCommonMessage(socket, 1, 1, client->getTargetTemp(), 0, client->getCost());
@@ -328,6 +331,7 @@ void MainWindow::storeSockets()
                     int lsize = -1;
                     for(int i = 1; i < 4; i++)
                     {
+                        lsize = -1;
                         if (SpeedList[i].size())
                         {
                             lsize = SpeedList[i].indexOf(room);
@@ -340,13 +344,13 @@ void MainWindow::storeSockets()
                 }
                 else if(client->isServing())
                 {
-                    qDebug() << "give a resource to room " << room;
-                    sendCommonMessage(socket, 1, 1, client->getCurrentTemp(), (int)client->getSpeed(), client->getCost());
-                    qDebug() << DATETIME << "send message when receive common: ";
-                    qDebug() << "\t\t\t Type : " << type << "Room : " << room << " Sitch : " << switchh;
-                    qDebug() << "\t\t\t Temp : " << temp << "Wind : " << wind;
+//                    qDebug() << "give a resource to room " << room;
+                    sendCommonMessage(socket, 1, 1, client->getTargetTemp(), (int)client->getSpeed(), client->getCost());
+//                    qDebug() << DATETIME << "send message when receive common: ";
+//                    qDebug() << "\t\t\t Type : " << type << "Room : " << room << " Sitch : " << switchh;
+//                    qDebug() << "\t\t\t Temp : " << temp << "Wind : " << wind;
                 }
-                else if(client->isBackTemp())
+                else if(isInList(room) && client->isBackTemp())
                 {
                     // take it to waiting list
                     int speedLevel = client->getLastSpeed();
@@ -370,6 +374,7 @@ void MainWindow::storeSockets()
                     // remove from speedlist
                     for(i = 1; i < 4; i++)
                     {
+                        si = -1;
                         if (SpeedList[i].size())
                         {
                             si = SpeedList[i].indexOf(room);
@@ -387,12 +392,14 @@ void MainWindow::storeSockets()
                     client->setTargetTemp(temp);
                     client->setTempState();
                     client->setSpeed(wind);
+                    client->setLastSpeed(client->getSpeed());
                     client->writeDetailedList(2);
                     if (wind == 0)
                     {
                         // remove from speedlist
                         for(i = 1; i < 4; i++)
                         {
+                            si = -1;
                             if (SpeedList[i].size())
                             {
                                 si = SpeedList[i].indexOf(room);
@@ -455,7 +462,7 @@ void MainWindow::storeSockets()
                 {
                     // room reach the target
                     // set wind = 0 and lastwind update
-                    qDebug() << "speedlevel = " << (int)client->getSpeed();
+//                    qDebug() << "speedlevel = " << (int)client->getSpeed();
                     client->setLastSpeed(client->getSpeed());
                     client->setSpeed(0);
                     sendCommonMessage(socket, 1, 1, client->getTargetTemp(), 0, client->getCost());
@@ -463,6 +470,7 @@ void MainWindow::storeSockets()
                     int lsize = -1;
                     for(int i = 1; i < 4; i++)
                     {
+                        lsize = -1;
                         if (SpeedList[i].size())
                         {
                             lsize = SpeedList[i].indexOf(room);
@@ -475,16 +483,17 @@ void MainWindow::storeSockets()
                 }
                 else if(client->isServing())
                 {
-                    qDebug() << "give a resource to room " << room;
-                    sendCommonMessage(socket, 1, 1, client->getCurrentTemp(), (int)client->getSpeed(), client->getCost());
-                    qDebug() << DATETIME << "send message when receive request: ";
-                    qDebug() << "\t\t\t Type : " << type << "Room : " << room << " Sitch : " << switchh;
-                    qDebug() << "\t\t\t Temp : " << temp << "Wind : " << wind;
+//                    qDebug() << "give a resource to room " << room;
+                    sendCommonMessage(socket, 1, 1, client->getTargetTemp(), (int)client->getSpeed(), client->getCost());
+//                    qDebug() << DATETIME << "send message when receive request: ";
+//                    qDebug() << "\t\t\t Type : " << type << "Room : " << room << " Sitch : " << switchh;
+//                    qDebug() << "\t\t\t Temp : " << temp << "Wind : " << wind;
                 }
-                else if(client->isBackTemp())
+                else if(isInList(room) && client->isBackTemp())
                 {
                     // take it to waiting list
                     int speedLevel = client->getLastSpeed();
+                    qDebug() << "Speed Level = " << speedLevel;
                     if(speedLevel)
                     {
                         client->setSpeed(speedLevel);
@@ -541,6 +550,21 @@ void MainWindow::storeSockets()
             client->setTargetTemp(0.0);
             client->setSpeed(0);
             client->writeDetailedList(5);
+            client->setEnergy(0);
+            client->setCost(0);
+            // remove from lists;
+            for(int i = 1; i < 4; i++)
+            {
+                int lsize = -1;
+                if (SpeedList[i].size())
+                {
+                    lsize = SpeedList[i].indexOf(client->getId());
+                }
+                if (lsize != -1)
+                {
+                    SpeedList[i].removeAt(lsize);
+                }
+            }
         });
     }
 }
@@ -617,9 +641,9 @@ void MainWindow::rrIncrease()
     {
         Client *client = qobject_cast<Client *>(clients.at(i));
 
-        if (!client->isServing() && last_serving[i])
+        if (!client->isServing() && last_serving[i] )
         {     // 剥夺资源
-            if (client->isTarget())
+            if (client->isTarget() && client->getSpeed() != Client::SpeedNone)
             { // 达到目标温度
                 // room reach the target
                 // set wind = 0 and lastwind update
@@ -630,6 +654,7 @@ void MainWindow::rrIncrease()
                 int lsize = -1;
                 for(int i = 1; i < 4; i++)
                 {
+                    lsize = -1;
                     if (SpeedList[i].size())
                     {
                         lsize = SpeedList[i].indexOf(client->getId());
@@ -642,12 +667,12 @@ void MainWindow::rrIncrease()
             }
             else
             {   // 未达到目标温度
-                sendCommonMessage(clientSockets[client->getId()], 1, 1, client->getTargetTemp(), client->getSpeed(), client->getCost());
+                sendCommonMessage(clientSockets[client->getId()], 1, 1, client->getTargetTemp(), 0, client->getCost());
             }
         }
         if (client->isServing())
         {
-            sendCommonMessage(clientSockets[client->getId()], 1, 1, client->getCurrentTemp(), (int)client->getSpeed(), client->getCost());
+            sendCommonMessage(clientSockets[client->getId()], 1, 1, client->getTargetTemp(), (int)client->getSpeed(), client->getCost());
         }
     }
 }
@@ -672,6 +697,21 @@ void MainWindow::roundRobin(int speed, int resNum)            // 轮转
     }
 }
 
+bool MainWindow::isInList(QString room)
+{
+    bool flag = true;
+    for(int i = 1; i < 4; i++)
+    {
+        int lsize = -1;
+        if (SpeedList[i].size())
+        {
+            lsize = SpeedList[i].indexOf(room);
+        }
+        if(lsize != -1)
+            flag =false;
+    }
+    return flag;
+}
 
 void MainWindow::sendRequestMessage(QTcpSocket *socket, int type, int isServed)
 {
@@ -712,16 +752,27 @@ void MainWindow::sendCommonMessage(QTcpSocket *tsock, int type, int switchh, dou
     json.insert("temperature", temp);
     json.insert("wind", wind);
     json.insert("cost", cost);
-//    qDebug() << DATETIME << "sendCommonMessage: Type:" << type
-//             << " Switch:" << switchh
-//             << " Temp:" << temp
-//             << " Wind:" << wind
-//             << " cost:" << cost;
+
+    Client  *client;
+    for (int i = 0; i < clients.size(); ++i)
+    {
+        client = qobject_cast<Client *>(clients[i]);
+        if (client->getSocket() == tsock)
+        {
+            break;
+        }
+    }
+
+    qDebug() << DATETIME << "sendCommonMessage: Type:" << type
+             << "Room : " << client->getId() << " Switch:" << switchh
+             << "\t Temp:" << temp << " Wind:" << wind
+             << " cost:" << cost;
 
     QJsonDocument document;
     document.setObject(json);
 
     QByteArray bytes = document.toJson(QJsonDocument::Compact);
+    tsock->flush();
     tsock->write(bytes);
 #else
     QByteArray  block;

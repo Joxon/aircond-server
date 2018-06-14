@@ -158,6 +158,7 @@ void Client::setTargetTemp(double t)
 
 void Client::setLastSpeed(Client::Speed s)
 {
+//    qDebug() << DATETIME << "set last speed = " << (int) s;
     lastSpeed = s;
 }
 
@@ -269,7 +270,7 @@ void Client::calCost()                   // 为了计算需要1个周期计算�
     //cost += wind * S;             S == 1;
     double wind = 0;
 
-    switch (SpeedLow)
+    switch (speed)
     {
     case SpeedNone:
         wind = 0;
@@ -288,7 +289,7 @@ void Client::calCost()                   // 为了计算需要1个周期计算�
         break;
     }
     double temp = wind * 0.02;
-
+//    qDebug() << "wind = " << wind << "temp = " << temp;
 //    qDebug() << DATETIME << "now temp : " << new_n << " ever temp : " << currentTemp << "Wind : " << speed;
     // 还需要编一个公式计算能量 暂定为 cost / 2
     cost  += temp;
@@ -335,7 +336,7 @@ bool Client::isTarget()
     else
         Diff = (double)(0.05 * (int)speed);
 //    qDebug() << "Diff = " << Diff;
-    tempT += 0.001;
+//    tempT += 0.001;
     return tempT <= Diff;
 }
 
@@ -343,6 +344,7 @@ bool Client::isBackTemp()
 {
     if(!isServing() && isWorking() && fabs(currentTemp - targetTemp) >= 1.0)
     {
+        qDebug() << "Room--" << id << "is reach backTemp";
         return true;
     }
     else
@@ -380,7 +382,7 @@ void Client::writeDetailedList(int option)
         while (sql_query.next())
         {
             max_id = sql_query.value(0).toInt();
-            qDebug() << QString("max id:%1").arg(max_id);
+//            qDebug() << QString("max id:%1").arg(max_id);
         }
     }
     max_id++;
@@ -394,7 +396,7 @@ void Client::writeDetailedList(int option)
     QString cp         = QString::number(cost, 10, 4);
     QString ep         = QString::number(energy, 10, 4);
     QString insert_sql = "insert into Info_list values(" + mid + ", \"" + roomid + "\", \"" + now_ts + "\", " + wd + ", " + nt + ", " + tt + ", " + op + ", " + cp + ", " + ep + ")";
-    qDebug() << "insert sql : " << insert_sql;
+//    qDebug() << "insert sql : " << insert_sql;
     if (!sql_query.exec(insert_sql))
     {
         qDebug() << DATETIME << "write_detail_list:" << sql_query.lastError();

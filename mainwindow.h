@@ -33,6 +33,8 @@ private slots:
     void storeSockets();
     void readFromSockets();
 
+    bool isInList(QString room);
+
     void sendCommonMessage(QTcpSocket *socket, int type, int switchh, double temp, int wind, double cost);
     void sendRequestMessage(QTcpSocket *socket, int type, int isServed);
 
