@@ -202,6 +202,26 @@ void Client::setCost(double c)
     ui->labelCost->setText(QString("费用：%1 元").arg(c));
 }
 
+void Client::setTimer(int status)   // status = 1 waiting || = 0 serving
+{
+    if(status)
+        timer = 60;
+    else
+        timer = 0;
+}
+
+void Client::changeTimer(int status)
+{
+    if(status)
+        timer--;
+    else
+        timer++;
+}
+
+int Client::getTimer()
+{
+    return timer;
+}
 
 void Client::setStartTime()
 {
@@ -265,30 +285,36 @@ double Client::getTargetTemp()
 //}
 
 
-void Client::calCost()                   // 为了计算需要1个周期计算一次，不然需要不断获取上一次的温度风速等信息
+void Client::calCost(double newTemp)            // 为了计算需要1个周期计算一次，不然需要获取上一次的温度等信息
 {
-    //cost += wind * S;             S == 1;
-    double wind = 0;
-
+    double wind = 0, unitPrice = 0;
     switch (speed)
     {
     case SpeedNone:
         wind = 0;
+        unitPrice = 0;
         break;
 
     case SpeedLow:
-        wind = 1.0;
+        wind = 0.05;
+        unitPrice = 0.02;
         break;
 
     case SpeedMid:
-        wind = 2.0;
+        wind = 0.1;
+        unitPrice = 0.04;
         break;
 
     case SpeedHigh:
-        wind = 3.0;
+        wind = 0.2;
+        unitPrice = 0.06;
         break;
     }
-    double temp = wind * 0.02;
+
+    if(wind == 0)   return ;
+
+    double temp = fabs(currentTemp - newTemp) / wind * unitPrice;
+
 //    qDebug() << "wind = " << wind << "temp = " << temp;
 //    qDebug() << DATETIME << "now temp : " << new_n << " ever temp : " << currentTemp << "Wind : " << speed;
     // 还需要编一个公式计算能量 暂定为 cost / 2
@@ -299,6 +325,22 @@ void Client::calCost()                   // 为了计算需要1个周期计算�
 //    qDebug() << DATETIME << "now cost : " << cost << " temp cost : " << temp;
 }
 
+bool Client::isWarmingUp()
+{
+    return warmingUp;
+}
+
+bool Client::warmingUpCheck()
+{
+    if( fabs(currentTemp - targetTemp) >= 1 )
+    {
+        return false;
+    }
+    else
+    {   // 未达到回温
+        return true;
+    }
+}
 
 bool Client::isServing()
 {
@@ -311,33 +353,43 @@ bool Client::isWorking()
     return this->working == WorkingYes;
 }
 
-void Client::setTempState()
-{
-    tempState = (currentTemp - targetTemp) > 0;
-}
+//void Client::setTempState()
+//{
+//    tempState = (currentTemp - targetTemp) > 0;
+//}
 
 bool Client::isTarget()
 {
-    double tempT = (currentTemp - targetTemp);
-    if(tempState)
-    {   // example 28->26
-        if(tempT > 0)
-            return false;
-    }
-    else
-    {   // 24->26
-        if(tempT < 0)
-            return false;
-    }
-    tempT = fabs(tempT);
-    double Diff;
-    if(speed == SpeedHigh)
-        Diff = 0.2;
-    else
-        Diff = (double)(0.05 * (int)speed);
+//    if(tempState)
+//    {   // example 28->26
+//        if(tempT > 0)
+//            return false;
+//    }
+//    else
+//    {   // 24->26
+//        if(tempT < 0)
+//            return false;
+//    }
+//    tempT = fabs(tempT);
+
+//    double Diff;
+//    if(speed == SpeedHigh)
+//        Diff = 0.2;
+//    else
+//        Diff = (double)(0.05 * (int)speed);
 //    qDebug() << "Diff = " << Diff;
 //    tempT += 0.001;
-    return tempT <= Diff;
+
+    double tempT = fabs(currentTemp - targetTemp);
+    if(qFuzzyIsNull(tempT))
+        return true;
+    else
+        return false;
+}
+
+void Client::setWarmingUp(bool status)
+{
+    warmingUp = status;
 }
 
 bool Client::isBackTemp()
