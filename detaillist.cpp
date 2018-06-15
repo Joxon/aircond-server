@@ -49,6 +49,12 @@ detailList::detailList(QSqlQuery tquery, QWidget *parent) :
                 case 4:
                     op = "断开连接";
                         break;
+                case 5:
+                    op = "给予资源";
+                    break;
+                case 6:
+                    op = "剥夺资源";
+                    break;
                 }
                 ui->detail_list->setItem(j, i, new QTableWidgetItem(op));
             }

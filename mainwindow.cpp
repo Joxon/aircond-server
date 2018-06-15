@@ -170,7 +170,7 @@ void MainWindow::initNetwork()
 {
     server = new QTcpServer(this);
     // 使用了IPv4的本地主机地址，等价于QHostAddress("127.0.0.1")
-    if (!server->listen(QHostAddress::Any, 6666))
+    if (!server->listen(QHostAddress::Any, 8080))
     {
         qDebug() << DATETIME << "initNetwork:" << server->errorString();
     }
@@ -327,6 +327,7 @@ void MainWindow::storeSockets()
                     client->setLastSpeed(client->getSpeed());
                     client->setSpeed(0);
                     sendCommonMessage(socket, 1, 1, client->getTargetTemp(), 0, client->getCost());
+                    client->writeDetailedList(1);
                     // remove the speedlist;
                     int lsize = -1;
                     for(int i = 1; i < 4; i++)
@@ -649,6 +650,7 @@ void MainWindow::rrIncrease()
                 // set wind = 0 and lastwind update
                 client->setLastSpeed(client->getSpeed());
                 client->setSpeed(0);
+                client->writeDetailedList(1);
                 sendCommonMessage(clientSockets[client->getId()], 1, 1, client->getTargetTemp(), 0, client->getCost());
                 // remove the speedlist;
                 int lsize = -1;
@@ -767,6 +769,13 @@ void MainWindow::sendCommonMessage(QTcpSocket *tsock, int type, int switchh, dou
              << "Room : " << client->getId() << " Switch:" << switchh
              << "\t Temp:" << temp << " Wind:" << wind
              << " cost:" << cost;
+    if(wind != client->getSpeed())
+    {
+        if(wind > 0)
+            client->writeDetailedList(6);
+        else
+            client->writeDetailedList(7);
+    }
 
     QJsonDocument document;
     document.setObject(json);

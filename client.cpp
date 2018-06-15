@@ -365,7 +365,7 @@ bool Client::hasWind()
 
 
 void Client::writeDetailedList(int option)
-{  // 当出现：①达到目标 ②修改任务 ③开机 ④关机 5 断开连接
+{  // 当出现：①达到目标 ②修改任务 ③开机 ④关机 5 断开连接 6 获得资源 7 剥夺资源
     QDateTime now_t  = QDateTime::currentDateTime();
     QString   now_ts = now_t.toString("yyyy-MM-dd hh:mm:ss");
 
