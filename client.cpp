@@ -16,22 +16,25 @@ Client::Client(QWidget *parent) :
     font.setPixelSize(15);
 
     ui->labelRoomIcon->setFont(font);
-    ui->labelRoomIcon->setText((QChar)ICON_FA_SPINNER);
+    ui->labelRoomIcon->setText(QChar(ICON_FA_SPINNER));
 
 //   ui->labelConnIcon->setFont(font);
 //   ui->labelConnIcon->setText((QChar)ICON_FA_TOGGLE_OFF);
 
     ui->labelCurrentTempIcon->setFont(font);
-    ui->labelCurrentTempIcon->setText((QChar)ICON_FA_THERMOMETER_FULL);
+    ui->labelCurrentTempIcon->setText(QChar(ICON_FA_THERMOMETER_FULL));
 
     ui->labelTargetTempIcon->setFont(font);
-    ui->labelTargetTempIcon->setText((QChar)ICON_FA_THERMOMETER_EMPTY);
+    ui->labelTargetTempIcon->setText(QChar(ICON_FA_THERMOMETER_EMPTY));
 
     ui->labelSpeedIcon->setFont(font);
-    ui->labelSpeedIcon->setText((QChar)ICON_FA_SNOWFLAKE);
+    ui->labelSpeedIcon->setText(QChar(ICON_FA_SNOWFLAKE));
 
-    ui->toolButtonDetails->setFont(font);
-    ui->toolButtonDetails->setText((QChar)ICON_FA_LIST);
+//    ui->toolButtonDetails->setFont(font);
+//    ui->toolButtonDetails->setText(QChar(ICON_FA_LIST) + QString("详单"));
+
+//    ui->toolButtonBill->setFont(font);
+//    ui->toolButtonBill->setText(QChar(ICON_FA_MONEY_BILL_WAVE) + QString("账单"));
 }
 
 
@@ -156,11 +159,13 @@ void Client::setTargetTemp(double t)
     }
 }
 
+
 void Client::setLastSpeed(Client::Speed s)
 {
 //    qDebug() << DATETIME << "set last speed = " << (int) s;
     lastSpeed = s;
 }
+
 
 void Client::setSpeed(int s)
 {
@@ -223,10 +228,12 @@ QString Client::getId()
     return id;
 }
 
+
 int Client::getLastSpeed()
 {
     return (int)lastSpeed;
 }
+
 
 Client::Speed Client::getSpeed() const
 {
@@ -239,10 +246,12 @@ double Client::getCost() const
     return cost;
 }
 
+
 double Client::getTargetTemp()
 {
-    return  targetTemp;
+    return targetTemp;
 }
+
 
 //QDateTime Client::getTime()                                     // 获得start_t;
 //{
@@ -293,7 +302,7 @@ void Client::calCost()                   // 为了计算需要1个周期计算�
 //    qDebug() << DATETIME << "now temp : " << new_n << " ever temp : " << currentTemp << "Wind : " << speed;
     // 还需要编一个公式计算能量 暂定为 cost / 2
     cost  += temp;
-    energy = cost / 2 ;
+    energy = cost / 2;
     ui->labelEnergy->setText(QString("能量：%1 度").arg(energy));
     ui->labelCost->setText(QString("费用：%1 元").arg(cost));
 //    qDebug() << DATETIME << "now cost : " << cost << " temp cost : " << temp;
@@ -311,45 +320,60 @@ bool Client::isWorking()
     return this->working == WorkingYes;
 }
 
+
 void Client::setTempState()
 {
     tempState = (currentTemp - targetTemp) > 0;
 }
 
+
 bool Client::isTarget()
 {
     double tempT = (currentTemp - targetTemp);
-    if(tempState)
+
+    if (tempState)
     {   // example 28->26
-        if(tempT > 0)
+        if (tempT > 0)
+        {
             return false;
+        }
     }
     else
     {   // 24->26
-        if(tempT < 0)
+        if (tempT < 0)
+        {
             return false;
+        }
     }
     tempT = fabs(tempT);
     double Diff;
-    if(speed == SpeedHigh)
+    if (speed == SpeedHigh)
+    {
         Diff = 0.2;
+    }
     else
+    {
         Diff = (double)(0.05 * (int)speed);
+    }
 //    qDebug() << "Diff = " << Diff;
 //    tempT += 0.001;
     return tempT <= Diff;
 }
 
+
 bool Client::isBackTemp()
 {
-    if(!isServing() && isWorking() && fabs(currentTemp - targetTemp) >= 1.0)
+    if (!isServing() && isWorking() && (fabs(currentTemp - targetTemp) >= 1.0))
     {
         qDebug() << "Room--" << id << "is reach backTemp";
         return true;
     }
     else
+    {
         return false;
+    }
 }
+
 
 bool Client::hasWind()
 {
@@ -426,19 +450,9 @@ void Client::readDetailedList(QString roomid)
     else
     {
         // 新建一个ui 来表示详单
-        detailList *list = new detailList(query, NULL);
+        detailList *list = new detailList(query, nullptr);
         list->show();
     }
-}
-
-void Client::readBill() // 打印账单
-{
-    QMessageBox::about(NULL, "账单", "Start time: " + connStartTime.toString("yyyy-MM-dd hh:mm:ss") + "\n End time: " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + "\t Cost: " + QString::number(cost, 10, 4) + " Energy: " + QString::number(energy, 10,4));
-}
-
-void Client::on_toolButtonDetails_clicked()
-{
-    readDetailedList(this->id);
 }
 
 
@@ -451,4 +465,29 @@ QTcpSocket *Client::getSocket() const
 void Client::setSocket(QTcpSocket *s)
 {
     socket = s;
+}
+
+
+void Client::on_comboBox_activated(const QString& arg1)
+{
+    if (arg1 == "账单")
+    {
+        QMessageBox::information(this,
+                                 "账单",
+                                 "连接启动时间: " + connStartTime.toString("yyyy-MM-dd hh:mm:ss")
+                                 + "\n当前时间: " + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                                 + "\n费用: " + QString::number(cost, 10, 4) + "元"
+                                 + "\n能量: " + QString::number(energy, 10, 4) + "度");
+    }
+    else if (arg1 == "详单")
+    {
+        readDetailedList(this->id);
+    }
+    else if (arg1 == "报表")
+    {
+    }
+    else
+    {
+    }
+    ui->comboBox->setCurrentIndex(0);
 }

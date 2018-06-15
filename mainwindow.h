@@ -44,6 +44,7 @@ private:
     QWidget *parent;
     Ui::MainWindow *ui;
     QFont fontAwesomeSolid;
+    QTimer *updateTimer;
 
     QPropertyAnimation *aniSizeChange;
     QPropertyAnimation *aniOpacityChange;
@@ -61,14 +62,16 @@ private:
     const int RES_NUM = 5;
     int turn[4];
     bool last_serving[8];
+    void resourceAllocation();
+    void roundRobin(int speed, int resNum);
+
     void initDatabase();
     void initNetwork();
     void initFont();
     void initAnimation();
     void initClientPanel();
     void initAllocation();
-    void resourceAllocation();
-    void roundRobin(int speed, int resNum);
+    void initUpdater();
 };
 
 #endif // MAINWINDOW_H

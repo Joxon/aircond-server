@@ -3,8 +3,9 @@
 #include <QDebug>
 
 detailList::detailList(QSqlQuery tquery, QWidget *parent) :
-    QDialog(parent), sql_query(tquery),
-    ui(new Ui::detailList)
+    QDialog(parent),
+    ui(new Ui::detailList),
+    sql_query(tquery)
 {
     ui->setupUi(this);
 
@@ -28,30 +29,39 @@ detailList::detailList(QSqlQuery tquery, QWidget *parent) :
         qDebug() << "detailist : room id " << sql_query.value(1).toString() << " start time " << sql_query.value(2).toString();
         for (int i = 0; i < col; i++)
         {
-            if(i != 5)
+            if (i != 5)
+            {
                 ui->detail_list->setItem(j, i, new QTableWidgetItem(sql_query.value(i + 1).toString()));
+            }
             else
             {
                 QString op = "";
-                switch(sql_query.value(i + 1).toInt()){
+                switch (sql_query.value(i + 1).toInt())
+                {
                 case 0:
                     op = "到达目标温度";
-                        break;
+                    break;
+
                 case 1:
                     op = "修改任务";
-                        break;
+                    break;
+
                 case 2:
                     op = "开机";
-                        break;
+                    break;
+
                 case 3:
                     op = "关机";
-                        break;
+                    break;
+
                 case 4:
                     op = "断开连接";
-                        break;
+                    break;
+
                 case 5:
                     op = "给予资源";
                     break;
+
                 case 6:
                     op = "剥夺资源";
                     break;

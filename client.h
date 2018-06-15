@@ -72,24 +72,24 @@ public:
     double getCurrentTemp() const;
     Speed getSpeed() const;
     double getCost() const;
+
 //    QDateTime getTime();                               // 获得start_t;
 //    void setTime(QDateTime time);                      // 设置start_t;
     QTcpSocket *getSocket() const;
 
     void calCost();                        // 计算价格
-    bool isServing();                                  // 判断服务
-    bool isWorking();                                  // 判断工作
+    bool isServing();                      // 判断服务
+    bool isWorking();                      // 判断工作
     bool isTarget();
     bool isBackTemp();
     bool hasWind();                                    // 判断风速
 
 public slots:
     void writeDetailedList(int option);            // 写入数据库
-    void readDetailedList(QString roomid);             // 打印详单
-    void readBill();
+    void readDetailedList(QString roomid);         // 打印详单
 
 private slots:
-    void on_toolButtonDetails_clicked();
+    void on_comboBox_activated(const QString& arg1);
 
 private:
     Ui::Client *ui;
