@@ -417,7 +417,7 @@ bool Client::hasWind()
 
 
 void Client::writeDetailedList(int option)
-{  // 当出现：①达到目标 ②修改任务 ③开机 ④关机 5 断开连接 6 获得资源 7 剥夺资源
+{  // 当出现：①达到目标 ②修改任务 ③开机 ④关机 5 断开连接 7 获得资源 6 剥夺资源
     QDateTime now_t  = QDateTime::currentDateTime();
     QString   now_ts = now_t.toString("yyyy-MM-dd hh:mm:ss");
 
@@ -440,14 +440,14 @@ void Client::writeDetailedList(int option)
     max_id++;
 
     QString mid        = QString::number(max_id, 10);
-    QString roomid     = id;
+//    QString roomid     = id;
     QString wd         = QString::number(speed, 10);
     QString nt         = QString::number(currentTemp, 10, 4);
     QString tt         = QString::number(targetTemp, 10, 4);
     QString op         = QString::number(option, 10);
     QString cp         = QString::number(cost, 10, 4);
     QString ep         = QString::number(energy, 10, 4);
-    QString insert_sql = "insert into Info_list values(" + mid + ", \"" + roomid + "\", \"" + now_ts + "\", " + wd + ", " + nt + ", " + tt + ", " + op + ", " + cp + ", " + ep + ")";
+    QString insert_sql = "insert into Info_list values(" + mid + ", \"" + id + "\", \"" + now_ts + "\", " + wd + ", " + nt + ", " + tt + ", " + op + ", " + cp + ", " + ep + ")";
 //    qDebug() << "insert sql : " << insert_sql;
     if (!sql_query.exec(insert_sql))
     {

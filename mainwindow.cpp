@@ -154,7 +154,7 @@ void MainWindow::initNetwork()
 {
     server = new QTcpServer(this);
     // 使用了IPv4的本地主机地址，等价于QHostAddress("127.0.0.1")
-    if (!server->listen(QHostAddress::Any, 8080))
+    if (!server->listen(QHostAddress::Any, 6666))
     {
         qDebug() << DATETIME << "initNetwork:" << server->errorString();
     }
@@ -286,8 +286,9 @@ void MainWindow::storeSockets()
                 client->setTargetTemp(temp);
 
                 client->setTimer(1);						// 设置等待时间60
+                client->setWarmingUp(false);
                 addIntoWaitingQueue(client);				// 加入等待队列
-                client->writeDetailedList(3);			// 开机的一个详单写入
+                client->writeDetailedList(3);               // 开机的一个详单写入
 
                 clients.append(client);
             }
@@ -350,7 +351,16 @@ void MainWindow::storeSockets()
                         {
                             if(canSeize())
                             {   // 可以抢占
-                                waitingIntoServing(client);
+                                if(sSize < RES_NUM)
+                                {
+                                    removeFromWaitingQueue(client);
+                                    addIntoServingQueue(client);
+                                }
+                                else
+                                {
+                                    waitingIntoServing(client);
+                                    qDebug() << "here is first";
+                                }
                             }
                             else
                             {
@@ -369,7 +379,22 @@ void MainWindow::storeSockets()
                         if(client->isWarmingUp())   // 回温的空调进入服务队列 删除回温标记
                             client->setWarmingUp(false);
                         waitingIntoServing(client);
+                        qDebug() << "here is second";
                     }
+                }
+
+                if(isInServingQueue(room))
+                {
+                    client->setServing(Client::ServingYes);
+                    if(client->isWarmingUp())
+                        sendCommonMessage(socket, 1, 1, client->getTargetTemp(), 0, client->getCost());
+                    else
+                        sendCommonMessage(socket, 1, 1, client->getTargetTemp(), (int)client->getSpeed(), client->getCost());
+                }
+                else
+                {
+                    client->setServing(Client::ServingNo);
+                    sendCommonMessage(socket, 1, 1, client->getTargetTemp(), 0, client->getCost());
                 }
             }
             //请求报文
@@ -395,7 +420,7 @@ void MainWindow::storeSockets()
                     break;
 
                 case 1:
-                    client->setWorking(Client::WorkingYes);
+
                     client->setTargetTemp(temp);
 
                     if(!client->isWorking())
@@ -405,7 +430,16 @@ void MainWindow::storeSockets()
                         {   // 判断是否可以抢占
                             if(canSeize())
                             {
-                                bootIntoServing(client);
+                                if(sSize < RES_NUM)
+                                {
+                                    removeFromWaitingQueue(client);
+                                    addIntoServingQueue(client);
+                                }
+                                else
+                                {
+                                    bootIntoServing(client);
+                                    qDebug() << "here is boot";
+                                }
                             }
                             else
                             {
@@ -414,9 +448,18 @@ void MainWindow::storeSockets()
                         }
                         else
                         {
-                            // 加入等待队列
-                            addIntoWaitingQueue(client);
-                            client->setTimer(1);
+                            if(sSize < RES_NUM)
+                            {   // 资源足够
+                                removeFromWaitingQueue(client);
+                                addIntoServingQueue(client);
+                                qDebug() << "here is third";
+                            }
+                            else
+                            {
+                                // 加入等待队列
+                                addIntoWaitingQueue(client);
+                                client->setTimer(1);
+                            }
                         }
                     }
                     else
@@ -424,7 +467,12 @@ void MainWindow::storeSockets()
                         lastWind = client->getLastSpeed();
                         if(lastWind == 0)
                         {   // 初次启动
-                            // do nothing
+                            if(sSize < RES_NUM)
+                            {   // 资源足够
+                                removeFromWaitingQueue(client);
+                                addIntoServingQueue(client);
+                                qDebug() << "here is third";
+                            }
                         }
                         else if(lastWind < wind)
                         {   // 调高风
@@ -432,14 +480,23 @@ void MainWindow::storeSockets()
                             {
                                 // do nothing
                             }
-                            else
+                            else    // 在服务队列里
                             {
                                 if(wind == 3)
                                 {
                                     // 判断是否可以抢占
                                     if(canSeize())
                                     {
-                                        waitingIntoServing(client);
+                                        if(sSize < RES_NUM)
+                                        {
+                                            removeFromWaitingQueue(client);
+                                            addIntoServingQueue(client);
+                                        }
+                                        else
+                                        {
+                                            waitingIntoServing(client);
+                                            qDebug() << "here is fourth";
+                                        }
                                     }
                                     else
                                     {
@@ -448,7 +505,12 @@ void MainWindow::storeSockets()
                                 }
                                 else
                                 {
-                                    // do nothing
+                                    if(sSize < RES_NUM)
+                                    {   // 资源足够
+                                        removeFromWaitingQueue(client);
+                                        addIntoServingQueue(client);
+                                        qDebug() << "here is fifth";
+                                    }
                                 }
                             }
                         }
@@ -462,6 +524,7 @@ void MainWindow::storeSockets()
                                     if(mayBeSeize())
                                     {
                                         waitingIntoServing(client);
+                                        qDebug() << "here is sixth";
                                     }
                                 }
                                 else
@@ -469,10 +532,20 @@ void MainWindow::storeSockets()
                                     // do nothing
                                 }
                             }
+                            else    // 在等待队列
+                            {
+                                if(sSize < RES_NUM)
+                                {   // 资源足够
+                                    removeFromWaitingQueue(client);
+                                    addIntoServingQueue(client);
+                                    qDebug() << "here is seventh";
+                                }
+                            }
                         }
                     }
                     client->setSpeed(wind);
                     client->setLastSpeed(client->getSpeed());
+                    client->setWorking(Client::WorkingYes);
                     client->writeDetailedList(2);               // 写请求详单
                     break;
 
@@ -573,6 +646,7 @@ void MainWindow::removeFromWaitingQueue(Client *tempR)
 void MainWindow::addIntoServingQueue(Client *tempR)
 {
     servingQueue[sSize++] = tempR;
+    tempR->writeDetailedList(7);
 }
 
 void MainWindow::removeFromServingQueue(Client *tempR)
@@ -637,13 +711,21 @@ void MainWindow::waitingIntoServing(Client * tempR)
             break;
         }
     }
+    servingQueue[0]->writeDetailedList(6);          // 剥夺资源
+    servingQueue[0]->setTimer(1);
     servingQueue[0] = tempR;
+    servingQueue[0]->setTimer(0);
+    servingQueue[0]->writeDetailedList(7);          // 赋予资源
 }
 
 void MainWindow::bootIntoServing(Client * tempR)
 {
     addIntoWaitingQueue(servingQueue[0]);
+//    servingQueue[0]->writeDetailedList(6);          // 剥夺资源
+    servingQueue[0]->setTimer(1);
     servingQueue[0] = tempR;
+    servingQueue[0]->setTimer(0);
+//    servingQueue[0]->writeDetailedList(7);          // 赋予资源
 }
 
 void MainWindow::sendRequestMessage(QTcpSocket *socket, int type, int isServed)
@@ -698,15 +780,15 @@ void MainWindow::sendCommonMessage(QTcpSocket *tsock, int type, int switchh, dou
 
     qDebug() << DATETIME << "sendCommonMessage: Type:" << type
              << "Room : " << client->getId() << " Switch:" << switchh
-             << "\t Temp:" << temp << " Wind:" << wind
+             << "\n\t\t Temp:" << temp << " Wind:" << wind
              << " cost:" << cost;
-    if(wind != client->getSpeed())
-    {
-        if(wind > 0)
-            client->writeDetailedList(6);
-        else
-            client->writeDetailedList(7);
-    }
+//    if(wind != client->getSpeed())
+//    {
+//        if(wind > 0)
+//            client->writeDetailedList(6);
+//        else
+//            client->writeDetailedList(7);
+//    }
 
     QJsonDocument document;
     document.setObject(json);
