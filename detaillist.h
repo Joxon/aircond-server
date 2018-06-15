@@ -4,6 +4,10 @@
 #include <QDialog>
 #include <QSqlQuery>
 
+#if _MSC_VER >= 1600
+#pragma execution_character_set("utf-8")
+#endif
+
 namespace Ui {
 class detailList;
 }
@@ -13,7 +17,7 @@ class detailList : public QDialog
     Q_OBJECT
 
 public:
-    detailList(QSqlQuery tquery, QWidget *parent = 0);
+    detailList(QSqlQuery tquery, QWidget *parent = nullptr);
     ~detailList();
 
 private slots:

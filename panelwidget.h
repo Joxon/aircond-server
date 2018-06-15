@@ -9,7 +9,7 @@ class PanelWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PanelWidget(QWidget *parent = 0);
+    explicit PanelWidget(QWidget *parent = nullptr);
 
 protected:
     void resizeEvent(QResizeEvent *);
