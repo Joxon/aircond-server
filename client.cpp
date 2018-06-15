@@ -415,7 +415,7 @@ void Client::readDetailedList(QString roomid)
 //    readBill();
     QSqlQuery query;
     QString   select = "select * from Info_list where roomid = \"" + roomid
-                       + "\" and start_t >= \"" + connStartTime.toString("yyyy-MM-dd hh:mm:ss") + "\"";
+                       + "\" and time >= \"" + connStartTime.toString("yyyy-MM-dd hh:mm:ss") + "\"";
 
     qDebug() << "select sql : " << select;
 
