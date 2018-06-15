@@ -288,7 +288,7 @@ double Client::getTargetTemp()
 void Client::calCost(double newTemp)            // 为了计算需要1个周期计算一次，不然需要获取上一次的温度等信息
 {
     double wind = 0, unitPrice = 0;
-    switch (speed)
+    switch (lastSpeed)
     {
     case SpeedNone:
         wind = 0;
@@ -315,7 +315,7 @@ void Client::calCost(double newTemp)            // 为了计算需要1个周期�
 
     double temp = fabs(currentTemp - newTemp) / wind * unitPrice;
 
-//    qDebug() << "wind = " << wind << "temp = " << temp;
+    qDebug() << "currentTemp = " << currentTemp << "newTemp = " << newTemp << "wind = " << wind << "temp = " << temp;
 //    qDebug() << DATETIME << "now temp : " << new_n << " ever temp : " << currentTemp << "Wind : " << speed;
     // 还需要编一个公式计算能量 暂定为 cost / 2
     cost  += temp;

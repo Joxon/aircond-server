@@ -295,12 +295,15 @@ void MainWindow::storeSockets()
             //通告报文
             if (type == 1)
             {
-                if (!client->isWarmingUp())
+                if (!client->isWarmingUp() && isInServingQueue(room))
                 {
                     client->calCost(temp);
                 }
                 client->setCurrentTemp(temp);
-
+                if(client->getSpeed() != Client::SpeedNone)
+                {
+                    client->setLastSpeed(client->getSpeed());
+                }
                 if(isInServingQueue(room))      // 在服务队列
                 {
                     if(client->isWarmingUp())
@@ -544,7 +547,7 @@ void MainWindow::storeSockets()
                         }
                     }
                     client->setSpeed(wind);
-                    client->setLastSpeed(client->getSpeed());
+//                    client->setLastSpeed(client->getSpeed());
                     client->setWorking(Client::WorkingYes);
                     client->writeDetailedList(2);               // 写请求详单
                     break;
