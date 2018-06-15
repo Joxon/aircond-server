@@ -3,6 +3,24 @@
 #include "quiwidget.h"
 #include "IconsFontAwesome5.h"
 
+bool scmp(Client *a,Client *b)
+{
+    if((int) a->getSpeed() == (int) b->getSpeed())
+    {
+        return a->getTimer() > b->getTimer();
+    }
+    return (int) a->getSpeed() < (int) b->getSpeed();
+}
+
+bool wcmp(Client *a,Client *b)
+{
+    if((int) a->getSpeed() == (int) b->getSpeed())
+    {
+        return a->getTimer() < b->getTimer();
+    }
+    return (int) a->getSpeed() > (int) b->getSpeed();
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     parent(parent),
     ui(new Ui::MainWindow)
@@ -295,6 +313,8 @@ void MainWindow::storeSockets()
             //通告报文
             if (type == 1)
             {
+                sort(waitingQueue, waitingQueue + wSize, wcmp);
+                sort(servingQueue, servingQueue + sSize, scmp);
                 if (!client->isWarmingUp() && isInServingQueue(room))
                 {
                     client->calCost(temp);
@@ -379,6 +399,7 @@ void MainWindow::storeSockets()
                     {
                         // 替换服务队列中优先级最低的
                         // 服务队列排序
+                        sort(servingQueue, servingQueue + sSize, scmp);
                         if(client->isWarmingUp())   // 回温的空调进入服务队列 删除回温标记
                             client->setWarmingUp(false);
                         waitingIntoServing(client);
@@ -398,6 +419,18 @@ void MainWindow::storeSockets()
                 {
                     client->setServing(Client::ServingNo);
                     sendCommonMessage(socket, 1, 1, client->getTargetTemp(), 0, client->getCost());
+                }
+
+                qDebug() << DATETIME << "Now is room--" << room;
+                qDebug() << "servingQueue:" ;
+                for(int i = 0; i < sSize; i++)
+                {
+                    qDebug() << "i = " << i << "room -- " << servingQueue[i]->getId();
+                }
+                qDebug() << "waitingQueue:";
+                for(int i = 0; i < wSize; i++)
+                {
+                    qDebug() << "i = " << i << "room -- " << waitingQueue[i]->getId();
                 }
             }
             //请求报文
@@ -467,6 +500,14 @@ void MainWindow::storeSockets()
                     }
                     else
                     {
+                        if(client->isWarmingUp())   // 中断回温
+                        {
+                            client->setWarmingUp(false);
+                        }
+                        else
+                        {
+                            // do nothing
+                        }
                         lastWind = client->getLastSpeed();
                         if(lastWind == 0)
                         {   // 初次启动
@@ -483,7 +524,7 @@ void MainWindow::storeSockets()
                             {
                                 // do nothing
                             }
-                            else    // 在服务队列里
+                            else    // 在等待队列里
                             {
                                 if(wind == 3)
                                 {
@@ -526,7 +567,7 @@ void MainWindow::storeSockets()
                                     // 查看等待队列里有没有可以抢占的
                                     if(mayBeSeize())
                                     {
-                                        waitingIntoServing(client);
+                                        servingIntoWaiting(client);
                                         qDebug() << "here is sixth";
                                     }
                                 }
@@ -606,29 +647,23 @@ void MainWindow::readFromSockets()
 {
 }
 
-
-bool MainWindow::wcmp(Client a,Client b)
-{
-    if((int) a.getSpeed() == (int) b.getSpeed())
-    {
-        return a.getTimer() < b.getTimer();
-    }
-    return (int) a.getSpeed() > (int) b.getSpeed();
-}
-
-bool MainWindow::scmp(Client a,Client b)
-{
-    if((int) a.getSpeed() == (int) b.getSpeed())
-    {
-        return a.getTimer() > b.getTimer();
-    }
-    return (int) a.getSpeed() < (int) b.getSpeed();
-}
-
-
 void MainWindow::addIntoWaitingQueue(Client *tempR)
 {
+    if(isInWaitingQueue(tempR))
+        return;
     waitingQueue[wSize++] = tempR;
+    qDebug() << "here is addIntoWaitingQueue";
+    qDebug() << "Now room is " << tempR->getId();
+    qDebug() << "servingQueue:" ;
+    for(int i = 0; i < sSize; i++)
+    {
+        qDebug() << "i = " << i << "room -- " << servingQueue[i]->getId();
+    }
+    qDebug() << "waitingQueue:";
+    for(int i = 0; i < wSize; i++)
+    {
+        qDebug() << "i = " << i << "room -- " << waitingQueue[i]->getId();
+    }
 }
 
 void MainWindow::removeFromWaitingQueue(Client *tempR)
@@ -677,6 +712,16 @@ bool MainWindow::isInServingQueue(QString roomId)
     return false;
 }
 
+bool MainWindow::isInWaitingQueue(Client * tempR)
+{
+    for(int i = 0; i < wSize; i++)
+    {
+        if(waitingQueue[i]->getId() == tempR->getId())
+            return true;
+    }
+    return false;
+}
+
 bool MainWindow::canSeize()     // 只为高风准备
 {
     if(sSize < RES_NUM)         // 留有资源
@@ -684,6 +729,7 @@ bool MainWindow::canSeize()     // 只为高风准备
     else                        // 资源已满 判断抢占
     {
         // 排序服务队列   优先级 低->高
+        sort(servingQueue, servingQueue + sSize, scmp);
         if(servingQueue[0]->getSpeed() != Client::SpeedHigh)
             return true;
         else
@@ -696,12 +742,29 @@ bool MainWindow::mayBeSeize()
     if(wSize > 0)
     {
         // 排序等待队列 优先级 高->低
+        sort(waitingQueue, waitingQueue + wSize, wcmp);
         if(waitingQueue[0]->getSpeed() != Client::SpeedHigh)
             return false;
         else
             return true;
     }
     return false;
+}
+void MainWindow::servingIntoWaiting(Client * tempR)
+{
+    for(int i = 0; i < sSize; i++)
+    {
+        if(servingQueue[i]->getId() == tempR->getId())
+        {
+            servingQueue[i] = waitingQueue[0];
+            break;
+        }
+    }
+    waitingQueue[0]->writeDetailedList(7);          // 赋予资源
+    waitingQueue[0]->setTimer(0);
+    waitingQueue[0] = tempR;
+    waitingQueue[0]->setTimer(1);
+    waitingQueue[0]->writeDetailedList(6);          // 剥夺资源
 }
 
 void MainWindow::waitingIntoServing(Client * tempR)
@@ -719,16 +782,42 @@ void MainWindow::waitingIntoServing(Client * tempR)
     servingQueue[0] = tempR;
     servingQueue[0]->setTimer(0);
     servingQueue[0]->writeDetailedList(7);          // 赋予资源
+
+//    qDebug() << "here is waitingIntoServing";
+//    qDebug() << "Now room is " << tempR->getId();
+//    qDebug() << "servingQueue:" ;
+//    for(int i = 0; i < sSize; i++)
+//    {
+//        qDebug() << "i = " << i << "room -- " << servingQueue[i]->getId();
+//    }
+//    qDebug() << "waitingQueue:";
+//    for(int i = 0; i < wSize; i++)
+//    {
+//        qDebug() << "i = " << i << "room -- " << waitingQueue[i]->getId();
+//    }
 }
 
 void MainWindow::bootIntoServing(Client * tempR)
 {
     addIntoWaitingQueue(servingQueue[0]);
-//    servingQueue[0]->writeDetailedList(6);          // 剥夺资源
+    servingQueue[0]->writeDetailedList(6);          // 剥夺资源
     servingQueue[0]->setTimer(1);
     servingQueue[0] = tempR;
     servingQueue[0]->setTimer(0);
-//    servingQueue[0]->writeDetailedList(7);          // 赋予资源
+    servingQueue[0]->writeDetailedList(7);          // 赋予资源
+
+//    qDebug() << "here is bootIntoServing";
+//    qDebug() << "Now room is " << tempR->getId();
+//    qDebug() << "servingQueue:" ;
+//    for(int i = 0; i < sSize; i++)
+//    {
+//        qDebug() << "i = " << i << "room -- " << servingQueue[i]->getId();
+//    }
+//    qDebug() << "waitingQueue:";
+//    for(int i = 0; i < wSize; i++)
+//    {
+//        qDebug() << "i = " << i << "room -- " << waitingQueue[i]->getId();
+//    }
 }
 
 void MainWindow::sendRequestMessage(QTcpSocket *socket, int type, int isServed)
@@ -781,10 +870,11 @@ void MainWindow::sendCommonMessage(QTcpSocket *tsock, int type, int switchh, dou
         }
     }
 
-    qDebug() << DATETIME << "sendCommonMessage: Type:" << type
-             << "Room : " << client->getId() << " Switch:" << switchh
-             << "\n\t\t Temp:" << temp << " Wind:" << wind
-             << " cost:" << cost;
+//    qDebug() << DATETIME << "sendCommonMessage: Type:" << type
+//             << "Room : " << client->getId() << " Switch:" << switchh
+//             << "\n\t\t Temp:" << temp << " Wind:" << wind
+//             << " cost:" << cost;
+
 //    if(wind != client->getSpeed())
 //    {
 //        if(wind > 0)

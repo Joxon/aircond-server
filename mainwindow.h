@@ -15,6 +15,7 @@
 #include <QtWidgets>
 #include <QtNetwork>
 #include "algorithm"
+using namespace std;
 
 namespace Ui {
 class MainWindow;
@@ -62,7 +63,7 @@ private:
     Client * waitingQueue[10];
     Client * servingQueue[10];
 
-    int RES_NUM = 5;
+    int RES_NUM = 3;
     int wSize = 0;                          // 等待队列长度
     int sSize = 0;                          // 服务队列长度
 //    int turn[4];
@@ -76,13 +77,15 @@ private:
     void resourceAllocation();
     void roundRobin(int speed, int resNum);
 
-    bool wcmp(Client a,Client b);
-    bool scmp(Client a, Client b);
+//    bool wcmp(Client a,Client b);
+//    bool scmp(Client a, Client b);
     void addIntoWaitingQueue(Client *tempR);
+    void servingIntoWaiting(Client *tempR);
     void removeFromWaitingQueue(Client *tempR);
     void addIntoServingQueue(Client *tempR);
     void removeFromServingQueue(Client *tempR);
     bool isInServingQueue(QString roomId);
+    bool isInWaitingQueue(Client * tempR);
     bool canSeize();
     bool mayBeSeize();
     void waitingIntoServing(Client * tempR);
