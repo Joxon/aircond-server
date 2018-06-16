@@ -1,7 +1,9 @@
 ﻿#include "client.h"
 #include "ui_client.h"
-#include "detaillist.h"
 #include "IconsFontAwesome5.h"
+
+#include "detaillist.h"
+#include "dailyreport.h"
 
 Client::Client(QWidget *parent) :
     QWidget(parent),
@@ -231,7 +233,7 @@ QString Client::getId()
 
 int Client::getLastSpeed()
 {
-    return (int)lastSpeed;
+    return int(lastSpeed);
 }
 
 
@@ -353,7 +355,7 @@ bool Client::isTarget()
     }
     else
     {
-        Diff = (double)(0.05 * (int)speed);
+        Diff = double((0.05 * int(speed)));
     }
 //    qDebug() << "Diff = " << Diff;
 //    tempT += 0.001;
@@ -481,13 +483,27 @@ void Client::on_comboBox_activated(const QString& arg1)
     }
     else if (arg1 == "详单")
     {
-        readDetailedList(this->id);
+        QSqlQuery query;
+        QString   select = "select * from Info_list where roomid = \"" + id
+                           + "\" and time >= \"" + connStartTime.toString("yyyy-MM-dd hh:mm:ss") + "\"";
+
+        qDebug() << "select sql : " << select;
+
+        if (!query.exec(select))
+        {
+            qDebug() << DATETIME << "read_detail_list:" << query.lastError();
+        }
+        else
+        {
+            detailList *list = new detailList(query, nullptr);
+            list->show();
+        }
     }
-    else if (arg1 == "报表")
+    else if (arg1 == "日报表")
     {
+        DailyReport *dr = new DailyReport(nullptr, id);
+        dr->show();
     }
-    else
-    {
-    }
+
     ui->comboBox->setCurrentIndex(0);
 }

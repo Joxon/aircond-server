@@ -11,7 +11,6 @@
 #include <QtWidgets>
 #include <QtGui>
 #include <QtSql/QtSql>
-#include <QMessageBox>
 
 namespace Ui {
 class Client;
@@ -77,12 +76,12 @@ public:
 //    void setTime(QDateTime time);                      // 设置start_t;
     QTcpSocket *getSocket() const;
 
-    void calCost();                        // 计算价格
-    bool isServing();                      // 判断服务
-    bool isWorking();                      // 判断工作
-    bool isTarget();
-    bool isBackTemp();
-    bool hasWind();                                    // 判断风速
+    void calCost();    // 计算价格
+    bool isServing();  // 判断服务
+    bool isWorking();  // 判断工作
+    bool isTarget();   // 达到目标
+    bool isBackTemp(); // 正在回温
+    bool hasWind();    // 判断风速
 
 public slots:
     void writeDetailedList(int option);            // 写入数据库

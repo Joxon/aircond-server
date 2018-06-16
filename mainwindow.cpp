@@ -3,6 +3,8 @@
 #include "quiwidget.h"
 #include "IconsFontAwesome5.h"
 
+#define SERVER_PORT 6666
+
 MainWindow::MainWindow(QWidget *parent) :
     parent(parent),
     ui(new Ui::MainWindow)
@@ -54,7 +56,7 @@ void MainWindow::initDatabase()
                            "cost_p DOUBLE   NOT NULL,"
                            "cost_e DOUBLE   NOT NULL );");
 
-    qDebug() << "built sql : " << built_sql;
+    //qDebug() << "built sql : " << built_sql;
 
     if (!query.exec(built_sql))
     {
@@ -73,7 +75,7 @@ void MainWindow::initFont()
     QString fontName = QFontDatabase::applicationFontFamilies(fontId).at(0);
 
     fontAwesomeSolid = QFont(fontName);
-    fontAwesomeSolid.setPixelSize(30);
+    fontAwesomeSolid.setPixelSize(20);
 
     ui->toolButtonPower->setFont(fontAwesomeSolid);
     ui->toolButtonPower->setText(QChar(ICON_FA_POWER_OFF));
@@ -157,6 +159,7 @@ void MainWindow::on_toolButtonPower_toggled(bool checked)
     if (checked)
     {
         ui->labelArrowDown->hide();
+
         //aniSizeChange->setStartValue(parent->geometry());
         aniSizeChange->setEndValue(QRect(parent->x(), parent->y() - 200, 1000, 600));
         aniSizeChange->start();
@@ -184,7 +187,7 @@ void MainWindow::initNetwork()
 {
     server = new QTcpServer(this);
     // 使用了IPv4的本地主机地址，等价于QHostAddress("127.0.0.1")
-    if (!server->listen(QHostAddress::Any, 8080))
+    if (!server->listen(QHostAddress::Any, SERVER_PORT))
     {
         qDebug() << DATETIME << "initNetwork:" << server->errorString();
     }
@@ -281,8 +284,8 @@ void MainWindow::storeSockets()
             }
 
             //搜索客户端列表
-            int clientIdx = 0;
-            Client *client;
+            int clientIdx  = 0;
+            Client *client = nullptr;
             //旧的ID，更新client
             while (clientIdx < clients.size())
             {
@@ -540,8 +543,8 @@ void MainWindow::storeSockets()
         });
 
         connect(socket, &QTcpSocket::disconnected, [socket, this]() {
-            int clientIdx = 0;
-            Client *client;
+            int clientIdx  = 0;
+            Client *client = nullptr;
             while (clientIdx < clients.size())
             {
                 client = qobject_cast<Client *>(clients[clientIdx]);
@@ -585,11 +588,6 @@ void MainWindow::storeSockets()
 }
 
 
-void MainWindow::readFromSockets()
-{
-}
-
-
 void MainWindow::resourceAllocation()
 {
     // 先将全部房间服务置零
@@ -618,7 +616,7 @@ void MainWindow::resourceAllocation()
             for (int j = 0; j < listSize; j++)
             {
                 QString clientID = SpeedList[i].at(j);
-                Client  *client;
+                Client  *client  = nullptr;
                 for (int ii = 0; ii < clients.size(); ++ii)
                 {
                     client = qobject_cast<Client *>(clients[ii]);
@@ -691,7 +689,7 @@ void MainWindow::rrIncrease()
         }
         if (client->isServing())
         {
-            sendCommonMessage(clientSockets[client->getId()], 1, 1, client->getTargetTemp(), (int)client->getSpeed(), client->getCost());
+            sendCommonMessage(clientSockets[client->getId()], 1, 1, client->getTargetTemp(), int(client->getSpeed()), client->getCost());
         }
     }
 }
@@ -704,7 +702,7 @@ void MainWindow::roundRobin(int speed, int resNum)            // 轮转
     for (int i = turn[speed], j = 0; j < resNum; j++, i = (i + 1) % listSize)
     {
         QString clientID = SpeedList[speed].at(i);
-        Client  *client;
+        Client  *client  = nullptr;
         for (int ii = 0; ii < clients.size(); ++ii)
         {
             client = qobject_cast<Client *>(clients[ii]);
@@ -778,7 +776,7 @@ void MainWindow::sendCommonMessage(QTcpSocket *tsock, int type, int switchh, dou
     json.insert("wind", wind);
     json.insert("cost", cost);
 
-    Client *client;
+    Client *client = nullptr;
     for (int i = 0; i < clients.size(); ++i)
     {
         client = qobject_cast<Client *>(clients[i]);

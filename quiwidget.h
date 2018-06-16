@@ -254,7 +254,7 @@ public:
     //全局静态方法集合结束--------------------------------
 
 public:
-    explicit QUIWidget(QWidget *parent = 0);
+    explicit QUIWidget(QWidget *parent = nullptr);
     ~QUIWidget();
 
 protected:
@@ -353,7 +353,7 @@ class QUIMessageBox : public QDialog
     Q_OBJECT
 
 public:
-    explicit QUIMessageBox(QWidget *parent = 0);
+    explicit QUIMessageBox(QWidget *parent = nullptr);
     ~QUIMessageBox();
 
     static QUIMessageBox *Instance()
@@ -431,7 +431,7 @@ class QUIInputBox : public QDialog
     Q_OBJECT
 
 public:
-    explicit QUIInputBox(QWidget *parent = 0);
+    explicit QUIInputBox(QWidget *parent = nullptr);
     ~QUIInputBox();
 
     static QUIInputBox *Instance()
@@ -508,7 +508,7 @@ class IconHelper : public QObject
     Q_OBJECT
 
 public:
-    explicit IconHelper(QObject *parent = 0);
+    explicit IconHelper(QObject *parent = nullptr);
     static IconHelper *Instance()
     {
         static QMutex mutex;

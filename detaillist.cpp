@@ -9,8 +9,7 @@ detailList::detailList(QSqlQuery tquery, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->detail_list->setSelectionBehavior(QAbstractItemView::SelectRows);  //设置选择行为，以行为单位
-    ui->detail_list->setSelectionMode(QAbstractItemView::SingleSelection); //设置选择模式，选择单行
+    setWindowFlags(Qt::WindowCloseButtonHint);
 
     sql_query.last();
     int row = sql_query.at() + 1;
@@ -19,7 +18,7 @@ detailList::detailList(QSqlQuery tquery, QWidget *parent) :
     ui->detail_list->setColumnCount(col);
 
     QStringList header;
-    header << "RoomId" << "操作时间" << "风速" << "目标温度" << "当前温度" << "操作" << "当前价格消费" << "当前能量消费";
+    header << "" << "操作时间" << "风速" << "目标温度" << "当前温度" << "操作" << "当前价格消费" << "当前能量消费";
     ui->detail_list->setHorizontalHeaderLabels(header);
 
     sql_query.first();

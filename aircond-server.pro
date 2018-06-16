@@ -21,7 +21,8 @@ SOURCES += \
     quiwidget.cpp \
     panelwidget.cpp \
     client.cpp \
-    detaillist.cpp
+    detaillist.cpp \
+    dailyreport.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -29,12 +30,14 @@ HEADERS += \
     panelwidget.h \
     client.h \
     IconsFontAwesome5.h \
-    detaillist.h
+    detaillist.h \
+    dailyreport.h
 
 FORMS += \
     mainwindow.ui \
     client.ui \
-    detaillist.ui
+    detaillist.ui \
+    dailyreport.ui
 
 RESOURCES += \
     res/qss.qrc \

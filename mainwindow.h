@@ -31,7 +31,6 @@ private slots:
     void on_toolButtonPower_toggled(bool checked);
 
     void storeSockets();
-    void readFromSockets();
 
     bool isInList(QString room);
 
