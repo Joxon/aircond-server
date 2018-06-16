@@ -2,26 +2,29 @@
 #include "ui_mainwindow.h"
 #include "quiwidget.h"
 #include "IconsFontAwesome5.h"
+#include "detaillist.h"
 
-#define SERVER_PORT 6666
+#define SERVER_PORT    6666
 
-bool scmp(Client *a,Client *b)
+bool scmp(Client *a, Client *b)
 {
-    if((int) a->getSpeed() == (int) b->getSpeed())
+    if ((int)a->getSpeed() == (int)b->getSpeed())
     {
         return a->getTimer() > b->getTimer();
     }
-    return (int) a->getSpeed() < (int) b->getSpeed();
+    return (int)a->getSpeed() < (int)b->getSpeed();
 }
 
-bool wcmp(Client *a,Client *b)
+
+bool wcmp(Client *a, Client *b)
 {
-    if((int) a->getSpeed() == (int) b->getSpeed())
+    if ((int)a->getSpeed() == (int)b->getSpeed())
     {
         return a->getTimer() < b->getTimer();
     }
-    return (int) a->getSpeed() > (int) b->getSpeed();
+    return (int)a->getSpeed() > (int)b->getSpeed();
 }
+
 
 MainWindow::MainWindow(QWidget *parent) :
     parent(parent),
@@ -62,16 +65,17 @@ void MainWindow::initDatabase()
         exit(EXIT_FAILURE);
     }
     QSqlQuery query;
-    QString   built_sql = ("CREATE TABLE IF NOT EXISTS Info_list ("
-                           "id     INT      PRIMARY KEY,"
-                           "roomid CHAR     NOT NULL,"
-                           "time   DATETIME NOT NULL,"
-                           "wind   INT      NOT NULL,"
-                           "currt  DOUBLE   NOT NULL,"
-                           "targt  DOUBLE   NOT NULL,"
-                           "option INT      NOT NULL,"
-                           "cost_p DOUBLE   NOT NULL,"
-                           "cost_e DOUBLE   NOT NULL );");
+    //"房间号" << "操作时间" << "风速" << "目标温度" << "当前温度" << "操作" << "当前价格消费" << "当前能量消费";
+    QString built_sql = ("CREATE TABLE IF NOT EXISTS Info_list ("
+                         "id     INT      PRIMARY KEY,"
+                         "roomid CHAR     NOT NULL,"
+                         "time   DATETIME NOT NULL,"
+                         "wind   INT      NOT NULL,"
+                         "currt  DOUBLE   NOT NULL,"
+                         "targt  DOUBLE   NOT NULL,"
+                         "option INT      NOT NULL,"
+                         "cost_p DOUBLE   NOT NULL,"
+                         "cost_e DOUBLE   NOT NULL );");
 
     //qDebug() << "built sql : " << built_sql;
 
@@ -320,9 +324,9 @@ void MainWindow::storeSockets()
                 client->setSocket(socket);
                 client->setTargetTemp(temp);
 
-                client->setTimer(1);						// 设置等待时间60
+                client->setTimer(1);                        // 设置等待时间60
                 client->setWarmingUp(false);
-                addIntoWaitingQueue(client);				// 加入等待队列
+                addIntoWaitingQueue(client);                // 加入等待队列
                 client->writeDetailedList(3);               // 开机的一个详单写入
 
                 clients.append(client);
@@ -337,16 +341,16 @@ void MainWindow::storeSockets()
                     client->calCost(temp);
                 }
                 client->setCurrentTemp(temp);
-                if(client->getSpeed() != Client::SpeedNone)
+                if (client->getSpeed() != Client::SpeedNone)
                 {
                     client->setLastSpeed(client->getSpeed());
                 }
-                if(isInServingQueue(room))      // 在服务队列
+                if (isInServingQueue(room))      // 在服务队列
                 {
-                    if(client->isWarmingUp())
-                    {   // 处于回温状态
-                        if(client->warmingUpCheck())
-                        {   // 仍在回温
+                    if (client->isWarmingUp())
+                    {     // 处于回温状态
+                        if (client->warmingUpCheck())
+                        { // 仍在回温
                             client->changeTimer(0);
                         }
                         else
@@ -355,7 +359,7 @@ void MainWindow::storeSockets()
                             client->changeTimer(0);
                         }
                     }
-                    else if(client->isTarget())
+                    else if (client->isTarget())
                     {   // 到达目标温度 移出服务队列 加入等待队列 进入回温状态
 //                        removeFromServingQueue(client);
 //                        addIntoWaitingQueue(client);
@@ -376,22 +380,24 @@ void MainWindow::storeSockets()
                         client->changeTimer(0); // 服务计时器 + 1
                     }
                 }
-                else    // 在等待队列
+                else                                                       // 在等待队列
                 {
-                    client->changeTimer(1);     // 等待计时器 - 1
-                    if(client->isWarmingUp() && client->warmingUpCheck()) // 回温
+                    client->changeTimer(1);                                // 等待计时器 - 1
+                    if (client->isWarmingUp() && client->warmingUpCheck()) // 回温
                     {
-                        if(client->getTimer() <= 0)
+                        if (client->getTimer() <= 0)
+                        {
                             client->setTimer(1);    // 未达到回温标准，重置计时器
+                        }
                     }
-                    else if(client->getSpeed() == Client::SpeedNone && client->isWarmingUp())
+                    else if ((client->getSpeed() == Client::SpeedNone) && client->isWarmingUp())
                     {
                         client->setSpeed(client->getLastSpeed());
-                        if(client->getSpeed() == Client::SpeedHigh) // 大风
+                        if (client->getSpeed() == Client::SpeedHigh) // 大风
                         {
-                            if(canSeize())
+                            if (canSeize())
                             {   // 可以抢占
-                                if(sSize < RES_NUM)
+                                if (sSize < RES_NUM)
                                 {
                                     removeFromWaitingQueue(client);
                                     addIntoServingQueue(client);
@@ -412,25 +418,31 @@ void MainWindow::storeSockets()
                             // do nothing
                         }
                     }
-                    else if(client->getTimer() <= 0)    // 计时器到了
+                    else if (client->getTimer() <= 0) // 计时器到了
                     {
-                        // 替换服务队列中优先级最低的
-                        // 服务队列排序
+                                                      // 替换服务队列中优先级最低的
+                                                      // 服务队列排序
                         sort(servingQueue, servingQueue + sSize, scmp);
-                        if(client->isWarmingUp())   // 回温的空调进入服务队列 删除回温标记
+                        if (client->isWarmingUp())    // 回温的空调进入服务队列 删除回温标记
+                        {
                             client->setWarmingUp(false);
+                        }
                         waitingIntoServing(client);
                         qDebug() << "here is second";
                     }
                 }
 
-                if(isInServingQueue(room))
+                if (isInServingQueue(room))
                 {
                     client->setServing(Client::ServingYes);
-                    if(client->isWarmingUp())
+                    if (client->isWarmingUp())
+                    {
                         sendCommonMessage(socket, 1, 1, client->getTargetTemp(), 0, client->getCost());
+                    }
                     else
+                    {
                         sendCommonMessage(socket, 1, 1, client->getTargetTemp(), (int)client->getSpeed(), client->getCost());
+                    }
                 }
                 else
                 {
@@ -439,13 +451,13 @@ void MainWindow::storeSockets()
                 }
 
                 qDebug() << DATETIME << "Now is room--" << room;
-                qDebug() << "servingQueue:" ;
-                for(int i = 0; i < sSize; i++)
+                qDebug() << "servingQueue:";
+                for (int i = 0; i < sSize; i++)
                 {
                     qDebug() << "i = " << i << "room -- " << servingQueue[i]->getId();
                 }
                 qDebug() << "waitingQueue:";
-                for(int i = 0; i < wSize; i++)
+                for (int i = 0; i < wSize; i++)
                 {
                     qDebug() << "i = " << i << "room -- " << waitingQueue[i]->getId();
                 }
@@ -460,7 +472,7 @@ void MainWindow::storeSockets()
                 {
                 case 0:
                     // remove from queue
-                    if(isInServingQueue(room))
+                    if (isInServingQueue(room))
                     {   // 在服务队列里
                         removeFromServingQueue(client);
                     }
@@ -476,14 +488,14 @@ void MainWindow::storeSockets()
 
                     client->setTargetTemp(temp);
 
-                    if(!client->isWorking())
+                    if (!client->isWorking())
                     {
-                        client->writeDetailedList(3);           // 写开机详单
-                        if(wind == 3)
-                        {   // 判断是否可以抢占
-                            if(canSeize())
+                        client->writeDetailedList(3); // 写开机详单
+                        if (wind == 3)
+                        {                             // 判断是否可以抢占
+                            if (canSeize())
                             {
-                                if(sSize < RES_NUM)
+                                if (sSize < RES_NUM)
                                 {
                                     removeFromWaitingQueue(client);
                                     addIntoServingQueue(client);
@@ -501,7 +513,7 @@ void MainWindow::storeSockets()
                         }
                         else
                         {
-                            if(sSize < RES_NUM)
+                            if (sSize < RES_NUM)
                             {   // 资源足够
                                 removeFromWaitingQueue(client);
                                 addIntoServingQueue(client);
@@ -517,7 +529,7 @@ void MainWindow::storeSockets()
                     }
                     else
                     {
-                        if(client->isWarmingUp())   // 中断回温
+                        if (client->isWarmingUp())   // 中断回温
                         {
                             client->setWarmingUp(false);
                         }
@@ -526,29 +538,29 @@ void MainWindow::storeSockets()
                             // do nothing
                         }
                         lastWind = client->getLastSpeed();
-                        if(lastWind == 0)
-                        {   // 初次启动
-                            if(sSize < RES_NUM)
-                            {   // 资源足够
+                        if (lastWind == 0)
+                        {     // 初次启动
+                            if (sSize < RES_NUM)
+                            { // 资源足够
                                 removeFromWaitingQueue(client);
                                 addIntoServingQueue(client);
                                 qDebug() << "here is third";
                             }
                         }
-                        else if(lastWind < wind)
+                        else if (lastWind < wind)
                         {   // 调高风
-                            if(isInServingQueue(room))
+                            if (isInServingQueue(room))
                             {
                                 // do nothing
                             }
                             else    // 在等待队列里
                             {
-                                if(wind == 3)
+                                if (wind == 3)
                                 {
                                     // 判断是否可以抢占
-                                    if(canSeize())
+                                    if (canSeize())
                                     {
-                                        if(sSize < RES_NUM)
+                                        if (sSize < RES_NUM)
                                         {
                                             removeFromWaitingQueue(client);
                                             addIntoServingQueue(client);
@@ -566,7 +578,7 @@ void MainWindow::storeSockets()
                                 }
                                 else
                                 {
-                                    if(sSize < RES_NUM)
+                                    if (sSize < RES_NUM)
                                     {   // 资源足够
                                         removeFromWaitingQueue(client);
                                         addIntoServingQueue(client);
@@ -575,14 +587,14 @@ void MainWindow::storeSockets()
                                 }
                             }
                         }
-                        else if(lastWind > wind)
+                        else if (lastWind > wind)
                         {   // 调低风
-                            if(isInServingQueue(room))
+                            if (isInServingQueue(room))
                             {
-                                if(lastWind == 3)
+                                if (lastWind == 3)
                                 {
                                     // 查看等待队列里有没有可以抢占的
-                                    if(mayBeSeize())
+                                    if (mayBeSeize())
                                     {
                                         servingIntoWaiting(client);
                                         qDebug() << "here is sixth";
@@ -595,7 +607,7 @@ void MainWindow::storeSockets()
                             }
                             else    // 在等待队列
                             {
-                                if(sSize < RES_NUM)
+                                if (sSize < RES_NUM)
                                 {   // 资源足够
                                     removeFromWaitingQueue(client);
                                     addIntoServingQueue(client);
@@ -647,7 +659,7 @@ void MainWindow::storeSockets()
             client->setEnergy(0);
             client->setCost(0);
 
-            if(isInServingQueue(client->getId()))
+            if (isInServingQueue(client->getId()))
             {   // 在服务队列里
                 removeFromServingQueue(client);
             }
@@ -660,41 +672,46 @@ void MainWindow::storeSockets()
 }
 
 
-
-
 void MainWindow::addIntoWaitingQueue(Client *tempR)
 {
-    if(isInWaitingQueue(tempR))
+    if (isInWaitingQueue(tempR))
+    {
         return;
+    }
     waitingQueue[wSize++] = tempR;
     qDebug() << "here is addIntoWaitingQueue";
     qDebug() << "Now room is " << tempR->getId();
-    qDebug() << "servingQueue:" ;
-    for(int i = 0; i < sSize; i++)
+    qDebug() << "servingQueue:";
+    for (int i = 0; i < sSize; i++)
     {
         qDebug() << "i = " << i << "room -- " << servingQueue[i]->getId();
     }
     qDebug() << "waitingQueue:";
-    for(int i = 0; i < wSize; i++)
+    for (int i = 0; i < wSize; i++)
     {
         qDebug() << "i = " << i << "room -- " << waitingQueue[i]->getId();
     }
 }
 
+
 void MainWindow::removeFromWaitingQueue(Client *tempR)
 {
     int i = 0;
-    for(; i < wSize; i++)
+
+    for ( ; i < wSize; i++)
     {
-        if(waitingQueue[i]->getId() == tempR->getId())
+        if (waitingQueue[i]->getId() == tempR->getId())
+        {
             break;
+        }
     }
-    for(; i < wSize; i++)
+    for ( ; i < wSize; i++)
     {
-        waitingQueue[i] = waitingQueue[i+1];
+        waitingQueue[i] = waitingQueue[i + 1];
     }
     wSize--;
 }
+
 
 void MainWindow::addIntoServingQueue(Client *tempR)
 {
@@ -702,74 +719,98 @@ void MainWindow::addIntoServingQueue(Client *tempR)
     tempR->writeDetailedList(7);
 }
 
+
 void MainWindow::removeFromServingQueue(Client *tempR)
 {
     int i = 0;
-    for(; i < sSize; i++)
+
+    for ( ; i < sSize; i++)
     {
-        if(servingQueue[i]->getId() == tempR->getId())
+        if (servingQueue[i]->getId() == tempR->getId())
+        {
             break;
+        }
     }
-    for(; i < sSize; i++)
+    for ( ; i < sSize; i++)
     {
-        servingQueue[i] = servingQueue[i+1];
+        servingQueue[i] = servingQueue[i + 1];
     }
     sSize--;
 }
 
+
 bool MainWindow::isInServingQueue(QString roomId)
 {
-    for(int i = 0; i < sSize; i++)
+    for (int i = 0; i < sSize; i++)
     {
-        if(servingQueue[i]->getId() == roomId)
+        if (servingQueue[i]->getId() == roomId)
+        {
             return true;
+        }
     }
     return false;
 }
 
-bool MainWindow::isInWaitingQueue(Client * tempR)
+
+bool MainWindow::isInWaitingQueue(Client *tempR)
 {
-    for(int i = 0; i < wSize; i++)
+    for (int i = 0; i < wSize; i++)
     {
-        if(waitingQueue[i]->getId() == tempR->getId())
+        if (waitingQueue[i]->getId() == tempR->getId())
+        {
             return true;
+        }
     }
     return false;
 }
+
 
 bool MainWindow::canSeize()     // 只为高风准备
 {
-    if(sSize < RES_NUM)         // 留有资源
+    if (sSize < RES_NUM)        // 留有资源
+    {
         return true;
+    }
     else                        // 资源已满 判断抢占
     {
         // 排序服务队列   优先级 低->高
         sort(servingQueue, servingQueue + sSize, scmp);
-        if(servingQueue[0]->getSpeed() != Client::SpeedHigh)
+        if (servingQueue[0]->getSpeed() != Client::SpeedHigh)
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
 }
 
+
 bool MainWindow::mayBeSeize()
 {
-    if(wSize > 0)
+    if (wSize > 0)
     {
         // 排序等待队列 优先级 高->低
         sort(waitingQueue, waitingQueue + wSize, wcmp);
-        if(waitingQueue[0]->getSpeed() != Client::SpeedHigh)
+        if (waitingQueue[0]->getSpeed() != Client::SpeedHigh)
+        {
             return false;
+        }
         else
+        {
             return true;
+        }
     }
     return false;
 }
-void MainWindow::servingIntoWaiting(Client * tempR)
+
+
+void MainWindow::servingIntoWaiting(Client *tempR)
 {
-    for(int i = 0; i < sSize; i++)
+    for (int i = 0; i < sSize; i++)
     {
-        if(servingQueue[i]->getId() == tempR->getId())
+        if (servingQueue[i]->getId() == tempR->getId())
         {
             servingQueue[i] = waitingQueue[0];
             break;
@@ -782,11 +823,12 @@ void MainWindow::servingIntoWaiting(Client * tempR)
     waitingQueue[0]->writeDetailedList(6);          // 剥夺资源
 }
 
-void MainWindow::waitingIntoServing(Client * tempR)
+
+void MainWindow::waitingIntoServing(Client *tempR)
 {
-    for(int i = 0; i < wSize; i++)
+    for (int i = 0; i < wSize; i++)
     {
-        if(waitingQueue[i]->getId() == tempR->getId())
+        if (waitingQueue[i]->getId() == tempR->getId())
         {
             waitingQueue[i] = servingQueue[0];
             break;
@@ -812,7 +854,8 @@ void MainWindow::waitingIntoServing(Client * tempR)
 //    }
 }
 
-void MainWindow::bootIntoServing(Client * tempR)
+
+void MainWindow::bootIntoServing(Client *tempR)
 {
     addIntoWaitingQueue(servingQueue[0]);
     servingQueue[0]->writeDetailedList(6);          // 剥夺资源
@@ -834,6 +877,7 @@ void MainWindow::bootIntoServing(Client * tempR)
 //        qDebug() << "i = " << i << "room -- " << waitingQueue[i]->getId();
 //    }
 }
+
 
 void MainWindow::sendRequestMessage(QTcpSocket *socket, int type, int isServed)
 {

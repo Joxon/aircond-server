@@ -8,24 +8,29 @@
 #pragma execution_character_set("utf-8")
 #endif
 
+#define OP_TGT_REACHED      1
+#define OP_TASK_MODIFIED    2
+#define OP_START_UP         3
+#define OP_SHUT_DOWN        4
+#define OP_DISCONNECTED     5
+#define OP_RES_REMOVED      6
+#define OP_RES_ASSIGNED     7
+
 namespace Ui {
-class detailList;
+class DetailList;
 }
 
-class detailList : public QDialog
+class DetailList : public QDialog
 {
     Q_OBJECT
 
 public:
-    detailList(QSqlQuery tquery, QWidget *parent = nullptr);
-    ~detailList();
-
-private slots:
-    void on_exit_clicked();
+    DetailList(QWidget *parent, QSqlQuery q);
+    ~DetailList();
 
 private:
-    Ui::detailList *ui;
-    QSqlQuery sql_query;
+    Ui::DetailList *ui;
+    QSqlQuery query;
 };
 
 #endif // DETAILLIST_H

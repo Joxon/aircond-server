@@ -209,26 +209,38 @@ void Client::setCost(double c)
     ui->labelCost->setText(QString("费用：%1 元").arg(c));
 }
 
+
 void Client::setTimer(int status)   // status = 1 waiting || = 0 serving
 {
-    if(status)
+    if (status)
+    {
         timer = 60;
+    }
     else
+    {
         timer = 0;
+    }
 }
+
 
 void Client::changeTimer(int status)
 {
-    if(status)
+    if (status)
+    {
         timer--;
+    }
     else
+    {
         timer++;
+    }
 }
+
 
 int Client::getTimer()
 {
     return timer;
 }
+
 
 void Client::setStartTime()
 {
@@ -299,30 +311,34 @@ double Client::getTargetTemp()
 void Client::calCost(double newTemp)            // 为了计算需要1个周期计算一次，不然需要获取上一次的温度等信息
 {
     double wind = 0, unitPrice = 0;
+
     switch (lastSpeed)
     {
     case SpeedNone:
-        wind = 0;
+        wind      = 0;
         unitPrice = 0;
         break;
 
     case SpeedLow:
-        wind = 0.05;
+        wind      = 0.05;
         unitPrice = 0.02;
         break;
 
     case SpeedMid:
-        wind = 0.1;
+        wind      = 0.1;
         unitPrice = 0.04;
         break;
 
     case SpeedHigh:
-        wind = 0.2;
+        wind      = 0.2;
         unitPrice = 0.06;
         break;
     }
 
-    if(wind == 0)   return ;
+    if (wind == 0)
+    {
+        return;
+    }
 
     double temp = fabs(currentTemp - newTemp) / wind * unitPrice;
 
@@ -336,14 +352,16 @@ void Client::calCost(double newTemp)            // 为了计算需要1个周期�
 //    qDebug() << DATETIME << "now cost : " << cost << " temp cost : " << temp;
 }
 
+
 bool Client::isWarmingUp()
 {
     return warmingUp;
 }
 
+
 bool Client::warmingUpCheck()
 {
-    if( fabs(currentTemp - targetTemp) >= 1 )
+    if (fabs(currentTemp - targetTemp) >= 1)
     {
         return false;
     }
@@ -352,6 +370,7 @@ bool Client::warmingUpCheck()
         return true;
     }
 }
+
 
 bool Client::isServing()
 {
@@ -363,6 +382,7 @@ bool Client::isWorking()
 {
     return this->working == WorkingYes;
 }
+
 
 //void Client::setTempState()
 //{
@@ -393,16 +413,23 @@ bool Client::isTarget()
 //    tempT += 0.001;
 
     double tempT = fabs(currentTemp - targetTemp);
-    if(qFuzzyIsNull(tempT))
+
+    if (qFuzzyIsNull(tempT))
+    {
         return true;
+    }
     else
+    {
         return false;
+    }
 }
+
 
 void Client::setWarmingUp(bool status)
 {
     warmingUp = status;
 }
+
 
 bool Client::isBackTemp()
 {
@@ -454,7 +481,7 @@ void Client::writeDetailedList(int option)
     }
     max_id++;
 
-    QString mid        = QString::number(max_id, 10);
+    QString mid = QString::number(max_id, 10);
 //    QString roomid     = id;
     QString wd         = QString::number(speed, 10);
     QString nt         = QString::number(currentTemp, 10, 4);
@@ -462,7 +489,9 @@ void Client::writeDetailedList(int option)
     QString op         = QString::number(option, 10);
     QString cp         = QString::number(cost, 10, 4);
     QString ep         = QString::number(energy, 10, 4);
-    QString insert_sql = "insert into Info_list values(" + mid + ", \"" + id + "\", \"" + now_ts + "\", " + wd + ", " + nt + ", " + tt + ", " + op + ", " + cp + ", " + ep + ")";
+    QString insert_sql = "insert into Info_list values(" + mid + ", \""
+                         + id + "\", \"" + now_ts + "\", " + wd + ", " + nt + ", "
+                         + tt + ", " + op + ", " + cp + ", " + ep + ")";
 //    qDebug() << "insert sql : " << insert_sql;
     if (!sql_query.exec(insert_sql))
     {
@@ -493,7 +522,7 @@ void Client::readDetailedList(QString roomid)
     else
     {
         // 新建一个ui 来表示详单
-        detailList *list = new detailList(query, nullptr);
+        DetailList *list = new DetailList(nullptr, query);
         list->show();
     }
 }
@@ -524,21 +553,7 @@ void Client::on_comboBox_activated(const QString& arg1)
     }
     else if (arg1 == "详单")
     {
-        QSqlQuery query;
-        QString   select = "select * from Info_list where roomid = \"" + id
-                           + "\" and time >= \"" + connStartTime.toString("yyyy-MM-dd hh:mm:ss") + "\"";
-
-        qDebug() << "select sql : " << select;
-
-        if (!query.exec(select))
-        {
-            qDebug() << DATETIME << "read_detail_list:" << query.lastError();
-        }
-        else
-        {
-            detailList *list = new detailList(query, nullptr);
-            list->show();
-        }
+        readDetailedList(id);
     }
     else if (arg1 == "日报表")
     {

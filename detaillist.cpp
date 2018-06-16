@@ -2,84 +2,78 @@
 #include "ui_detaillist.h"
 #include <QDebug>
 
-detailList::detailList(QSqlQuery tquery, QWidget *parent) :
+DetailList::DetailList(QWidget *parent, QSqlQuery q) :
     QDialog(parent),
-    ui(new Ui::detailList),
-    sql_query(tquery)
+    ui(new Ui::DetailList),
+    query(q)
 {
     ui->setupUi(this);
 
     setWindowFlags(Qt::WindowCloseButtonHint);
 
-    sql_query.last();
-    int row = sql_query.at() + 1;
-    ui->detail_list->setRowCount(row);
-    int col = 8;
-    ui->detail_list->setColumnCount(col);
+    query.last();
+    int rowCount = query.at() + 1;
+    ui->detail_list->setRowCount(rowCount);
+    const int colCount = 8;
+    ui->detail_list->setColumnCount(colCount);
 
     QStringList header;
-    header << "" << "操作时间" << "风速" << "目标温度" << "当前温度" << "操作" << "当前价格消费" << "当前能量消费";
+    header << "房间号" << "操作时间" << "风速" << "当前温度" << "目标温度" << "操作" << "当前价格消费" << "当前能量消费";
     ui->detail_list->setHorizontalHeaderLabels(header);
 
-    sql_query.first();
-    int j = 0;
+    query.first();
+    int row = 0;
     do
     {
-        qDebug() << "detailist : room id " << sql_query.value(1).toString() << " start time " << sql_query.value(2).toString();
-        for (int i = 0; i < col; i++)
+        qDebug() << "detailist : room id " << query.value(1).toString() << " start time " << query.value(2).toString();
+        for (int col = 0; col < colCount; col++)
         {
-            if (i != 5)
+            if (col != 5)
             {
-                ui->detail_list->setItem(j, i, new QTableWidgetItem(sql_query.value(i + 1).toString()));
+                ui->detail_list->setItem(row, col, new QTableWidgetItem(query.value(col + 1).toString()));
             }
             else
             {
                 QString op = "";
-                switch (sql_query.value(i + 1).toInt())
+                switch (query.value(col + 1).toInt())
                 {
-                case 1:
+                case OP_TGT_REACHED:
                     op = "到达目标温度";
                     break;
 
-                case 2:
+                case OP_TASK_MODIFIED:
                     op = "修改任务";
                     break;
 
-                case 3:
+                case OP_START_UP:
                     op = "开机";
                     break;
 
-                case 4:
+                case OP_SHUT_DOWN:
                     op = "关机";
                     break;
 
-                case 5:
+                case OP_DISCONNECTED:
                     op = "断开连接";
                     break;
 
-                case 7:
+                case OP_RES_ASSIGNED:
                     op = "给予资源";
                     break;
 
-                case 6:
+                case OP_RES_REMOVED:
                     op = "剥夺资源";
                     break;
                 }
-                ui->detail_list->setItem(j, i, new QTableWidgetItem(op));
+                ui->detail_list->setItem(row, col, new QTableWidgetItem(op));
             }
         }
-        j++;
-    } while (sql_query.next());
+        row++;
+    } while (query.next());
 }
 
 
-detailList::~detailList()
+DetailList::~DetailList()
 {
     delete ui;
-}
-
-
-void detailList::on_exit_clicked()
-{
-    this->close();
 }
