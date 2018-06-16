@@ -37,27 +37,27 @@ detailList::detailList(QSqlQuery tquery, QWidget *parent) :
                 QString op = "";
                 switch (sql_query.value(i + 1).toInt())
                 {
-                case 0:
+                case 1:
                     op = "到达目标温度";
                     break;
 
-                case 1:
+                case 2:
                     op = "修改任务";
                     break;
 
-                case 2:
+                case 3:
                     op = "开机";
                     break;
 
-                case 3:
+                case 4:
                     op = "关机";
                     break;
 
-                case 4:
+                case 5:
                     op = "断开连接";
                     break;
 
-                case 5:
+                case 7:
                     op = "给予资源";
                     break;
 

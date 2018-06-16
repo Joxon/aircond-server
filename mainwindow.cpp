@@ -5,6 +5,24 @@
 
 #define SERVER_PORT 6666
 
+bool scmp(Client *a,Client *b)
+{
+    if((int) a->getSpeed() == (int) b->getSpeed())
+    {
+        return a->getTimer() > b->getTimer();
+    }
+    return (int) a->getSpeed() < (int) b->getSpeed();
+}
+
+bool wcmp(Client *a,Client *b)
+{
+    if((int) a->getSpeed() == (int) b->getSpeed())
+    {
+        return a->getTimer() < b->getTimer();
+    }
+    return (int) a->getSpeed() > (int) b->getSpeed();
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     parent(parent),
     ui(new Ui::MainWindow)
@@ -17,7 +35,6 @@ MainWindow::MainWindow(QWidget *parent) :
     initUpdater();
     initAnimation();
     initClientPanel();
-    initAllocation();
     initNetwork();
 }
 
@@ -118,21 +135,6 @@ void MainWindow::initClientPanel()
 //      clients.append(client);
 //   }
 //   ui->clientPanel->setWidget(clients, 4);
-}
-
-
-void MainWindow::initAllocation()
-{
-    turn[0] = 1;
-    for (int i = 1; i < 4; i++)
-    {
-        turn[i] = 0;
-        SpeedList[i].clear();
-    }
-
-    rrTimer = new QTimer(this);
-    connect(rrTimer, SIGNAL(timeout()), this, SLOT(rrIncrease()));
-    rrTimer->start(999);
 }
 
 
@@ -286,7 +288,7 @@ void MainWindow::storeSockets()
             //搜索客户端列表
             int clientIdx  = 0;
             Client *client = nullptr;
-            //旧的ID，更新client
+            // 旧的ID，更新client
             while (clientIdx < clients.size())
             {
                 client = qobject_cast<Client *>(clients[clientIdx]);
@@ -317,226 +319,300 @@ void MainWindow::storeSockets()
                 client->setCurrentTemp(28);
                 client->setSocket(socket);
                 client->setTargetTemp(temp);
-                client->writeDetailedList(3);
+
+                client->setTimer(1);						// 设置等待时间60
+                client->setWarmingUp(false);
+                addIntoWaitingQueue(client);				// 加入等待队列
+                client->writeDetailedList(3);               // 开机的一个详单写入
+
                 clients.append(client);
             }
             //通告报文
             if (type == 1)
             {
-                if (client->isServing())
+                sort(waitingQueue, waitingQueue + wSize, wcmp);
+                sort(servingQueue, servingQueue + sSize, scmp);
+                if (!client->isWarmingUp() && isInServingQueue(room))
                 {
-                    client->calCost();
+                    client->calCost(temp);
                 }
                 client->setCurrentTemp(temp);
-                if (client->isTarget())
+                if(client->getSpeed() != Client::SpeedNone)
                 {
-                    client->setCurrentTemp(client->getTargetTemp());
-                    client->writeDetailedList(1);   // reach target
+                    client->setLastSpeed(client->getSpeed());
+                }
+                if(isInServingQueue(room))      // 在服务队列
+                {
+                    if(client->isWarmingUp())
+                    {   // 处于回温状态
+                        if(client->warmingUpCheck())
+                        {   // 仍在回温
+                            client->changeTimer(0);
+                        }
+                        else
+                        {   // 开启空调
+                            client->setWarmingUp(false);
+                            client->changeTimer(0);
+                        }
+                    }
+                    else if(client->isTarget())
+                    {   // 到达目标温度 移出服务队列 加入等待队列 进入回温状态
+//                        removeFromServingQueue(client);
+//                        addIntoWaitingQueue(client);
+//                        client->setWarmingUp(true);
+//                        client->setTimer(1);    // 设置计时器
+//                        // 从等待队列中加入一个
+//                        // 排序服务队列
+//                        Client * tempC = waitingQueue[0];
+//                        addIntoServingQueue(tempC);
+//                        removeFromWaitingQueue(tempC);
+
+                        // 进入回温状态
+                        client->setWarmingUp(true);
+                        client->changeTimer(0);
+                    }
+                    else
+                    {
+                        client->changeTimer(0); // 服务计时器 + 1
+                    }
+                }
+                else    // 在等待队列
+                {
+                    client->changeTimer(1);     // 等待计时器 - 1
+                    if(client->isWarmingUp() && client->warmingUpCheck()) // 回温
+                    {
+                        if(client->getTimer() <= 0)
+                            client->setTimer(1);    // 未达到回温标准，重置计时器
+                    }
+                    else if(client->getSpeed() == Client::SpeedNone && client->isWarmingUp())
+                    {
+                        client->setSpeed(client->getLastSpeed());
+                        if(client->getSpeed() == Client::SpeedHigh) // 大风
+                        {
+                            if(canSeize())
+                            {   // 可以抢占
+                                if(sSize < RES_NUM)
+                                {
+                                    removeFromWaitingQueue(client);
+                                    addIntoServingQueue(client);
+                                }
+                                else
+                                {
+                                    waitingIntoServing(client);
+                                    qDebug() << "here is first";
+                                }
+                            }
+                            else
+                            {
+                                // do nothing
+                            }
+                        }
+                        else
+                        {
+                            // do nothing
+                        }
+                    }
+                    else if(client->getTimer() <= 0)    // 计时器到了
+                    {
+                        // 替换服务队列中优先级最低的
+                        // 服务队列排序
+                        sort(servingQueue, servingQueue + sSize, scmp);
+                        if(client->isWarmingUp())   // 回温的空调进入服务队列 删除回温标记
+                            client->setWarmingUp(false);
+                        waitingIntoServing(client);
+                        qDebug() << "here is second";
+                    }
                 }
 
-//                qDebug() << DATETIME << " readFromSockets: " << type << " " << room << " " << temp;
-                if (client->isTarget())
+                if(isInServingQueue(room))
                 {
-                    // room reach the target
-                    // set wind = 0 and lastwind update
-//                    qDebug() << "speedlevel = " << (int)client->getSpeed();
-                    qDebug() << "here is target";
-                    client->setLastSpeed(client->getSpeed());
-                    client->setSpeed(0);
+                    client->setServing(Client::ServingYes);
+                    if(client->isWarmingUp())
+                        sendCommonMessage(socket, 1, 1, client->getTargetTemp(), 0, client->getCost());
+                    else
+                        sendCommonMessage(socket, 1, 1, client->getTargetTemp(), (int)client->getSpeed(), client->getCost());
+                }
+                else
+                {
+                    client->setServing(Client::ServingNo);
                     sendCommonMessage(socket, 1, 1, client->getTargetTemp(), 0, client->getCost());
-                    client->writeDetailedList(1);
-                    // remove the speedlist;
-                    int lsize = -1;
-                    for (int i = 1; i < 4; i++)
-                    {
-                        lsize = -1;
-                        if (SpeedList[i].size())
-                        {
-                            lsize = SpeedList[i].indexOf(room);
-                        }
-                        if (lsize != -1)
-                        {
-                            SpeedList[i].removeAt(lsize);
-                        }
-                    }
                 }
-                else if (client->isServing())
+
+                qDebug() << DATETIME << "Now is room--" << room;
+                qDebug() << "servingQueue:" ;
+                for(int i = 0; i < sSize; i++)
                 {
-//                    qDebug() << "give a resource to room " << room;
-                    sendCommonMessage(socket, 1, 1, client->getTargetTemp(), (int)client->getSpeed(), client->getCost());
-//                    qDebug() << DATETIME << "send message when receive common: ";
-//                    qDebug() << "\t\t\t Type : " << type << "Room : " << room << " Sitch : " << switchh;
-//                    qDebug() << "\t\t\t Temp : " << temp << "Wind : " << wind;
+                    qDebug() << "i = " << i << "room -- " << servingQueue[i]->getId();
                 }
-                else if (isInList(room) && client->isBackTemp())
+                qDebug() << "waitingQueue:";
+                for(int i = 0; i < wSize; i++)
                 {
-                    // take it to waiting list
-                    int speedLevel = client->getLastSpeed();
-//                    qDebug() << "speedlevel = " << speedLevel;
-                    if (speedLevel)
-                    {
-                        client->setSpeed(speedLevel);
-                        SpeedList[speedLevel].append(room);
-                    }
+                    qDebug() << "i = " << i << "room -- " << waitingQueue[i]->getId();
                 }
             }
             //请求报文
             else if (type == 0)
             {
                 // write detail list
-                int i = 1, si = -1;
-                QDateTime temp_t;
+
+                int lastWind = 0;
                 switch (switchh)
                 {
                 case 0:
-                    // remove from speedlist
-                    for (i = 1; i < 4; i++)
-                    {
-                        si = -1;
-                        if (SpeedList[i].size())
-                        {
-                            si = SpeedList[i].indexOf(room);
-                        }
-                        if (si != -1)
-                        {
-                            SpeedList[i].removeAt(si);
-                        }
+                    // remove from queue
+                    if(isInServingQueue(room))
+                    {   // 在服务队列里
+                        removeFromServingQueue(client);
+                    }
+                    else
+                    {   // 在等待队列里
+                        removeFromWaitingQueue(client);
                     }
                     client->setWorking(Client::WorkingNo);
-                    client->writeDetailedList(4);
+                    client->writeDetailedList(4);               // 写关机详单
                     break;
 
                 case 1:
+
                     client->setTargetTemp(temp);
-                    client->setTempState();
-                    client->setSpeed(wind);
-                    client->setLastSpeed(client->getSpeed());
-                    client->writeDetailedList(2);
-                    if (wind == 0)
+
+                    if(!client->isWorking())
                     {
-                        // remove from speedlist
-                        for (i = 1; i < 4; i++)
-                        {
-                            si = -1;
-                            if (SpeedList[i].size())
+                        client->writeDetailedList(3);           // 写开机详单
+                        if(wind == 3)
+                        {   // 判断是否可以抢占
+                            if(canSeize())
                             {
-                                si = SpeedList[i].indexOf(room);
-                            }
-                            if (si != -1)
-                            {
-                                SpeedList[i].removeAt(si);
-                            }
-                        }
-//                        client->writeDetailedList(room);
-                    }
-                    else if (wind < 4)
-                    {
-                        // update the speed list
-                        for (i = 1; i < 4; i++)
-                        {
-                            si = -1;
-                            if (i == wind)
-                            {
-                                if (SpeedList[i].size())
+                                if(sSize < RES_NUM)
                                 {
-                                    si = SpeedList[i].indexOf(room);
+                                    removeFromWaitingQueue(client);
+                                    addIntoServingQueue(client);
                                 }
-                                if (si == -1)
+                                else
                                 {
-                                    SpeedList[i].append(room);
+                                    bootIntoServing(client);
+                                    qDebug() << "here is boot";
                                 }
                             }
                             else
                             {
-                                if (SpeedList[i].size())
-                                {
-                                    si = SpeedList[i].indexOf(room);
-                                }
-                                if (si != -1)
-                                {
-                                    SpeedList[i].removeAt(si);
-                                }
+                                // do nothing
                             }
-//                            qDebug() << "SpeedListSize : " << SpeedList[i].size() << "when level = " << i;
+                        }
+                        else
+                        {
+                            if(sSize < RES_NUM)
+                            {   // 资源足够
+                                removeFromWaitingQueue(client);
+                                addIntoServingQueue(client);
+                                qDebug() << "here is third";
+                            }
+                            else
+                            {
+                                // 加入等待队列
+                                addIntoWaitingQueue(client);
+                                client->setTimer(1);
+                            }
                         }
                     }
-
-//                    temp_t = QDateTime::currentDateTime();
-//                    if (temp_t < client->getTime())
-//                    {
-//                        client->setTime(temp_t);
-//                    }
-
-//                    qDebug() << DATETIME << "client.start_t : " << client->getTime().toString("yyyy-MM-dd hh:mm:ss");
-
+                    else
+                    {
+                        if(client->isWarmingUp())   // 中断回温
+                        {
+                            client->setWarmingUp(false);
+                        }
+                        else
+                        {
+                            // do nothing
+                        }
+                        lastWind = client->getLastSpeed();
+                        if(lastWind == 0)
+                        {   // 初次启动
+                            if(sSize < RES_NUM)
+                            {   // 资源足够
+                                removeFromWaitingQueue(client);
+                                addIntoServingQueue(client);
+                                qDebug() << "here is third";
+                            }
+                        }
+                        else if(lastWind < wind)
+                        {   // 调高风
+                            if(isInServingQueue(room))
+                            {
+                                // do nothing
+                            }
+                            else    // 在等待队列里
+                            {
+                                if(wind == 3)
+                                {
+                                    // 判断是否可以抢占
+                                    if(canSeize())
+                                    {
+                                        if(sSize < RES_NUM)
+                                        {
+                                            removeFromWaitingQueue(client);
+                                            addIntoServingQueue(client);
+                                        }
+                                        else
+                                        {
+                                            waitingIntoServing(client);
+                                            qDebug() << "here is fourth";
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // do nothing
+                                    }
+                                }
+                                else
+                                {
+                                    if(sSize < RES_NUM)
+                                    {   // 资源足够
+                                        removeFromWaitingQueue(client);
+                                        addIntoServingQueue(client);
+                                        qDebug() << "here is fifth";
+                                    }
+                                }
+                            }
+                        }
+                        else if(lastWind > wind)
+                        {   // 调低风
+                            if(isInServingQueue(room))
+                            {
+                                if(lastWind == 3)
+                                {
+                                    // 查看等待队列里有没有可以抢占的
+                                    if(mayBeSeize())
+                                    {
+                                        servingIntoWaiting(client);
+                                        qDebug() << "here is sixth";
+                                    }
+                                }
+                                else
+                                {
+                                    // do nothing
+                                }
+                            }
+                            else    // 在等待队列
+                            {
+                                if(sSize < RES_NUM)
+                                {   // 资源足够
+                                    removeFromWaitingQueue(client);
+                                    addIntoServingQueue(client);
+                                    qDebug() << "here is seventh";
+                                }
+                            }
+                        }
+                    }
+                    client->setSpeed(wind);
+//                    client->setLastSpeed(client->getSpeed());
                     client->setWorking(Client::WorkingYes);
+                    client->writeDetailedList(2);               // 写请求详单
                     break;
 
                 default:
                     break;
                 }
-
-                if (client->isTarget())
-                {
-                    // room reach the target
-                    // set wind = 0 and lastwind update
-//                    qDebug() << "speedlevel = " << (int)client->getSpeed();
-                    client->setLastSpeed(client->getSpeed());
-                    client->setSpeed(0);
-                    sendCommonMessage(socket, 1, 1, client->getTargetTemp(), 0, client->getCost());
-                    // remove the speedlist;
-                    int lsize = -1;
-                    for (int i = 1; i < 4; i++)
-                    {
-                        lsize = -1;
-                        if (SpeedList[i].size())
-                        {
-                            lsize = SpeedList[i].indexOf(room);
-                        }
-                        if (lsize != -1)
-                        {
-                            SpeedList[i].removeAt(lsize);
-                        }
-                    }
-                }
-                else if (client->isServing())
-                {
-//                    qDebug() << "give a resource to room " << room;
-                    sendCommonMessage(socket, 1, 1, client->getTargetTemp(), (int)client->getSpeed(), client->getCost());
-//                    qDebug() << DATETIME << "send message when receive request: ";
-//                    qDebug() << "\t\t\t Type : " << type << "Room : " << room << " Sitch : " << switchh;
-//                    qDebug() << "\t\t\t Temp : " << temp << "Wind : " << wind;
-                }
-                else if (isInList(room) && client->isBackTemp())
-                {
-                    // take it to waiting list
-                    int speedLevel = client->getLastSpeed();
-                    qDebug() << "Speed Level = " << speedLevel;
-                    if (speedLevel)
-                    {
-                        client->setSpeed(speedLevel);
-                        SpeedList[speedLevel].append(room);
-                    }
-                }
-
-//                if (client->isServing())     // 分配成功
-//                {
-//                    qDebug() << "give one resource for room--" << room;
-//                    sendCommonMessage(socket, 1, 1, client->getCurrentTemp(), (int)client->getSpeed(), client->getCost());
-//                }
-//                else
-//                {
-//                    if (client->isTarget())
-//                    {       // 达到目标温度
-//                        qDebug() << "Room reach the target room--" << room;
-//                        sendCommonMessage(socket, 1, 0, 0, 0, 0);
-//                    }
-//                    else
-//                    {       // 未达到目标温度
-//                        qDebug() << "kill one resource for room--" << room;
-//                        sendCommonMessage(socket, 1, 0, 0, -1, 0);
-//                    }
-//                }
             }
 
             ui->clientPanel->setWidget(clients, 4);
@@ -570,171 +646,194 @@ void MainWindow::storeSockets()
             client->writeDetailedList(5);
             client->setEnergy(0);
             client->setCost(0);
-            // remove from lists;
-            for (int i = 1; i < 4; i++)
-            {
-                int lsize = -1;
-                if (SpeedList[i].size())
-                {
-                    lsize = SpeedList[i].indexOf(client->getId());
-                }
-                if (lsize != -1)
-                {
-                    SpeedList[i].removeAt(lsize);
-                }
+
+            if(isInServingQueue(client->getId()))
+            {   // 在服务队列里
+                removeFromServingQueue(client);
+            }
+            else
+            {   // 在等待队列里
+                removeFromWaitingQueue(client);
             }
         });
     }
 }
 
 
-void MainWindow::resourceAllocation()
-{
-    // 先将全部房间服务置零
-    for (int i = 0; i < clients.size(); i++)
-    {
-        Client *client = qobject_cast<Client *>(clients.at(i));
-        last_serving[i] = false;
-        if (client->isServing())
-        {
-            last_serving[i] = true;
-        }
-        client->setServing(Client::ServingNo);
-    }
 
-    int listSize = 0, resSize = RES_NUM;
-    for (int i = 3; i > 0; i--)
+
+void MainWindow::addIntoWaitingQueue(Client *tempR)
+{
+    if(isInWaitingQueue(tempR))
+        return;
+    waitingQueue[wSize++] = tempR;
+    qDebug() << "here is addIntoWaitingQueue";
+    qDebug() << "Now room is " << tempR->getId();
+    qDebug() << "servingQueue:" ;
+    for(int i = 0; i < sSize; i++)
     {
-        if (resSize <= 0)
-        {
-            break;                          // there is no resource.
-        }
-        listSize = SpeedList[i].size();
-//        qDebug() << "listSize : " << listSize << "when level = " << i;
-        if (listSize <= resSize)
-        {   // 不需要轮转 直接分配
-            for (int j = 0; j < listSize; j++)
-            {
-                QString clientID = SpeedList[i].at(j);
-                Client  *client  = nullptr;
-                for (int ii = 0; ii < clients.size(); ++ii)
-                {
-                    client = qobject_cast<Client *>(clients[ii]);
-                    if (client->getId() == clientID)
-                    {
-                        break;
-                    }
-                }
-                client->setServing(Client::ServingYes);
-            }
-        }
+        qDebug() << "i = " << i << "room -- " << servingQueue[i]->getId();
+    }
+    qDebug() << "waitingQueue:";
+    for(int i = 0; i < wSize; i++)
+    {
+        qDebug() << "i = " << i << "room -- " << waitingQueue[i]->getId();
+    }
+}
+
+void MainWindow::removeFromWaitingQueue(Client *tempR)
+{
+    int i = 0;
+    for(; i < wSize; i++)
+    {
+        if(waitingQueue[i]->getId() == tempR->getId())
+            break;
+    }
+    for(; i < wSize; i++)
+    {
+        waitingQueue[i] = waitingQueue[i+1];
+    }
+    wSize--;
+}
+
+void MainWindow::addIntoServingQueue(Client *tempR)
+{
+    servingQueue[sSize++] = tempR;
+    tempR->writeDetailedList(7);
+}
+
+void MainWindow::removeFromServingQueue(Client *tempR)
+{
+    int i = 0;
+    for(; i < sSize; i++)
+    {
+        if(servingQueue[i]->getId() == tempR->getId())
+            break;
+    }
+    for(; i < sSize; i++)
+    {
+        servingQueue[i] = servingQueue[i+1];
+    }
+    sSize--;
+}
+
+bool MainWindow::isInServingQueue(QString roomId)
+{
+    for(int i = 0; i < sSize; i++)
+    {
+        if(servingQueue[i]->getId() == roomId)
+            return true;
+    }
+    return false;
+}
+
+bool MainWindow::isInWaitingQueue(Client * tempR)
+{
+    for(int i = 0; i < wSize; i++)
+    {
+        if(waitingQueue[i]->getId() == tempR->getId())
+            return true;
+    }
+    return false;
+}
+
+bool MainWindow::canSeize()     // 只为高风准备
+{
+    if(sSize < RES_NUM)         // 留有资源
+        return true;
+    else                        // 资源已满 判断抢占
+    {
+        // 排序服务队列   优先级 低->高
+        sort(servingQueue, servingQueue + sSize, scmp);
+        if(servingQueue[0]->getSpeed() != Client::SpeedHigh)
+            return true;
         else
-        {
-            roundRobin(i, resSize);
-        }
-        resSize -= listSize;
+            return false;
     }
 }
 
-
-void MainWindow::rrIncrease()
+bool MainWindow::mayBeSeize()
 {
-    turn[0]++;
-    //qDebug() << turn[0];
-    if (turn[0] % 120 == 0)                     // RR
+    if(wSize > 0)
     {
-        for (int i = 1; i < 4; i++)
-        {
-            if (SpeedList[i].size() != 0)
-            {
-                turn[i] = (turn[i] + 1) % SpeedList[i].size();
-            }
-        }
+        // 排序等待队列 优先级 高->低
+        sort(waitingQueue, waitingQueue + wSize, wcmp);
+        if(waitingQueue[0]->getSpeed() != Client::SpeedHigh)
+            return false;
+        else
+            return true;
     }
-    resourceAllocation();
-    // send
-    for (int i = 0; i < clients.size(); i++)
-    {
-        Client *client = qobject_cast<Client *>(clients.at(i));
-
-        if (!client->isServing() && last_serving[i])
-        {     // 剥夺资源
-            if (client->isTarget() && (client->getSpeed() != Client::SpeedNone))
-            { // 达到目标温度
-                // room reach the target
-                // set wind = 0 and lastwind update
-                client->setLastSpeed(client->getSpeed());
-                client->setSpeed(0);
-                client->writeDetailedList(1);
-                sendCommonMessage(clientSockets[client->getId()], 1, 1, client->getTargetTemp(), 0, client->getCost());
-                // remove the speedlist;
-                int lsize = -1;
-                for (int i = 1; i < 4; i++)
-                {
-                    lsize = -1;
-                    if (SpeedList[i].size())
-                    {
-                        lsize = SpeedList[i].indexOf(client->getId());
-                    }
-                    if (lsize != -1)
-                    {
-                        SpeedList[i].removeAt(lsize);
-                    }
-                }
-            }
-            else
-            {   // 未达到目标温度
-                sendCommonMessage(clientSockets[client->getId()], 1, 1, client->getTargetTemp(), 0, client->getCost());
-            }
-        }
-        if (client->isServing())
-        {
-            sendCommonMessage(clientSockets[client->getId()], 1, 1, client->getTargetTemp(), int(client->getSpeed()), client->getCost());
-        }
-    }
+    return false;
 }
-
-
-void MainWindow::roundRobin(int speed, int resNum)            // 轮转
+void MainWindow::servingIntoWaiting(Client * tempR)
 {
-    int listSize = SpeedList[speed].size();
-
-    for (int i = turn[speed], j = 0; j < resNum; j++, i = (i + 1) % listSize)
+    for(int i = 0; i < sSize; i++)
     {
-        QString clientID = SpeedList[speed].at(i);
-        Client  *client  = nullptr;
-        for (int ii = 0; ii < clients.size(); ++ii)
+        if(servingQueue[i]->getId() == tempR->getId())
         {
-            client = qobject_cast<Client *>(clients[ii]);
-            if (client->getId() == clientID)
-            {
-                break;
-            }
+            servingQueue[i] = waitingQueue[0];
+            break;
         }
-        client->setServing(Client::ServingYes);
     }
+    waitingQueue[0]->writeDetailedList(7);          // 赋予资源
+    waitingQueue[0]->setTimer(0);
+    waitingQueue[0] = tempR;
+    waitingQueue[0]->setTimer(1);
+    waitingQueue[0]->writeDetailedList(6);          // 剥夺资源
 }
 
-
-bool MainWindow::isInList(QString room)
+void MainWindow::waitingIntoServing(Client * tempR)
 {
-    bool flag = true;
-
-    for (int i = 1; i < 4; i++)
+    for(int i = 0; i < wSize; i++)
     {
-        int lsize = -1;
-        if (SpeedList[i].size())
+        if(waitingQueue[i]->getId() == tempR->getId())
         {
-            lsize = SpeedList[i].indexOf(room);
-        }
-        if (lsize != -1)
-        {
-            flag = false;
+            waitingQueue[i] = servingQueue[0];
+            break;
         }
     }
-    return flag;
+    servingQueue[0]->writeDetailedList(6);          // 剥夺资源
+    servingQueue[0]->setTimer(1);
+    servingQueue[0] = tempR;
+    servingQueue[0]->setTimer(0);
+    servingQueue[0]->writeDetailedList(7);          // 赋予资源
+
+//    qDebug() << "here is waitingIntoServing";
+//    qDebug() << "Now room is " << tempR->getId();
+//    qDebug() << "servingQueue:" ;
+//    for(int i = 0; i < sSize; i++)
+//    {
+//        qDebug() << "i = " << i << "room -- " << servingQueue[i]->getId();
+//    }
+//    qDebug() << "waitingQueue:";
+//    for(int i = 0; i < wSize; i++)
+//    {
+//        qDebug() << "i = " << i << "room -- " << waitingQueue[i]->getId();
+//    }
 }
 
+void MainWindow::bootIntoServing(Client * tempR)
+{
+    addIntoWaitingQueue(servingQueue[0]);
+    servingQueue[0]->writeDetailedList(6);          // 剥夺资源
+    servingQueue[0]->setTimer(1);
+    servingQueue[0] = tempR;
+    servingQueue[0]->setTimer(0);
+    servingQueue[0]->writeDetailedList(7);          // 赋予资源
+
+//    qDebug() << "here is bootIntoServing";
+//    qDebug() << "Now room is " << tempR->getId();
+//    qDebug() << "servingQueue:" ;
+//    for(int i = 0; i < sSize; i++)
+//    {
+//        qDebug() << "i = " << i << "room -- " << servingQueue[i]->getId();
+//    }
+//    qDebug() << "waitingQueue:";
+//    for(int i = 0; i < wSize; i++)
+//    {
+//        qDebug() << "i = " << i << "room -- " << waitingQueue[i]->getId();
+//    }
+}
 
 void MainWindow::sendRequestMessage(QTcpSocket *socket, int type, int isServed)
 {
@@ -786,21 +885,18 @@ void MainWindow::sendCommonMessage(QTcpSocket *tsock, int type, int switchh, dou
         }
     }
 
-    qDebug() << DATETIME << "sendCommonMessage: Type:" << type
-             << "Room : " << client->getId() << " Switch:" << switchh
-             << "\t Temp:" << temp << " Wind:" << wind
-             << " cost:" << cost;
-    if (wind != client->getSpeed())
-    {
-        if (wind > 0)
-        {
-            client->writeDetailedList(6);
-        }
-        else
-        {
-            client->writeDetailedList(7);
-        }
-    }
+//    qDebug() << DATETIME << "sendCommonMessage: Type:" << type
+//             << "Room : " << client->getId() << " Switch:" << switchh
+//             << "\n\t\t Temp:" << temp << " Wind:" << wind
+//             << " cost:" << cost;
+
+//    if(wind != client->getSpeed())
+//    {
+//        if(wind > 0)
+//            client->writeDetailedList(6);
+//        else
+//            client->writeDetailedList(7);
+//    }
 
     QJsonDocument document;
     document.setObject(json);

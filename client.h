@@ -64,6 +64,9 @@ public:
     void setStartTime();
     void setSocket(QTcpSocket *s);
     void setTempState();
+    void setTimer(int status);
+    void changeTimer(int status);
+    int getTimer();
 
     QString getId();
     int getLastSpeed();
@@ -76,12 +79,15 @@ public:
 //    void setTime(QDateTime time);                      // 设置start_t;
     QTcpSocket *getSocket() const;
 
-    void calCost();    // 计算价格
+    void calCost(double unitPrice);                        // 计算价格
     bool isServing();  // 判断服务
     bool isWorking();  // 判断工作
     bool isTarget();   // 达到目标
     bool isBackTemp(); // 正在回温
     bool hasWind();    // 判断风速
+    bool isWarmingUp();                                 // 返回回温状态
+    void setWarmingUp(bool status);                     // 设置回温状态
+    bool warmingUpCheck();                              // 回温的判断
 
 public slots:
     void writeDetailedList(int option);            // 写入数据库
@@ -107,9 +113,12 @@ private:
     Speed lastSpeed;         // 上次风速
     double energy;           // 消耗的能量
     double cost;             // 费用
-    bool tempState;          // 趋近关系 true 下 false 上
-    QDateTime costStartTime; // 计费开启时间
-    QDateTime connStartTime; // 连接开启时间
+//    bool tempState;          // 趋近关系 true 下 false 上
+    bool warmingUp;
+//    QDateTime costStartTime; // 计费开启时间
+    QDateTime connStartTime;    // 连接开启时间
+
+    int timer;                  // 计时器
 
     QTcpSocket *socket;
 };
