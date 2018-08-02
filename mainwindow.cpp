@@ -51,6 +51,7 @@ MainWindow::~MainWindow()
 
     delete server;
     delete rrTimer;
+    delete updateTimer;
 }
 
 
